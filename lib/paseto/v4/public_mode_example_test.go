@@ -20,7 +20,7 @@ func ExamplePublicMode() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pmode := NewPublicMode(seed)
+	pmode := NewPublicMode([32]byte(seed))
 
 	plain := []byte(`{"data":"signed message!"}`)
 	footer := []byte(`{"kid":1000}`)
@@ -54,7 +54,7 @@ func ExamplePublicMode_Pack() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		pmode = NewPublicMode(seed)
+		pmode = NewPublicMode([32]byte(seed))
 		peer = paseto.Peer{
 			ID:      id,
 			Private: pmode.PrivateKey,
@@ -110,7 +110,7 @@ func ExamplePublicMode_Unpack() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		pmode = NewPublicMode(seed)
+		pmode = NewPublicMode([32]byte(seed))
 		peer = paseto.Peer{
 			ID:      id,
 			Private: pmode.PrivateKey,

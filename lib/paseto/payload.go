@@ -15,11 +15,11 @@ const DriftSeconds = 5
 
 // List of errors for [Payload.Validate].
 var (
-	ErrUnknownIssuer   = errors.New(`unknown issuer`)
-	ErrUnknownSubject  = errors.New(`unknown subject`)
-	ErrInvalidAudience = errors.New(`invalid audience`)
-	ErrExpired         = errors.New(`expired`)
-	ErrNotBeforeAfter  = errors.New(`not-before is after current time`)
+	ErrPayloadIssuer    = errors.New(`unknown issuer`)
+	ErrPayloadSubject   = errors.New(`unknown subject`)
+	ErrPayloadAudience  = errors.New(`invalid audience`)
+	ErrPayloadExpired   = errors.New(`expired`)
+	ErrPayloadNotBefore = errors.New(`payload cannot be used yet`)
 )
 
 // Payload represents the data and claims.
@@ -79,16 +79,16 @@ func (pload *Payload) Validate(recvID string, sender Peer) (err error) {
 
 	now := time.Now().UTC().Unix()
 	if pload.Issuer != sender.ID {
-		return fmt.Errorf(`%s: %w`, logp, ErrUnknownIssuer)
+		return fmt.Errorf(`%s: %w`, logp, ErrPayloadIssuer)
 	}
 	if len(sender.AllowedSubjects) != 0 {
 		_, ok := sender.AllowedSubjects[pload.Subject]
 		if !ok {
-			return fmt.Errorf(`%s: %w`, logp, ErrUnknownSubject)
+			return fmt.Errorf(`%s: %w`, logp, ErrPayloadSubject)
 		}
 	}
 	if len(recvID) != 0 && pload.Audience != recvID {
-		return fmt.Errorf(`%s: %w`, logp, ErrInvalidAudience)
+		return fmt.Errorf(`%s: %w`, logp, ErrPayloadAudience)
 	}
 	if pload.ExpiredAt != 0 {
 		diff := pload.ExpiredAt - now
@@ -97,7 +97,7 @@ func (pload *Payload) Validate(recvID string, sender Peer) (err error) {
 			diff *= -1
 		}
 		if diff > DriftSeconds {
-			return fmt.Errorf(`%s: %w`, logp, ErrExpired)
+			return fmt.Errorf(`%s: %w`, logp, ErrPayloadExpired)
 		}
 	}
 	if pload.NotBefore != 0 {
@@ -106,7 +106,7 @@ func (pload *Payload) Validate(recvID string, sender Peer) (err error) {
 			diff *= -1
 		}
 		if diff > DriftSeconds {
-			return fmt.Errorf(`%s: %w`, logp, ErrNotBeforeAfter)
+			return fmt.Errorf(`%s: %w`, logp, ErrPayloadNotBefore)
 		}
 	}
 	return nil

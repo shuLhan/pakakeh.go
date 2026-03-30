@@ -21,6 +21,8 @@ const publicHeader = `v4.public.`
 // List of errors for [PublicMode.Unpack] and [PublicMode.Verify].
 var (
 	ErrSignature = errors.New(`invalid signature`)
+	ErrPeerID    = errors.New(`invalid or empty peer ID`)
+	ErrPublicKey = errors.New(`invalid or empty public key`)
 )
 
 // PublicMode contains ed25519 private and public key for signing and
@@ -35,11 +37,11 @@ type PublicMode struct {
 }
 
 // NewPublicMode returns new instance of public mode from ed25519 seeds.
-func NewPublicMode(seed []byte) (pmode *PublicMode) {
+func NewPublicMode(seed [ed25519.SeedSize]byte) (pmode *PublicMode) {
 	pmode = &PublicMode{
 		peers: make(map[string]paseto.Peer),
 	}
-	pmode.PrivateKey = ed25519.NewKeyFromSeed(seed)
+	pmode.PrivateKey = ed25519.NewKeyFromSeed(seed[:])
 	pmode.PublicKey = pmode.PrivateKey.Public().(ed25519.PublicKey)
 	return pmode
 }
@@ -48,11 +50,12 @@ func NewPublicMode(seed []byte) (pmode *PublicMode) {
 // token.
 // The only required fields in [paseto.Peer] is ID and Public.
 func (pmode *PublicMode) AddPeer(peer paseto.Peer) (err error) {
+	logp := `AddPeer`
 	if len(peer.ID) == 0 {
-		return errors.New(`empty peer ID`)
+		return fmt.Errorf(`%s: %w`, logp, ErrPeerID)
 	}
 	if len(peer.Public) == 0 {
-		return errors.New(`empty public key`)
+		return fmt.Errorf(`%s: %w`, logp, ErrPeerID)
 	}
 	pmode.Lock()
 	pmode.peers[peer.ID] = peer
@@ -161,7 +164,7 @@ func (pmode *PublicMode) Unpack(token string, implicit []byte, msg *paseto.Messa
 	}
 	sender, ok := pmode.GetPeer(msg.Footer.PeerID)
 	if !ok {
-		return fmt.Errorf(`%s: unknown peer ID %s`, logp, msg.Footer.PeerID)
+		return fmt.Errorf(`%s: %w %s`, logp, ErrPeerID, msg.Footer.PeerID)
 	}
 
 	if !ed25519.Verify(sender.Public, msg.PAE, msg.Sig) {
