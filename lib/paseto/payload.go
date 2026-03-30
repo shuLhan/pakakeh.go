@@ -11,7 +11,9 @@ import (
 
 // DriftSeconds defines the time differences in seconds allowed in
 // [Payload.ExpiredAt] and [Payload.NotBefore].
-const DriftSeconds = 5
+// This value can be changes to increases or decreases the leeway during
+// [Payload.Validate].
+var DriftSeconds int64 = 5
 
 // List of errors for [Payload.Validate].
 var (
