@@ -1,33 +1,54 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2026 M. Shulhan <ms@kilabit.info>
 
-package pasetov4
+package pasetov4_test
 
 import (
-	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
-	"strings"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+	pasetov4 "git.sr.ht/~shulhan/pakakeh.go/lib/paseto/v4"
 )
 
-func ExamplePublicMode() {
+func ExamplePublicMode_Sign() {
 	secret := `b4cbfb43df4ce210727d953e4a713307fa19bb7d9f85041438d9e11b942a3774`
 	seed, err := hex.DecodeString(secret)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pmode := NewPublicMode([32]byte(seed))
+	pmode := pasetov4.NewPublicMode([32]byte(seed))
 
-	plain := []byte(`{"data":"signed message!"}`)
-	footer := []byte(`{"kid":1000}`)
-	token, err := pmode.Sign(plain, footer, nil)
+	payload := []byte(`{"data":"signed message!"}`)
+	footer := []byte(`{"peer_id":1000}`)
+
+	token, err := pmode.Sign(payload, footer, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	msg := paseto.Message{}
+	msg.Unpack(pasetov4.PublicHeader, token, nil)
+
+	fmt.Printf("Payload: %s\n", msg.RawPayload)
+	fmt.Printf("Footer: %s\n", msg.RawFooter)
+
+	// Output:
+	// Payload: {"data":"signed message!"}
+	// Footer: {"peer_id":1000}
+}
+
+func ExamplePublicMode_Verify() {
+	secret := `b4cbfb43df4ce210727d953e4a713307fa19bb7d9f85041438d9e11b942a3774`
+	seed, err := hex.DecodeString(secret)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pmode := pasetov4.NewPublicMode([32]byte(seed))
+
+	token := `v4.public.eyJkYXRhIjoic2lnbmVkIG1lc3NhZ2UhIn0kqxCoccpjcXj3jNt6Q8cafIIF2JpapJrFNWi0mBJKS-Q3IU4dXZx-_Qx3P7LtSPnHyu6deqdeg72jb6hTCz4E.eyJwZWVyX2lkIjoxMDAwfQ`
 
 	gotPlain, gotFooter, err := pmode.Verify(token, nil)
 	if err != nil {
@@ -38,23 +59,18 @@ func ExamplePublicMode() {
 
 	// Output:
 	// {"data":"signed message!"}
-	// {"kid":1000}
-}
-
-type DummyData struct {
-	Email string `json:"email"`
-}
-type DummyFooterData struct {
-	Quote string `json:"quote"`
+	// {"peer_id":1000}
 }
 
 func ExamplePublicMode_Pack() {
-	createPeer := func(id, secret string) (peer paseto.Peer, pmode *PublicMode) {
+	createPeer := func(id, secret string) (
+		peer paseto.Peer, pmode *pasetov4.PublicMode,
+	) {
 		seed, err := hex.DecodeString(secret)
 		if err != nil {
 			log.Fatal(err)
 		}
-		pmode = NewPublicMode([32]byte(seed))
+		pmode = pasetov4.NewPublicMode([32]byte(seed))
 		peer = paseto.Peer{
 			ID:      id,
 			Private: pmode.PrivateKey,
@@ -72,11 +88,11 @@ func ExamplePublicMode_Pack() {
 	)
 
 	sendMsg := paseto.NewMessage(sender, receiver, `hello`)
-	sendMsg.Payload.Data = DummyData{
-		Email: `hello@example.com`,
+	sendMsg.Payload.Data = map[string]string{
+		`email`: `hello@example.com`,
 	}
-	sendMsg.Footer.Data = DummyFooterData{
-		Quote: `Live to eat`,
+	sendMsg.Footer.Data = map[string]string{
+		`quote`: `Live to eat`,
 	}
 
 	token, err := senderpm.Pack(*sendMsg, nil)
@@ -84,33 +100,28 @@ func ExamplePublicMode_Pack() {
 		log.Fatal(err)
 	}
 
-	pieces := strings.Split(token, `.`)
-	fmt.Printf("Header: %s.%s\n", pieces[0], pieces[1])
+	msg := paseto.Message{}
+	msg.Unpack(pasetov4.PublicHeader, token, nil)
 
-	paysig, _ := base64.RawURLEncoding.DecodeString(pieces[2])
-	payload := paysig[:len(paysig)-64]
-	pdata := paseto.Payload{
-		Data: &DummyData{},
-	}
-	_ = json.Unmarshal(payload, &pdata)
+	pdata := paseto.Payload{}
+	_ = json.Unmarshal(msg.RawPayload, &pdata)
 	fmt.Printf("Payload.Data: %+v\n", pdata.Data)
-
-	footer, _ := base64.RawURLEncoding.DecodeString(pieces[3])
-	fmt.Printf("Footer: %s", footer)
+	fmt.Printf("Footer: %s", msg.RawFooter)
 
 	// Output:
-	// Header: v4.public
-	// Payload.Data: &{Email:hello@example.com}
+	// Payload.Data: map[email:hello@example.com]
 	// Footer: {"data":{"quote":"Live to eat"},"peer_id":"john@example.com"}
 }
 
 func ExamplePublicMode_Unpack() {
-	createPeer := func(id, secret string) (peer paseto.Peer, pmode *PublicMode) {
+	createPeer := func(id, secret string) (
+		peer paseto.Peer, pmode *pasetov4.PublicMode,
+	) {
 		seed, err := hex.DecodeString(secret)
 		if err != nil {
 			log.Fatal(err)
 		}
-		pmode = NewPublicMode([32]byte(seed))
+		pmode = pasetov4.NewPublicMode([32]byte(seed))
 		peer = paseto.Peer{
 			ID:      id,
 			Private: pmode.PrivateKey,
@@ -126,27 +137,22 @@ func ExamplePublicMode_Unpack() {
 		`jane@example.org`,
 		`2222222222222222222222222222222222222222222222222222222222222222`,
 	)
+
+	// Add the sender to list of receiver's peer.
 	recvpm.AddPeer(sender)
 
-	token := `v4.public.eyJpc3MiOiJqb2huQGV4YW1wbGUuY29tIiwic3ViIjoiaGVsbG8iLCJhdWQiOiJqYW5lQGV4YW1wbGUub3JnIiwiZXhwIjoxNzc0ODE5NzYzLCJuYmYiOjE3NzQ4MTk3MDMsImlhdCI6MTc3NDgxOTcwMywiZGF0YSI6eyJlbWFpbCI6ImhlbGxvQGV4YW1wbGUuY29tIn19Ui741xeDUhQE2w31smKyAJ_d-fhMH20SRLkIY3lDbIBfj_tq7es9-H2wQR3q6EZZRPrlAPxEug712IEgomTnBA.eyJkYXRhIjp7InF1b3RlIjoiTGlmZSBpcyBmb3IgZWF0aW5nIn0sInBlZXJfaWQiOiJqb2huQGV4YW1wbGUuY29tIn0`
-	pdata := DummyData{}
-	fdata := DummyFooterData{}
-	recvMsg := paseto.Message{
-		Payload: paseto.Payload{
-			Data: &pdata,
-		},
-		Footer: paseto.Footer{
-			Data: &fdata,
-		},
-	}
+	// This is the token send by sender.
+	token := `v4.public.eyJkYXRhIjp7ImVtYWlsIjoiaGVsbG9AZXhhbXBsZS5jb20ifSwiaXNzIjoiam9obkBleGFtcGxlLmNvbSIsInN1YiI6ImhlbGxvIiwiYXVkIjoiamFuZUBleGFtcGxlLm9yZyIsImV4cCI6MTc3NDg1OTg4OSwibmJmIjoxNzc0ODU5ODI5LCJpYXQiOjE3NzQ4NTk4Mjl9eGHMkOlYiVchKl1GqQwSMyTC8eWCpXhNJHGHq_MEJNqlKur-kPpHqY-hWHoh4I1RaBq68MN_TNveqwPIbk9iBQ.eyJkYXRhIjp7InF1b3RlIjoiTGl2ZSB0byBlYXQifSwicGVlcl9pZCI6ImpvaG5AZXhhbXBsZS5jb20ifQ`
+
+	recvMsg := paseto.Message{}
 	err := recvpm.Unpack(token, nil, &recvMsg)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%+v\n", recvMsg.Payload.Data)
-	fmt.Printf("%+v\n", recvMsg.Footer.Data)
+	fmt.Printf("Payload.Data: %+v\n", recvMsg.Payload.Data)
+	fmt.Printf("Footer: %+v\n", recvMsg.Footer)
 
 	// Output:
-	// &{Email:hello@example.com}
-	// &{Quote:Life is for eating}
+	// Payload.Data: map[email:hello@example.com]
+	// Footer: {Data:map[quote:Live to eat] PeerID:john@example.com}
 }

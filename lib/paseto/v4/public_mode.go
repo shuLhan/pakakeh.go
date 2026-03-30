@@ -16,7 +16,8 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
 )
 
-const publicHeader = `v4.public.`
+// PublicHeader defines the public header in generated token.
+const PublicHeader = `v4.public.`
 
 // List of errors for [PublicMode.Unpack] and [PublicMode.Verify].
 var (
@@ -25,8 +26,10 @@ var (
 	ErrPublicKey = errors.New(`invalid or empty public key`)
 )
 
-// PublicMode contains ed25519 private and public key for signing and
-// verifying message.
+// PublicMode represents paseto v4 public protocol.
+// It contains ed25519 private and public key for signing and
+// verifying message, and list of known peers for verifying the peer's
+// message.
 type PublicMode struct {
 	peers map[string]paseto.Peer
 
@@ -112,7 +115,7 @@ func (pmode *PublicMode) Sign(payload, footer, implicit []byte) (
 	logp := `Sign`
 
 	// Step 3: pack header, message, footer, and implicit.
-	pae, err := paseto.PreAuthEncode([]byte(publicHeader),
+	pae, err := paseto.PreAuthEncode([]byte(PublicHeader),
 		payload, footer, implicit)
 	if err != nil {
 		return ``, fmt.Errorf(`%s: %w`, logp, err)
@@ -124,7 +127,7 @@ func (pmode *PublicMode) Sign(payload, footer, implicit []byte) (
 	// Step 5: Pack all into token,
 	var buf bytes.Buffer
 
-	buf.WriteString(publicHeader)
+	buf.WriteString(PublicHeader)
 
 	paysig := slices.Concat(payload, sig)
 	n := base64.RawURLEncoding.EncodedLen(len(paysig))
@@ -153,7 +156,7 @@ func (pmode *PublicMode) Unpack(token string, implicit []byte, msg *paseto.Messa
 ) {
 	logp := `Unpack`
 
-	err = msg.Unpack(publicHeader, token, implicit)
+	err = msg.Unpack(PublicHeader, token, implicit)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -188,7 +191,7 @@ func (pmode *PublicMode) Verify(token string, implicit []byte) (
 	logp := `Verify`
 	msg := &paseto.Message{}
 
-	err = msg.Unpack(publicHeader, token, implicit)
+	err = msg.Unpack(PublicHeader, token, implicit)
 	if err != nil {
 		return nil, nil, fmt.Errorf(`%s: %w`, logp, err)
 	}

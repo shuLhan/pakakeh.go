@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2026 M. Shulhan <ms@kilabit.info>
 
-package pasetov4
+package pasetov4_test
 
 import (
 	"encoding/hex"
 	"fmt"
 	"log"
+
+	pasetov4 "git.sr.ht/~shulhan/pakakeh.go/lib/paseto/v4"
 )
 
 func ExampleLocalMode() {
@@ -15,7 +17,7 @@ func ExampleLocalMode() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lmode := NewLocalMode([32]byte(key))
+	lmode := pasetov4.NewLocalMode([32]byte(key))
 	plain := []byte(`{"data":"Hello, secret!"}`)
 	footer := []byte(`{"kid":1000}`)
 	token, err := lmode.Encrypt(plain, footer, nil)
