@@ -59,7 +59,7 @@ func TestPublicMode_Sign(t *testing.T) {
 			}()
 
 			tc.init()
-			pmode := NewPublicMode([32]byte(tc.seed))
+			pmode := NewPublicMode(`testsign`, [32]byte(tc.seed))
 			gotToken, err := pmode.Sign([]byte(tc.Payload), []byte(tc.Footer),
 				[]byte(tc.Implicit))
 			if err != nil {
@@ -96,7 +96,7 @@ func TestPublicMode_Verify(t *testing.T) {
 			}()
 
 			tc.init()
-			pmode := NewPublicMode([32]byte(tc.seed))
+			pmode := NewPublicMode(`testverify`, [32]byte(tc.seed))
 			gotMsg, gotFooter, err := pmode.Verify(tc.Token, []byte(tc.Implicit))
 			if err != nil {
 				if tc.ExpectFail {

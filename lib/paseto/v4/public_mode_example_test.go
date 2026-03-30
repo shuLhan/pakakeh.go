@@ -19,7 +19,7 @@ func ExamplePublicMode_Sign() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pmode := pasetov4.NewPublicMode([32]byte(seed))
+	pmode := pasetov4.NewPublicMode(`testsign`, [32]byte(seed))
 
 	payload := []byte(`{"data":"signed message!"}`)
 	footer := []byte(`{"peer_id":1000}`)
@@ -46,7 +46,7 @@ func ExamplePublicMode_Verify() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pmode := pasetov4.NewPublicMode([32]byte(seed))
+	pmode := pasetov4.NewPublicMode(`testverify`, [32]byte(seed))
 
 	token := `v4.public.eyJkYXRhIjoic2lnbmVkIG1lc3NhZ2UhIn0kqxCoccpjcXj3jNt6Q8cafIIF2JpapJrFNWi0mBJKS-Q3IU4dXZx-_Qx3P7LtSPnHyu6deqdeg72jb6hTCz4E.eyJwZWVyX2lkIjoxMDAwfQ`
 
@@ -63,31 +63,24 @@ func ExamplePublicMode_Verify() {
 }
 
 func ExamplePublicMode_Pack() {
-	createPeer := func(id, secret string) (
-		peer paseto.Peer, pmode *pasetov4.PublicMode,
-	) {
+	createPeerMode := func(id, secret string) (pmode *pasetov4.PublicMode) {
 		seed, err := hex.DecodeString(secret)
 		if err != nil {
 			log.Fatal(err)
 		}
-		pmode = pasetov4.NewPublicMode([32]byte(seed))
-		peer = paseto.Peer{
-			ID:      id,
-			Private: pmode.PrivateKey,
-			Public:  pmode.PublicKey,
-		}
-		return peer, pmode
+		pmode = pasetov4.NewPublicMode(id, [32]byte(seed))
+		return pmode
 	}
-	sender, senderpm := createPeer(
+	senderpm := createPeerMode(
 		`john@example.com`,
 		`b4cbfb43df4ce210727d953e4a713307fa19bb7d9f85041438d9e11b942a3774`,
 	)
-	receiver, _ := createPeer(
+	receivpm := createPeerMode(
 		`jane@example.org`,
 		`2222222222222222222222222222222222222222222222222222222222222222`,
 	)
 
-	sendMsg := paseto.NewMessage(sender, receiver, `hello`)
+	sendMsg := paseto.NewMessage(senderpm.Peer, receivpm.Peer, `hello`)
 	sendMsg.Payload.Data = map[string]string{
 		`email`: `hello@example.com`,
 	}
@@ -114,38 +107,33 @@ func ExamplePublicMode_Pack() {
 }
 
 func ExamplePublicMode_Unpack() {
-	createPeer := func(id, secret string) (
-		peer paseto.Peer, pmode *pasetov4.PublicMode,
+	createPeerMode := func(id, secret string) (
+		pmode *pasetov4.PublicMode,
 	) {
 		seed, err := hex.DecodeString(secret)
 		if err != nil {
 			log.Fatal(err)
 		}
-		pmode = pasetov4.NewPublicMode([32]byte(seed))
-		peer = paseto.Peer{
-			ID:      id,
-			Private: pmode.PrivateKey,
-			Public:  pmode.PublicKey,
-		}
-		return peer, pmode
+		pmode = pasetov4.NewPublicMode(id, [32]byte(seed))
+		return pmode
 	}
-	sender, _ := createPeer(
+	senderpm := createPeerMode(
 		`john@example.com`,
 		`b4cbfb43df4ce210727d953e4a713307fa19bb7d9f85041438d9e11b942a3774`,
 	)
-	_, recvpm := createPeer(
+	receivpm := createPeerMode(
 		`jane@example.org`,
 		`2222222222222222222222222222222222222222222222222222222222222222`,
 	)
 
 	// Add the sender to list of receiver's peer.
-	recvpm.AddPeer(sender)
+	receivpm.AddPeer(senderpm.Peer)
 
 	// This is the token send by sender.
 	token := `v4.public.eyJkYXRhIjp7ImVtYWlsIjoiaGVsbG9AZXhhbXBsZS5jb20ifSwiaXNzIjoiam9obkBleGFtcGxlLmNvbSIsInN1YiI6ImhlbGxvIiwiYXVkIjoiamFuZUBleGFtcGxlLm9yZyIsImV4cCI6MTc3NDg1OTg4OSwibmJmIjoxNzc0ODU5ODI5LCJpYXQiOjE3NzQ4NTk4Mjl9eGHMkOlYiVchKl1GqQwSMyTC8eWCpXhNJHGHq_MEJNqlKur-kPpHqY-hWHoh4I1RaBq68MN_TNveqwPIbk9iBQ.eyJkYXRhIjp7InF1b3RlIjoiTGl2ZSB0byBlYXQifSwicGVlcl9pZCI6ImpvaG5AZXhhbXBsZS5jb20ifQ`
 
 	recvMsg := paseto.Message{}
-	err := recvpm.Unpack(token, nil, &recvMsg)
+	err := receivpm.Unpack(token, nil, &recvMsg)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -33,19 +33,24 @@ var (
 type PublicMode struct {
 	peers map[string]paseto.Peer
 
-	PrivateKey ed25519.PrivateKey
-	PublicKey  ed25519.PublicKey
+	paseto.Peer
 
 	sync.Mutex
 }
 
 // NewPublicMode returns new instance of public mode from ed25519 seeds.
-func NewPublicMode(seed [ed25519.SeedSize]byte) (pmode *PublicMode) {
+// The id parameter is required when processing [paseto.Message] with
+// [PublicMode.Pack] and [PublicMode.Unpack], but optional when processing
+// payload with [PublicMode.Sign] and [PublicMode.Verify].
+func NewPublicMode(id string, seed [ed25519.SeedSize]byte) (pmode *PublicMode) {
 	pmode = &PublicMode{
 		peers: make(map[string]paseto.Peer),
+		Peer: paseto.Peer{
+			ID:      id,
+			Private: ed25519.NewKeyFromSeed(seed[:]),
+		},
 	}
-	pmode.PrivateKey = ed25519.NewKeyFromSeed(seed[:])
-	pmode.PublicKey = pmode.PrivateKey.Public().(ed25519.PublicKey)
+	pmode.Public = pmode.Private.Public().(ed25519.PublicKey)
 	return pmode
 }
 
@@ -66,7 +71,7 @@ func (pmode *PublicMode) AddPeer(peer paseto.Peer) (err error) {
 	return nil
 }
 
-// GetPeer returns the Peer and true if ID found in list of peers.
+// GetPeer returns the Peer and true if ID found in list of known peers.
 func (pmode *PublicMode) GetPeer(id string) (peer paseto.Peer, ok bool) {
 	pmode.Lock()
 	peer, ok = pmode.peers[id]
@@ -122,7 +127,7 @@ func (pmode *PublicMode) Sign(payload, footer, implicit []byte) (
 	}
 
 	// Step 4: Sign pae.
-	sig := ed25519.Sign(pmode.PrivateKey, pae)
+	sig := ed25519.Sign(pmode.Peer.Private, pae)
 
 	// Step 5: Pack all into token,
 	var buf bytes.Buffer
@@ -197,7 +202,7 @@ func (pmode *PublicMode) Verify(token string, implicit []byte) (
 	}
 
 	// Step 6: Verify the signature.
-	if !ed25519.Verify(pmode.PublicKey, msg.PAE, msg.Sig) {
+	if !ed25519.Verify(pmode.Peer.Public, msg.PAE, msg.Sig) {
 		return nil, nil, fmt.Errorf(`%s: %w`, logp, ErrSignature)
 	}
 
