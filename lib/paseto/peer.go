@@ -18,8 +18,8 @@ type Peer struct {
 	ID string
 
 	// PrivateKey for signing message.
-	Private ed25519.PrivateKey
+	PrivateKey ed25519.PrivateKey
 
 	// PublicKey for verifying message.
-	Public ed25519.PublicKey
+	PublicKey ed25519.PublicKey
 }

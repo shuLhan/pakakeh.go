@@ -18,9 +18,9 @@ func ExamplePublicMode() {
 	senderSK, _ := hex.DecodeString("e9ae9c7eae2fce6fd6727b5ca8df0fbc0aa60a5ffb354d4fdee1729e4e1463688d2160a4dc71a9a697d6ad6424da3f9dd18a259cdd51b0ae2b521e998b82d36e")
 	senderPK, _ := hex.DecodeString("8d2160a4dc71a9a697d6ad6424da3f9dd18a259cdd51b0ae2b521e998b82d36e")
 	senderKey := paseto.Peer{
-		ID:      "sender",
-		Private: ed25519.PrivateKey(senderSK),
-		Public:  ed25519.PublicKey(senderPK),
+		ID:         `sender`,
+		PrivateKey: ed25519.PrivateKey(senderSK),
+		PublicKey:  ed25519.PublicKey(senderPK),
 		AllowedSubjects: map[string]struct{}{
 			subjectMessage: struct{}{},
 		},
@@ -29,9 +29,9 @@ func ExamplePublicMode() {
 	receiverSK, _ := hex.DecodeString("4983da648bff1fd3e1892df9c56370215aa640829a5cab02d6616b115fa0bc5707c22e74ab9b181f8d87bdf03cf88476ec4c35e5517e173f236592f6695d59f5")
 	receiverPK, _ := hex.DecodeString("07c22e74ab9b181f8d87bdf03cf88476ec4c35e5517e173f236592f6695d59f5")
 	receiverKey := paseto.Peer{
-		ID:      "receiver",
-		Private: ed25519.PrivateKey(receiverSK),
-		Public:  ed25519.PublicKey(receiverPK),
+		ID:         `receiver`,
+		PrivateKey: ed25519.PrivateKey(receiverSK),
+		PublicKey:  ed25519.PublicKey(receiverPK),
 	}
 
 	//

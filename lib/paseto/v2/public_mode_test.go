@@ -19,9 +19,9 @@ func TestPublicMode_UnpackHTTPRequest(t *testing.T) {
 	senderSK, _ := hex.DecodeString("e9ae9c7eae2fce6fd6727b5ca8df0fbc0aa60a5ffb354d4fdee1729e4e1463688d2160a4dc71a9a697d6ad6424da3f9dd18a259cdd51b0ae2b521e998b82d36e")
 	senderPK, _ := hex.DecodeString("8d2160a4dc71a9a697d6ad6424da3f9dd18a259cdd51b0ae2b521e998b82d36e")
 	ourKey := paseto.Peer{
-		ID:      "sender",
-		Private: ed25519.PrivateKey(senderSK),
-		Public:  ed25519.PublicKey(senderPK),
+		ID:         "sender",
+		PrivateKey: ed25519.PrivateKey(senderSK),
+		PublicKey:  ed25519.PublicKey(senderPK),
 		AllowedSubjects: map[string]struct{}{
 			subjectMessage: struct{}{},
 		},

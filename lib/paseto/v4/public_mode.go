@@ -46,11 +46,11 @@ func NewPublicMode(id string, seed [ed25519.SeedSize]byte) (pmode *PublicMode) {
 	pmode = &PublicMode{
 		peers: make(map[string]paseto.Peer),
 		Peer: paseto.Peer{
-			ID:      id,
-			Private: ed25519.NewKeyFromSeed(seed[:]),
+			ID:         id,
+			PrivateKey: ed25519.NewKeyFromSeed(seed[:]),
 		},
 	}
-	pmode.Public = pmode.Private.Public().(ed25519.PublicKey)
+	pmode.PublicKey = pmode.PrivateKey.Public().(ed25519.PublicKey)
 	return pmode
 }
 
@@ -62,7 +62,7 @@ func (pmode *PublicMode) AddPeer(peer paseto.Peer) (err error) {
 	if len(peer.ID) == 0 {
 		return fmt.Errorf(`%s: %w`, logp, ErrPeerID)
 	}
-	if len(peer.Public) == 0 {
+	if len(peer.PublicKey) == 0 {
 		return fmt.Errorf(`%s: %w`, logp, ErrPeerID)
 	}
 	pmode.Lock()
@@ -127,7 +127,7 @@ func (pmode *PublicMode) Sign(payload, footer, implicit []byte) (
 	}
 
 	// Step 4: Sign pae.
-	sig := ed25519.Sign(pmode.Peer.Private, pae)
+	sig := ed25519.Sign(pmode.Peer.PrivateKey, pae)
 
 	// Step 5: Pack all into token,
 	var buf bytes.Buffer
@@ -175,7 +175,7 @@ func (pmode *PublicMode) Unpack(token string, implicit []byte, msg *paseto.Messa
 		return fmt.Errorf(`%s: %w %s`, logp, ErrPeerID, msg.Footer.PeerID)
 	}
 
-	if !ed25519.Verify(sender.Public, msg.PAE, msg.Sig) {
+	if !ed25519.Verify(sender.PublicKey, msg.PAE, msg.Sig) {
 		return fmt.Errorf(`%s: %w`, logp, ErrSignature)
 	}
 
@@ -202,7 +202,7 @@ func (pmode *PublicMode) Verify(token string, implicit []byte) (
 	}
 
 	// Step 6: Verify the signature.
-	if !ed25519.Verify(pmode.Peer.Public, msg.PAE, msg.Sig) {
+	if !ed25519.Verify(pmode.Peer.PublicKey, msg.PAE, msg.Sig) {
 		return nil, nil, fmt.Errorf(`%s: %w`, logp, ErrSignature)
 	}
 

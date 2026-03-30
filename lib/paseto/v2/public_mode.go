@@ -37,7 +37,7 @@ func NewPublicMode(our paseto.Peer) (auth *PublicMode, err error) {
 	if len(our.ID) == 0 {
 		return nil, errors.New(`empty key ID`)
 	}
-	if len(our.Private) == 0 {
+	if len(our.PrivateKey) == 0 {
 		return nil, errors.New(`empty private key`)
 	}
 	auth = &PublicMode{
@@ -85,7 +85,7 @@ func (auth *PublicMode) AddPeer(k paseto.Peer) (err error) {
 	if len(k.ID) == 0 {
 		return errors.New(`empty key ID`)
 	}
-	if len(k.Public) == 0 {
+	if len(k.PublicKey) == 0 {
 		return errors.New(`empty public key`)
 	}
 	auth.peers.upsert(k)
@@ -133,7 +133,7 @@ func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[s
 		return "", err
 	}
 
-	return Sign(auth.our.Private, msg, rawfooter)
+	return Sign(auth.our.PrivateKey, msg, rawfooter)
 }
 
 // Unpack the token to get the Payload and the data.
@@ -171,7 +171,7 @@ func (auth *PublicMode) Unpack(token string) (msg *paseto.Message, err error) {
 		return nil, err
 	}
 
-	payload, err := Verify(peerKey.Public, msgSig, rawfooter)
+	payload, err := Verify(peerKey.PublicKey, msgSig, rawfooter)
 	if err != nil {
 		return nil, err
 	}
