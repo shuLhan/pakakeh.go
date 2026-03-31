@@ -22,7 +22,7 @@ func ExamplePublicMode_Sign() {
 	pmode := pasetov4.NewPublicMode(`testsign`, [32]byte(seed))
 
 	payload := []byte(`{"data":"signed message!"}`)
-	footer := []byte(`{"peer_id":1000}`)
+	footer := []byte(`{"peer_id":"1000"}`)
 
 	token, err := pmode.Sign(payload, footer, nil)
 	if err != nil {
@@ -30,14 +30,17 @@ func ExamplePublicMode_Sign() {
 	}
 
 	msg := paseto.Message{}
-	msg.Unpack(pasetov4.PublicHeader, token, nil)
+	err = pasetov4.UnpackPublicToken(&msg, token, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Printf("Payload: %s\n", msg.RawPayload)
 	fmt.Printf("Footer: %s\n", msg.RawFooter)
 
 	// Output:
 	// Payload: {"data":"signed message!"}
-	// Footer: {"peer_id":1000}
+	// Footer: {"peer_id":"1000"}
 }
 
 func ExamplePublicMode_Verify() {
@@ -48,7 +51,7 @@ func ExamplePublicMode_Verify() {
 	}
 	pmode := pasetov4.NewPublicMode(`testverify`, [32]byte(seed))
 
-	token := `v4.public.eyJkYXRhIjoic2lnbmVkIG1lc3NhZ2UhIn0kqxCoccpjcXj3jNt6Q8cafIIF2JpapJrFNWi0mBJKS-Q3IU4dXZx-_Qx3P7LtSPnHyu6deqdeg72jb6hTCz4E.eyJwZWVyX2lkIjoxMDAwfQ`
+	token := `v4.public.eyJkYXRhIjoic2lnbmVkIG1lc3NhZ2UhIn2PyAoUJRvIViAgbEn0wVCLClzz26ZuJ7UY8z7rKRDXB0Vlo6i3QzYqmpg75TPJFQe2XX5_DmURV8hJnboNzH0H.eyJwZWVyX2lkIjoiMTAwMCJ9`
 
 	gotPlain, gotFooter, err := pmode.Verify(token, nil)
 	if err != nil {
@@ -59,7 +62,7 @@ func ExamplePublicMode_Verify() {
 
 	// Output:
 	// {"data":"signed message!"}
-	// {"peer_id":1000}
+	// {"peer_id":"1000"}
 }
 
 func ExamplePublicMode_Pack() {
@@ -94,7 +97,7 @@ func ExamplePublicMode_Pack() {
 	}
 
 	msg := paseto.Message{}
-	msg.Unpack(pasetov4.PublicHeader, token, nil)
+	pasetov4.UnpackPublicToken(&msg, token, nil)
 
 	pdata := paseto.Payload{}
 	_ = json.Unmarshal(msg.RawPayload, &pdata)

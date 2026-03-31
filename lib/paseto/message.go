@@ -4,20 +4,7 @@
 package paseto
 
 import (
-	"crypto/ed25519"
-	"encoding/base64"
-	"errors"
-	"fmt"
-	"strings"
 	"time"
-)
-
-// List of error messages for [Message.Unpack].
-var (
-	ErrTokenHeader  = errors.New(`invalid token header`)
-	ErrTokenPayload = errors.New(`invalid token payload`)
-	ErrTokenFooter  = errors.New(`invalid token footer`)
-	ErrTokenSize    = errors.New(`invalid token payload size`)
 )
 
 // Message defines the payload be signed and verified by sender/receiver.
@@ -52,42 +39,4 @@ func NewMessage(sender, receiver Peer, subject string) (msg *Message) {
 		},
 	}
 	return msg
-}
-
-// Unpack returns the decoded token into a [Message].
-func (msg *Message) Unpack(header, token string, implicit []byte) (err error) {
-	logp := `Unpack`
-
-	// Step 3: verify the header and unpack the footer if it exists.
-	token, found := strings.CutPrefix(token, header)
-	if !found {
-		return fmt.Errorf(`%s: %w: want %s`, logp, ErrTokenHeader, header)
-	}
-	token, footerb64, found := strings.Cut(token, `.`)
-	if found {
-		msg.RawFooter, err = base64.RawURLEncoding.DecodeString(footerb64)
-		if err != nil {
-			return fmt.Errorf(`%s: %w: %w`, logp, ErrTokenFooter, err)
-		}
-	}
-
-	// Step 4: Decodes the payload.
-	paysig, err := base64.RawURLEncoding.DecodeString(token)
-	if err != nil {
-		return fmt.Errorf(`%s: %w: %w`, logp, ErrTokenPayload, err)
-	}
-	lenpaysig := len(paysig)
-	if lenpaysig <= ed25519.SignatureSize {
-		return fmt.Errorf(`%s: %w %d`, logp, ErrTokenSize, lenpaysig)
-	}
-	msg.RawPayload = paysig[:lenpaysig-64]
-	msg.Sig = paysig[lenpaysig-64:]
-
-	// Step 5: Generate PAE.
-	msg.PAE, err = PreAuthEncode([]byte(header), msg.RawPayload, msg.RawFooter, implicit)
-	if err != nil {
-		return fmt.Errorf(`%s: %w`, logp, err)
-	}
-
-	return nil
 }

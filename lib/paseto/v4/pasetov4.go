@@ -105,3 +105,54 @@
 //
 // [paseto-v4]: https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version4.md
 package pasetov4
+
+import (
+	"crypto/ed25519"
+	"encoding/base64"
+	"fmt"
+	"strings"
+
+	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+)
+
+// UnpackPublicToken unpacks the v4 public token into msg.
+func UnpackPublicToken(msg *paseto.Message, token string, implicit []byte) (err error) {
+	// Step 3: verify the header and token length.
+	if !strings.HasPrefix(token, PublicHeader) {
+		return fmt.Errorf(`%w, want %s`, paseto.ErrTokenHeader, PublicHeader)
+	}
+	pieces := strings.Split(token, `.`)
+	if len(pieces) < 3 {
+		return paseto.ErrToken
+	}
+	if len(pieces) >= 4 {
+		msg.RawFooter, err = base64.RawURLEncoding.DecodeString(pieces[3])
+		if err != nil {
+			return fmt.Errorf(`%w: %w`, paseto.ErrTokenFooter, err)
+		}
+	}
+
+	payload, err := base64.RawURLEncoding.DecodeString(pieces[2])
+	if err != nil {
+		return fmt.Errorf(`%w: %w`, paseto.ErrTokenPayload, err)
+	}
+
+	// Step 4: Decodes the payload.
+	lenpayload := len(payload)
+	if lenpayload <= ed25519.SignatureSize {
+		return fmt.Errorf(`%w %d`, paseto.ErrTokenLen, lenpayload)
+	}
+	msg.RawPayload = payload[:lenpayload-64]
+	msg.Sig = payload[lenpayload-64:]
+	if len(msg.Sig) != ed25519.SignatureSize {
+		return fmt.Errorf(`%w %d`, paseto.ErrTokenSigLen, len(msg.Sig))
+	}
+
+	// Step 5: Generate PAE.
+	msg.PAE, err = paseto.PreAuthEncode([]byte(PublicHeader), msg.RawPayload, msg.RawFooter, implicit)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

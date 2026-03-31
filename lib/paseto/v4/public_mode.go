@@ -161,15 +161,16 @@ func (pmode *PublicMode) Unpack(token string, implicit []byte, msg *paseto.Messa
 ) {
 	logp := `Unpack`
 
-	err = msg.Unpack(PublicHeader, token, implicit)
+	err = UnpackPublicToken(msg, token, implicit)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	err = json.Unmarshal(msg.RawFooter, &msg.Footer)
 	if err != nil {
-		return fmt.Errorf(`%s: %w`, logp, err)
+		return fmt.Errorf(`%w: %w`, paseto.ErrTokenFooter, err)
 	}
+
 	sender, ok := pmode.GetPeer(msg.Footer.PeerID)
 	if !ok {
 		return fmt.Errorf(`%s: %w %s`, logp, ErrPeerID, msg.Footer.PeerID)
@@ -196,7 +197,7 @@ func (pmode *PublicMode) Verify(token string, implicit []byte) (
 	logp := `Verify`
 	msg := &paseto.Message{}
 
-	err = msg.Unpack(PublicHeader, token, implicit)
+	err = UnpackPublicToken(msg, token, implicit)
 	if err != nil {
 		return nil, nil, fmt.Errorf(`%s: %w`, logp, err)
 	}

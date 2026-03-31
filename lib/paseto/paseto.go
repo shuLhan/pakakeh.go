@@ -17,7 +17,18 @@ package paseto
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
+)
+
+// List of errors when unpacking token.
+var (
+	ErrToken        = errors.New(`invalid token`)
+	ErrTokenFooter  = errors.New(`invalid token footer`)
+	ErrTokenHeader  = errors.New(`invalid token header`)
+	ErrTokenLen     = errors.New(`invalid token payload length`)
+	ErrTokenPayload = errors.New(`invalid token payload`)
+	ErrTokenSigLen  = errors.New(`invalid token signature length`)
 )
 
 // DefaultTTL define the time-to-live of a message, by setting ExpiredAt to

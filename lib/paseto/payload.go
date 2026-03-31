@@ -17,11 +17,11 @@ var DriftSeconds int64 = 5
 
 // List of errors for [Payload.Validate].
 var (
-	ErrPayloadIssuer    = errors.New(`unknown issuer`)
-	ErrPayloadSubject   = errors.New(`unknown subject`)
 	ErrPayloadAudience  = errors.New(`invalid audience`)
 	ErrPayloadExpired   = errors.New(`expired`)
+	ErrPayloadIssuer    = errors.New(`unknown issuer`)
 	ErrPayloadNotBefore = errors.New(`token cannot be used yet`)
+	ErrPayloadSubject   = errors.New(`unknown subject`)
 )
 
 // Payload represents the data and claims.
