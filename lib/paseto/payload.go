@@ -29,9 +29,9 @@ var (
 // The claims follow RFC 7519 that includes issuer, subject, audience,
 // expiration time, not-before time, issued-at, and ID.
 type Payload struct {
-	// Data defines actual information to be send in message.
+	// Data defines additional information to be send in message.
 	// Data must be JSON encodable.
-	Data any `json:"data"`
+	Data any `json:"data,omitempty"`
 
 	// Issuer defines the peer ID that issued the payload.
 	Issuer string `json:"iss,omitempty"`

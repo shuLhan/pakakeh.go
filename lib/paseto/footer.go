@@ -8,5 +8,5 @@ package paseto
 // MUST NOT include sensitive information.
 type Footer struct {
 	Data   any    `json:"data,omitempty"`
-	PeerID string `json:"peer_id"`
+	PeerID string `json:"peer_id,omitempty"`
 }

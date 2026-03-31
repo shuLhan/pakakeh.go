@@ -31,7 +31,6 @@ func TestNewMessage(t *testing.T) {
     "peer_id": "sender"
   },
   "Payload": {
-    "data": null,
     "iss": "sender",
     "sub": "test",
     "aud": "receiver",

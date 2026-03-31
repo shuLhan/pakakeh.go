@@ -95,6 +95,9 @@ func (pmode *PublicMode) Pack(msg paseto.Message, implicit []byte) (
 	if err != nil {
 		return ``, fmt.Errorf(`%s: %w`, logp, err)
 	}
+	if bytes.Equal(msg.RawFooter, []byte(`{}`)) {
+		msg.RawFooter = nil
+	}
 	token, err = pmode.Sign(msg.RawPayload, msg.RawFooter, implicit)
 	if err != nil {
 		return ``, fmt.Errorf(`%s: %w`, logp, err)
@@ -166,14 +169,20 @@ func (pmode *PublicMode) Unpack(token string, implicit []byte, msg *paseto.Messa
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	err = json.Unmarshal(msg.RawFooter, &msg.Footer)
-	if err != nil {
-		return fmt.Errorf(`%w: %w`, paseto.ErrTokenFooter, err)
-	}
+	var sender paseto.Peer
+	if msg.RawFooter != nil {
+		err = json.Unmarshal(msg.RawFooter, &msg.Footer)
+		if err != nil {
+			return fmt.Errorf(`%w: %w`, paseto.ErrTokenFooter, err)
+		}
 
-	sender, ok := pmode.GetPeer(msg.Footer.PeerID)
-	if !ok {
-		return fmt.Errorf(`%s: %w %s`, logp, ErrPeerID, msg.Footer.PeerID)
+		var ok bool
+		sender, ok = pmode.GetPeer(msg.Footer.PeerID)
+		if !ok {
+			return fmt.Errorf(`%s: %w %s`, logp, ErrPeerID, msg.Footer.PeerID)
+		}
+	} else {
+		sender = pmode.Peer
 	}
 
 	if !ed25519.Verify(sender.PublicKey, msg.PAE, msg.Sig) {
