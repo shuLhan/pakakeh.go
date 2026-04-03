@@ -14,6 +14,7 @@ func TestUUIDv7_Scan(t *testing.T) {
 		desc     string
 		data     any
 		expError string
+		exp      UUIDv7
 	}{{
 		desc:     `With empty data`,
 		data:     `017F22E2-79B0-7CC3-98C4-DC0C0C07398F`,
@@ -22,6 +23,10 @@ func TestUUIDv7_Scan(t *testing.T) {
 		desc:     `With invalid version`,
 		data:     []byte(`5c146b14-3c52-4afd-938a-375d0df1fbf6`),
 		expError: `uuidv7: invalid version 2`,
+	}, {
+		desc:     `With nil`,
+		data:     nil,
+		expError: ``,
 	}}
 	for _, tc := range listCase {
 		var id UUIDv7

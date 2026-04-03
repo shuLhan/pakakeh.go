@@ -165,6 +165,7 @@ func (id *UUIDv7) UnmarshalText(data []byte) (err error) {
 
 // Scan scans the raw database value into id.
 // This method implement [database/sql.Scanner] interface.
+// Column with NULL value will returns no error but zero UUID.
 func (id *UUIDv7) Scan(src any) (err error) {
 	switch v := src.(type) {
 	case []byte:
@@ -172,6 +173,8 @@ func (id *UUIDv7) Scan(src any) (err error) {
 		if err != nil {
 			return err
 		}
+	case nil:
+		return nil
 	default:
 		return fmt.Errorf(`uuidv7: Scan: invalid type %T`, src)
 	}
