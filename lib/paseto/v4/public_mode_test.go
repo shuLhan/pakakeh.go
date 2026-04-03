@@ -43,11 +43,11 @@ func TestPublicMode_Pack(t *testing.T) {
 	cryptotest.SetGlobalRandom(t, 1)
 
 	listcase := []struct {
-		msg           paseto.Message
 		desc          string
 		expToken      string
 		expRawPayload string
 		expRawFooter  string
+		msg           paseto.Message
 	}{{
 		desc:          `Empty`,
 		expToken:      `v4.public.e316aAoBcV59pCXGKmxwuKl050jOA9gP9F5qCFWllfEHUzzEWqRtZDK29vC07QoCJZEd-6T_65tybe4uJRuErwwE`,
