@@ -153,19 +153,20 @@ func (id *UUIDv7) UnmarshalText(data []byte) (err error) {
 	if err != nil {
 		return fmt.Errorf(`uuidv7: %w`, err)
 	}
-	id.high = binary.BigEndian.Uint64(dst)
+	high := binary.BigEndian.Uint64(dst)
 
 	_, err = hex.Decode(dst, src[16:])
 	if err != nil {
 		return fmt.Errorf(`uuidv7: %w`, err)
 	}
+	id.high = high
 	id.low = binary.BigEndian.Uint64(dst)
 	return nil
 }
 
 // Scan scans the raw database value into id.
 // This method implement [database/sql.Scanner] interface.
-// Column with NULL value will returns no error but zero UUID.
+// Column with NULL value will returns no error set it to zero UUID.
 func (id *UUIDv7) Scan(src any) (err error) {
 	switch v := src.(type) {
 	case []byte:
@@ -174,6 +175,8 @@ func (id *UUIDv7) Scan(src any) (err error) {
 			return err
 		}
 	case nil:
+		id.high = 0
+		id.low = 0
 		return nil
 	default:
 		return fmt.Errorf(`uuidv7: Scan: invalid type %T`, src)
