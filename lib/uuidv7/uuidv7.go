@@ -99,6 +99,11 @@ func (id *UUIDv7) Equal(v any) (err error) {
 	return nil
 }
 
+// IsEqual returns true if id equal with other.
+func (id UUIDv7) IsEqual(other UUIDv7) bool {
+	return id.high == other.high && id.low == other.low
+}
+
 // IsZero returns true if all bits is zero.
 func (id UUIDv7) IsZero() bool {
 	return id.high == 0 && id.low == 0

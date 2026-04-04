@@ -15,6 +15,7 @@ import (
 )
 
 func ExampleGenerate() {
+	// Begin mocking Now and Rand, DO NOT USE in production code.
 	now := time.Date(2026, 3, 9, 14, 20, 0, 123456700, time.UTC)
 	uuidv7.Now = func() time.Time {
 		now = now.Add(time.Second)
@@ -63,6 +64,18 @@ func ExampleUUIDv7_Equal() {
 	// <nil>
 	// <nil>
 	// uuidv7: not equal, want 019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF, got 019CD2F8-2AE3-774E-BFFF-FFFFFFFFFFFF
+}
+
+func ExampleUUIDv7_IsEqual() {
+	id := uuidv7.Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`)
+	other := uuidv7.Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFF0`)
+
+	fmt.Println(id.IsEqual(id))
+	fmt.Println(id.IsEqual(other))
+
+	// Output:
+	// true
+	// false
 }
 
 func ExampleUUIDv7_MarshalBinary() {
