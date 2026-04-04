@@ -50,10 +50,7 @@ func ComputeAccuracies(tp, fp, tn, fn []int64) (accuracies []float64) {
 // and `end` timestamps.
 func ComputeElapsedTimes(start, end []int64) (elaps []int64) {
 	// Get minimum length.
-	minlen := len(start)
-	if len(end) < minlen {
-		minlen = len(end)
-	}
+	minlen := min(len(end), len(start))
 
 	for x := range minlen {
 		elaps = append(elaps, end[x]-start[x])

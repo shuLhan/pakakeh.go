@@ -129,7 +129,7 @@ func unpackPacket(payload []byte) (pac *packet, err error) {
 		)
 		n := binary.BigEndian.Uint32(payload)
 		payload = payload[4:]
-		for x := uint32(0); x < n; x++ {
+		for range n {
 			node := &dirEntry{}
 
 			v = binary.BigEndian.Uint32(payload)

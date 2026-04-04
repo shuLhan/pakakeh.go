@@ -53,7 +53,7 @@ func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out *tagStruc
 					out.v[key] = sf
 				}
 
-			case reflect.Ptr:
+			case reflect.Pointer:
 				if fval.IsNil() {
 					continue
 				}

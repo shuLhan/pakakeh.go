@@ -5,10 +5,10 @@ package google
 
 // Name define Google contact name format.
 type Name struct {
-	Prefix GD `json:"gd$namePrefix,omitempty"`
-	First  GD `json:"gd$givenName,omitempty"`
-	Middle GD `json:"gd$additionalName,omitempty"`
-	Last   GD `json:"gd$familyName,omitempty"`
-	Suffix GD `json:"gd$nameSuffix,omitempty"`
-	Full   GD `json:"gd$fullName,omitempty"`
+	Prefix GD `json:"gd$namePrefix"`
+	First  GD `json:"gd$givenName"`
+	Middle GD `json:"gd$additionalName"`
+	Last   GD `json:"gd$familyName"`
+	Suffix GD `json:"gd$nameSuffix"`
+	Full   GD `json:"gd$fullName"`
 }

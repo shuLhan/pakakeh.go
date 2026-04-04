@@ -106,8 +106,8 @@ func (as *Set) Equal(as2 Set) bool {
 // the set in any other way.
 func (as *Set) Visit(do func(n byte) (skip bool)) (aborted bool) {
 	var currentChar byte
-	for i := uint(0); i < 4; i++ {
-		for j := uint(0); j < 32; j++ {
+	for i := range uint(4) {
+		for j := range uint(32) {
 			if (as[i] & (1 << j)) != 0 {
 				if do(currentChar) {
 					return true

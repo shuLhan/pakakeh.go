@@ -213,10 +213,7 @@ func (dataset *Dataset) SetColumnsName(names []string) {
 	}
 
 	// find minimum length
-	minlen := collen
-	if nameslen < collen {
-		minlen = nameslen
-	}
+	minlen := min(nameslen, collen)
 
 	for x := range minlen {
 		dataset.Columns[x].Name = names[x]
@@ -364,11 +361,7 @@ func (dataset *Dataset) TransposeToColumns() {
 	}
 
 	// use the least length
-	minlen := len(*dataset.GetRow(0))
-
-	if minlen > ncol {
-		minlen = ncol
-	}
+	minlen := min(len(*dataset.GetRow(0)), ncol)
 
 	switch orgmode {
 	case DatasetModeRows, DatasetNoMode:
@@ -407,7 +400,7 @@ func (dataset *Dataset) TransposeToRows() {
 	rowlen := math.MinInt32
 	flen := len(dataset.Columns)
 
-	for f := 0; f < flen; f++ {
+	for f := range flen {
 		l := dataset.Columns[f].Len()
 
 		if l > rowlen {
@@ -421,7 +414,7 @@ func (dataset *Dataset) TransposeToRows() {
 	for r := 0; r < rowlen; r++ {
 		row := make(Row, flen)
 
-		for f := 0; f < flen; f++ {
+		for f := range flen {
 			if dataset.Columns[f].Len() > r {
 				row[f] = dataset.Columns[f].Records[r]
 			} else {
@@ -526,7 +519,7 @@ func (dataset *Dataset) FillRowsWithColumn(colIdx int, col Column) {
 	for ; y < nrow; y++ {
 		row := make(Row, ncol)
 
-		for z := 0; z < ncol; z++ {
+		for z := range ncol {
 			if z == colIdx {
 				row[colIdx] = col.Records[y]
 			} else {
@@ -591,18 +584,15 @@ func (dataset *Dataset) PushColumnToRows(col Column) {
 		// If no existing rows in dataset, initialize the rows slice.
 		dataset.Rows = make(Rows, colsize)
 
-		for nrow = 0; nrow < colsize; nrow++ {
+		for nrow = range colsize {
 			row := make(Row, 0)
 			dataset.Rows[nrow] = &row
 		}
+		nrow++
 	}
 
 	// Pick the minimum length between column or current row length.
-	minrow := nrow
-
-	if colsize < nrow {
-		minrow = colsize
-	}
+	minrow := min(colsize, nrow)
 
 	// Push each record in column to each rows
 	var row *Row

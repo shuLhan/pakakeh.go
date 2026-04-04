@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"slices"
 )
 
 // Rows represent slice of Row.
@@ -141,13 +142,7 @@ func (rows *Rows) RandomPick(n int, duplicate bool) (
 			}
 
 			// check if its already picked
-			isPicked := false
-			for _, pastIdx := range pickedIdx {
-				if idx == pastIdx {
-					isPicked = true
-					break
-				}
-			}
+			isPicked := slices.Contains(pickedIdx, idx)
 			// get another random idx again
 			if isPicked {
 				continue
@@ -166,13 +161,7 @@ func (rows *Rows) RandomPick(n int, duplicate bool) (
 	// select unpicked rows using picked index.
 	for rid := range *rows {
 		// check if row index has been picked up
-		isPicked := false
-		for _, idx := range pickedIdx {
-			if rid == idx {
-				isPicked = true
-				break
-			}
-		}
+		isPicked := slices.Contains(pickedIdx, rid)
 		if !isPicked {
 			unpicked.PushBack((*rows)[rid])
 			unpickedIdx = append(unpickedIdx, rid)

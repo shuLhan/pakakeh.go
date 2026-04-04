@@ -114,7 +114,7 @@ func Marshal(v any) (b []byte, err error) {
 	rvalue := reflect.ValueOf(v)
 	kind := rtipe.Kind()
 
-	for kind == reflect.Ptr {
+	for kind == reflect.Pointer {
 		rtipe = rtipe.Elem()
 		rvalue = rvalue.Elem()
 		kind = rtipe.Kind()
@@ -194,7 +194,7 @@ func (in *Ini) marshalStruct(
 		}
 		key = strings.ToLower(key)
 
-		for kind == reflect.Ptr {
+		for kind == reflect.Pointer {
 			ftype = ftype.Elem()
 			kind = ftype.Kind()
 			fvalue = fvalue.Elem()
@@ -209,7 +209,7 @@ func (in *Ini) marshalStruct(
 		case reflect.Array, reflect.Slice:
 			for xx := 0; xx < fvalue.Len(); xx++ {
 				item := fvalue.Index(xx)
-				for item.Kind() == reflect.Ptr {
+				for item.Kind() == reflect.Pointer {
 					item = item.Elem()
 				}
 				switch item.Kind() {
@@ -255,7 +255,7 @@ func (in *Ini) marshalStruct(
 			for _, key = range keys {
 				mapValue = amap[key]
 				valueType = reflect.TypeOf(mapValue.Interface())
-				for valueType.Kind() == reflect.Ptr {
+				for valueType.Kind() == reflect.Pointer {
 					valueType = valueType.Elem()
 					mapValue = mapValue.Elem()
 				}
@@ -267,8 +267,8 @@ func (in *Ini) marshalStruct(
 				}
 			}
 
-		case reflect.Ptr:
-			for ftype.Kind() == reflect.Ptr {
+		case reflect.Pointer:
+			for ftype.Kind() == reflect.Pointer {
 				ftype = ftype.Elem()
 				fvalue = fvalue.Elem()
 			}
@@ -328,7 +328,7 @@ func (in *Ini) Unmarshal(v any) (err error) {
 	rvalue := reflect.ValueOf(v)
 	kind := rtipe.Kind()
 
-	for kind != reflect.Ptr {
+	for kind != reflect.Pointer {
 		return fmt.Errorf("ini: Unmarshal: expecting pointer to struct, got %v", kind)
 	}
 

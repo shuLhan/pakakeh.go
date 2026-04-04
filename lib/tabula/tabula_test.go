@@ -39,7 +39,7 @@ func initRows() (rows Rows, e error) {
 		l := len(rowsData[i])
 		row := make(Row, 0)
 
-		for j := 0; j < l; j++ {
+		for j := range l {
 			rec, e := NewRecordBy(rowsData[i][j],
 				testColTypes[j])
 

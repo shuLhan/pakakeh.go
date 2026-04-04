@@ -357,7 +357,7 @@ func (runtime *Runtime) ClassifySet(data tabula.ClasetInterface) (e error) {
 	nrow := data.GetNRow()
 	targetAttr := data.GetClassColumn()
 
-	for i := 0; i < nrow; i++ {
+	for i := range nrow {
 		class := runtime.Classify(data.GetRow(i))
 
 		_ = targetAttr.Records[i].SetValue(class, tabula.TString)

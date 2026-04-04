@@ -7,5 +7,5 @@ package google
 type Root struct {
 	Version  string `json:"version,omitempty"`
 	Encoding string `json:"encoding,omitempty"`
-	Feed     Feed   `json:"feed,omitempty"`
+	Feed     Feed   `json:"feed"`
 }

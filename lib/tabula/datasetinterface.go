@@ -7,6 +7,7 @@ package tabula
 import (
 	"encoding/json"
 	"os"
+	"slices"
 )
 
 // DatasetInterface is the interface for working with DSV data.
@@ -191,12 +192,9 @@ func SplitRowsByCategorical(di DatasetInterface, colidx int, splitVal []string) 
 
 	for _, row := range *di.GetRows() {
 		found := false
-		for _, val := range splitVal {
-			if (*row)[colidx].String() == val {
-				splitIn.PushRow(row)
-				found = true
-				break
-			}
+		if slices.Contains(splitVal, (*row)[colidx].String()) {
+			splitIn.PushRow(row)
+			found = true
 		}
 		if !found {
 			splitEx.PushRow(row)

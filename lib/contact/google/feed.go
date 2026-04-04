@@ -25,6 +25,6 @@ type Feed struct {
 	// StartIndex      GD         `json:"openSearch$startIndex,omitempty"`
 	// ItemsPerPage    GD         `json:"openSearch$itemsPerPage,omitempty"`
 
-	TotalResult GD        `json:"openSearch$totalResults,omitempty"`
+	TotalResult GD        `json:"openSearch$totalResults"`
 	Contacts    []Contact `json:"entry,omitempty"`
 }

@@ -37,8 +37,8 @@ func (sfield *structField) set(val string) bool {
 			return true
 		}
 
-	case reflect.Ptr:
-		for sfield.fkind == reflect.Ptr {
+	case reflect.Pointer:
+		for sfield.fkind == reflect.Pointer {
 			sfield.ftype = sfield.ftype.Elem()
 			sfield.fkind = sfield.ftype.Kind()
 		}
@@ -96,8 +96,8 @@ func (sfield *structField) append(val string) (slice reflect.Value, ok bool) {
 			slice = reflect.Append(slice, reflect.ValueOf(t))
 		}
 
-	case reflect.Ptr:
-		for ftype.Kind() == reflect.Ptr {
+	case reflect.Pointer:
+		for ftype.Kind() == reflect.Pointer {
 			ftype = ftype.Elem()
 		}
 

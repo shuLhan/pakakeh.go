@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // Chunk represent subset of line, contain starting position and slice of
@@ -20,15 +21,15 @@ type Chunk struct {
 // JoinChunks all chunk's values using `sep` as separator and return it as
 // string.
 func JoinChunks(chunks []Chunk, sep string) string {
-	var out string
+	var out strings.Builder
 
 	for x := range len(chunks) {
 		if x > 0 {
-			out += sep
+			out.WriteString(sep)
 		}
-		out += string(chunks[x].V)
+		out.WriteString(string(chunks[x].V))
 	}
-	return out
+	return out.String()
 }
 
 // MarshalJSON encode the Chunk into JSON value.

@@ -21,8 +21,8 @@ type Contact struct {
 	// Title      GD         `json:"title,omitempty"`
 	// Links      []Link     `json:"link,omitempty"`
 
-	Name      Name      `json:"gd$name,omitempty"`
-	Birthday  Birthday  `json:"gContact$birthday,omitempty"`
+	Name      Name      `json:"gd$name"`
+	Birthday  Birthday  `json:"gContact$birthday"`
 	Orgs      []Org     `json:"gd$organization,omitempty"`
 	Emails    []Email   `json:"gd$email,omitempty"`
 	Phones    []Phone   `json:"gd$phoneNumber,omitempty"`

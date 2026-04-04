@@ -235,10 +235,7 @@ func (col *Column) SetValues(values []string) {
 	}
 
 	// pick the least length
-	minlen := reclen
-	if vallen < reclen {
-		minlen = vallen
-	}
+	minlen := min(vallen, reclen)
 
 	for x := range minlen {
 		_ = col.Records[x].SetValue(values[x], col.Type)

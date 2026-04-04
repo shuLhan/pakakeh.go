@@ -8,12 +8,12 @@ package bot
 type messageRequest struct {
 	// Unique identifier for the target chat or username of the target
 	// channel (in the format @channelusername).
-	ChatID interface{} `json:"chat_id"`
+	ChatID any `json:"chat_id"`
 
 	// Additional interface options. A JSON-serialized object for an
 	// inline keyboard, custom reply keyboard, instructions to remove
 	// reply keyboard or to force a reply from the user.
-	ReplyMarkup interface{} `json:"reply_markup,omitempty"`
+	ReplyMarkup any `json:"reply_markup,omitempty"`
 
 	// Text of the message to be sent, 1-4096 characters after entities
 	// parsing.

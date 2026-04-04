@@ -342,14 +342,8 @@ func SkipAfterToken(text, token []byte, startAt int, checkEsc bool) (int, bool) 
 func SnippetByIndexes(s []byte, indexes []int, sniplen int) (snippets [][]byte) {
 	var start, end int
 	for _, idx := range indexes {
-		start = idx - sniplen
-		if start < 0 {
-			start = 0
-		}
-		end = idx + sniplen
-		if end > len(s) {
-			end = len(s)
-		}
+		start = max(idx-sniplen, 0)
+		end = min(idx+sniplen, len(s))
 
 		snippets = append(snippets, s[start:end])
 	}

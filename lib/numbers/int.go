@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"log"
 	"math/big"
+	"slices"
 )
 
 // IntCreateSeq will create and return sequence of integer from `min` to
@@ -50,13 +51,7 @@ func IntPickRandPositive(maxVal int, dup bool, pickedListID, exsListID []int) (i
 		idx = int(randv.Int64())
 
 		// Check in exclude indices.
-		excluded = false
-		for _, v := range exsListID {
-			if idx == v {
-				excluded = true
-				break
-			}
-		}
+		excluded = slices.Contains(exsListID, idx)
 		if excluded {
 			continue
 		}
@@ -67,13 +62,7 @@ func IntPickRandPositive(maxVal int, dup bool, pickedListID, exsListID []int) (i
 		}
 
 		// Check if its already picked.
-		picked = false
-		for _, v := range pickedListID {
-			if idx == v {
-				picked = true
-				break
-			}
-		}
+		picked = slices.Contains(pickedListID, idx)
 
 		if picked {
 			// Get another random idx again.

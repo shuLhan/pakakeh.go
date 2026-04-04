@@ -27,7 +27,7 @@ func TestRandomPickColumns(t *testing.T) {
 	dup := false
 	ncols := 6
 	excludeIdx := []int{3}
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		picked, unpicked, _, _ :=
 			dataset.Columns.RandomPick(ncols, dup, excludeIdx)
 

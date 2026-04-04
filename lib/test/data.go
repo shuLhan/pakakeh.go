@@ -320,20 +320,20 @@ func (data *Data) parse(content []byte) (err error) {
 
 func (data *Data) parseFlag(content []byte) {
 	var (
-		idx  = bytes.IndexByte(content, ':')
-		bkey []byte
-		bval []byte
+		before, after, ok = bytes.Cut(content, []byte{':'})
+		bkey              []byte
+		bval              []byte
 	)
-	if idx < 0 {
+	if !ok {
 		return
 	}
 
-	bkey = bytes.TrimSpace(content[:idx])
+	bkey = bytes.TrimSpace(before)
 	if len(bkey) == 0 {
 		return
 	}
 
-	bval = bytes.TrimSpace(content[idx+1:])
+	bval = bytes.TrimSpace(after)
 
 	data.Flag[string(bkey)] = string(bval)
 }

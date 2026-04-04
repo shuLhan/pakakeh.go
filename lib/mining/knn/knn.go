@@ -80,10 +80,7 @@ func (in *Runtime) FindNeighbors(samples *tabula.Rows, instance *tabula.Row) (
 	}
 
 	// Make sure number of neighbors is greater than request.
-	minK := in.AllNeighbors.Len()
-	if minK > in.K {
-		minK = in.K
-	}
+	minK := min(in.AllNeighbors.Len(), in.K)
 
 	kneighbors = in.AllNeighbors.SelectRange(0, minK)
 

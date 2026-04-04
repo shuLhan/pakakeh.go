@@ -5,6 +5,8 @@
 package tabula
 
 import (
+	"slices"
+
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	libnumbers "git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
 )
@@ -29,11 +31,7 @@ func (cols *Columns) Reset() {
 func (cols *Columns) SetTypes(types []int) {
 	typeslen := len(types)
 	colslen := len(*cols)
-	minlen := typeslen
-
-	if colslen < minlen {
-		minlen = colslen
-	}
+	minlen := min(colslen, typeslen)
 
 	for x := range minlen {
 		(*cols)[x].Type = types[x]
@@ -72,13 +70,7 @@ func (cols *Columns) RandomPick(n int, dup bool, excludeIdx []int) (
 	// select unpicked columns using picked index.
 	for cid := range *cols {
 		// check if column index has been picked up
-		isPicked := false
-		for _, idx := range pickedIdx {
-			if cid == idx {
-				isPicked = true
-				break
-			}
-		}
+		isPicked := slices.Contains(pickedIdx, cid)
 		if !isPicked {
 			unpicked = append(unpicked, (*cols)[cid])
 			unpickedIdx = append(unpickedIdx, cid)

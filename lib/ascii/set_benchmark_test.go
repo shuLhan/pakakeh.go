@@ -22,7 +22,7 @@ const N int = 10
 // if populate is true, fill each set with every 2nd ASCII character
 func setupSets(populate bool) []Set {
 	sets := []Set{}
-	for i := 0; i < N; i++ {
+	for range N {
 		var as Set
 		if populate {
 			for c := 0; c < utf8.RuneSelf; c += 2 {
@@ -41,7 +41,7 @@ func setupSets(populate bool) []Set {
 // if populate is true, fill each set with every 2nd ASCII character
 func setupMapSets(populate bool) []map[byte]struct{} {
 	sets := []map[byte]struct{}{}
-	for i := 0; i < N; i++ {
+	for range N {
 		as := make(map[byte]struct{})
 		if populate {
 			for c := 0; c < utf8.RuneSelf; c += 2 {
@@ -73,7 +73,7 @@ func BenchmarkSet(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
-				for c := byte(0); c < utf8.RuneSelf; c++ {
+				for c := range byte(utf8.RuneSelf) {
 					exists = as.Contains(c)
 				}
 			}
@@ -85,7 +85,7 @@ func BenchmarkSet(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
-				for c := byte(0); c < utf8.RuneSelf; c++ {
+				for c := range byte(utf8.RuneSelf) {
 					as.Remove(c)
 				}
 			}
@@ -97,7 +97,7 @@ func BenchmarkSet(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
-				for c := byte(0); c < utf8.RuneSelf; c++ {
+				for range byte(utf8.RuneSelf) {
 					size = as.Size()
 				}
 			}
@@ -139,7 +139,7 @@ func BenchmarkMapSet(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
-				for c := byte(0); c < utf8.RuneSelf; c++ {
+				for c := range byte(utf8.RuneSelf) {
 					_, exists = as[c]
 				}
 			}
@@ -151,7 +151,7 @@ func BenchmarkMapSet(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
-				for c := byte(0); c < utf8.RuneSelf; c++ {
+				for c := range byte(utf8.RuneSelf) {
 					delete(as, c)
 				}
 			}
@@ -163,7 +163,7 @@ func BenchmarkMapSet(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
-				for c := byte(0); c < utf8.RuneSelf; c++ {
+				for range byte(utf8.RuneSelf) {
 					size = len(as)
 				}
 			}

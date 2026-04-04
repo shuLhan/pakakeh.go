@@ -453,7 +453,6 @@ func ExampleTag() {
 	}
 
 	var (
-		t      T
 		vtype  reflect.Type
 		field  reflect.StructField
 		val    string
@@ -461,10 +460,10 @@ func ExampleTag() {
 		hasTag bool
 	)
 
-	vtype = reflect.TypeOf(t)
+	vtype = reflect.TypeFor[T]()
 
-	for x := range vtype.NumField() {
-		field = vtype.Field(x)
+	for field0 := range vtype.Fields() {
+		field = field0
 		val, opts, hasTag = libreflect.Tag(field, "atag")
 		fmt.Println(val, opts, hasTag)
 	}

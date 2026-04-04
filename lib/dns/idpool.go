@@ -7,22 +7,22 @@ import (
 	"sync/atomic"
 )
 
-var idPool uint32
+var idPool atomic.Uint32
 
 // getNextID increment and return ID.
 func getNextID() uint16 {
-	atomic.AddUint32(&idPool, 1)
-	var id = atomic.LoadUint32(&idPool)
+	idPool.Add(1)
+	var id = idPool.Load()
 
 	return uint16(id)
 }
 
 // getID return the current ID value in pool.
 func getID() uint16 {
-	var id = atomic.LoadUint32(&idPool)
+	var id = idPool.Load()
 	return uint16(id)
 }
 
 func resetIDPool() {
-	atomic.StoreUint32(&idPool, 0)
+	idPool.Store(0)
 }

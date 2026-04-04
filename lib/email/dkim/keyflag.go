@@ -6,6 +6,7 @@ package dkim
 
 import (
 	"bytes"
+	"slices"
 )
 
 // KeyFlag define a type of key flag in DKIM key record.
@@ -46,10 +47,8 @@ func unpackKeyFlags(in []byte) (out []KeyFlag) {
 }
 
 func insertKeyFlag(flags *[]KeyFlag, key KeyFlag) {
-	for _, v := range *flags {
-		if v == key {
-			return
-		}
+	if slices.Contains(*flags, key) {
+		return
 	}
 	*flags = append(*flags, key)
 }

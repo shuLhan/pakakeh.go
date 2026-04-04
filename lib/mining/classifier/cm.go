@@ -77,7 +77,7 @@ func (cm *CM) ComputeStrings(valueSpace, targets, predictions []string) {
 	cm.computeClassError()
 }
 
-// ComputeNumeric will calculate confusion matrix using targets and predictions
+// ComputeNumeric calculates confusion matrix using targets and predictions
 // values.
 func (cm *CM) ComputeNumeric(vs, actuals, predictions []int64) {
 	cm.initByNumeric(vs)
@@ -141,16 +141,13 @@ func (cm *CM) countTargetPrediction(target, predict string,
 	return
 }
 
-// countNumeric will count and return number of `pred` in predictions where
-// actuals value is `act`.
+// countNumeric returns count of `pred` in predictions where actuals value is
+// `act`.
 func (cm *CM) countNumeric(act, pred int64, actuals, predictions []int64) (
 	cnt int64,
 ) {
 	// Find minimum length to mitigate out-of-range loop.
-	minlen := len(actuals)
-	if len(predictions) < minlen {
-		minlen = len(predictions)
-	}
+	minlen := min(len(predictions), len(actuals))
 
 	for x := range minlen {
 		if actuals[x] != act {

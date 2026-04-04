@@ -53,9 +53,9 @@ type Contact struct {
 	SpouseName    string `json:"spouseName,omitempty"`
 	PersonalNotes string `json:"personalNotes,omitempty"`
 
-	HomeAddress     Address `json:"homeAddress,omitempty"`
-	BusinessAddress Address `json:"businessAddress,omitempty"`
-	OtherAddress    Address `json:"otherAddress,omitempty"`
+	HomeAddress     Address `json:"homeAddress"`
+	BusinessAddress Address `json:"businessAddress"`
+	OtherAddress    Address `json:"otherAddress"`
 
 	IMAddresses    []string `json:"imAddresses,omitempty"`
 	HomePhones     []string `json:"homePhones,omitempty"`

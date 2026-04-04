@@ -112,7 +112,7 @@ func TestRandomPick(t *testing.T) {
 	}
 
 	// random pick with duplicate
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		picked, unpicked, pickedIdx, unpickedIdx := rows.RandomPick(6,
 			true)
 
@@ -130,7 +130,7 @@ func TestRandomPick(t *testing.T) {
 	}
 
 	// random pick without duplication
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		picked, unpicked, pickedIdx, unpickedIdx := rows.RandomPick(3,
 			false)
 

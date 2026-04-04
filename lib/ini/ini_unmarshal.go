@@ -46,8 +46,8 @@ func (in *Ini) unmarshal(tagField *tagStructField) {
 		case reflect.Map:
 			unmarshalToMap(sec, sfield.ftype, sfield.fval)
 
-		case reflect.Ptr:
-			for sfield.fkind == reflect.Ptr {
+		case reflect.Pointer:
+			for sfield.fkind == reflect.Pointer {
 				sfield.ftype = sfield.ftype.Elem()
 				sfield.fkind = sfield.ftype.Kind()
 			}
@@ -72,9 +72,9 @@ func (in *Ini) unmarshal(tagField *tagStructField) {
 				newSlice := reflect.Append(sfield.fval, newStruct.Elem())
 				sfield.fval.Set(newSlice)
 
-			case reflect.Ptr:
+			case reflect.Pointer:
 				// V []*T
-				for sliceElem.Kind() == reflect.Ptr {
+				for sliceElem.Kind() == reflect.Pointer {
 					sliceElem = sliceElem.Elem()
 				}
 
@@ -127,7 +127,7 @@ func unmarshalToMap(sec *Section, rtype reflect.Type, rval reflect.Value) bool {
 	} else {
 		amap = rval
 	}
-	for elKind == reflect.Ptr {
+	for elKind == reflect.Pointer {
 		elType = elType.Elem()
 		elKind = elType.Kind()
 		isPtr = true

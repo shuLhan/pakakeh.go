@@ -54,14 +54,12 @@ func TestParseContentRange(t *testing.T) {
 	}
 }
 
-func ptrInt64(v int64) *int64 { return &v }
-
 func TestRangePositionContentRange(t *testing.T) {
 	var (
 		unit = AcceptRangesBytes
 		pos  = RangePosition{
-			start: ptrInt64(10),
-			end:   ptrInt64(20),
+			start: new(int64(10)),
+			end:   new(int64(20)),
 		}
 	)
 

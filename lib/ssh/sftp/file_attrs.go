@@ -112,7 +112,7 @@ func unpackFileAttrs(payload []byte) (fa *FileAttrs, length int) {
 		length += 4
 
 		fa.exts = make(extensions, n)
-		for x := uint32(0); x < n; x++ {
+		for range n {
 			size := binary.BigEndian.Uint32(payload[:4])
 			payload = payload[4:]
 			length += 4

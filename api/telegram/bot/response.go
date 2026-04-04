@@ -18,7 +18,7 @@ const (
 
 // response is the internal, generic response from API.
 type response struct {
-	Result      interface{}         `json:"result"`
+	Result      any                 `json:"result"`
 	Parameters  *responseParameters `json:"parameters"`
 	Description string              `json:"description"`
 	ErrorCode   int                 `json:"error_code"`

@@ -489,9 +489,9 @@ func (sig *Signature) set(t *tag) (err error) {
 // setQueryMethods parse list of query methods and set Signature.QueryMethod
 // based on first match.
 func (sig *Signature) setQueryMethods(v []byte) {
-	methods := bytes.Split(v, sepColon)
+	methods := bytes.SplitSeq(v, sepColon)
 
-	for _, m := range methods {
+	for m := range methods {
 		var qtype, qopt []byte
 
 		kv := bytes.Split(m, sepSlash)

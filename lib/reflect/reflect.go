@@ -68,7 +68,7 @@ func IsNil(v any) bool {
 		kind == reflect.Func ||
 		kind == reflect.Interface ||
 		kind == reflect.Map ||
-		kind == reflect.Ptr ||
+		kind == reflect.Pointer ||
 		kind == reflect.Slice {
 		return val.IsNil()
 	}
@@ -104,7 +104,7 @@ func Marshal(obj any) (out []byte, err error) {
 		ok         bool
 	)
 
-	if objKind == reflect.Ptr && objValue.IsNil() {
+	if objKind == reflect.Pointer && objValue.IsNil() {
 		return nil, nil
 	}
 
@@ -167,7 +167,7 @@ func Set(obj reflect.Value, val string) (err error) {
 		objValue reflect.Value
 	)
 
-	if objKind != reflect.Ptr {
+	if objKind != reflect.Pointer {
 		// Variable passed value (V T).
 		return fmt.Errorf("%s: object %T is not setable", logp, obj.Interface())
 	}
@@ -177,7 +177,7 @@ func Set(obj reflect.Value, val string) (err error) {
 	objType = objType.Elem()
 	objKind = objType.Kind()
 
-	if objKind == reflect.Ptr {
+	if objKind == reflect.Pointer {
 		// Variable is passed as **T.
 		if obj.IsNil() {
 			objType = objType.Elem()
@@ -246,11 +246,11 @@ func setSlice(slice reflect.Value, val string) (sliceOut reflect.Value, err erro
 	sliceType = sliceType.Elem() // T = []T
 	sliceKind = sliceType.Kind()
 
-	if sliceKind == reflect.Ptr {
+	if sliceKind == reflect.Pointer {
 		sliceType = sliceType.Elem()
 		sliceKind = sliceType.Kind()
 
-		if sliceKind == reflect.Ptr {
+		if sliceKind == reflect.Pointer {
 			elValue = reflect.New(sliceType)  // var t = new(*T)
 			sliceType = sliceType.Elem()      // *T <= **T
 			ptrValue = reflect.New(sliceType) // var pt = new(T)
@@ -288,7 +288,7 @@ func setValue(obj reflect.Value, val string) (err error) {
 		v        any
 	)
 
-	for objKind == reflect.Ptr {
+	for objKind == reflect.Pointer {
 		objType = objType.Elem()
 		objKind = objType.Kind()
 	}
@@ -442,7 +442,7 @@ func Unmarshal(obj reflect.Value, val []byte) (ok bool, err error) {
 		methodName string
 	)
 
-	if objKind != reflect.Ptr {
+	if objKind != reflect.Pointer {
 		// Variable passed as is (V T).
 		return false, nil
 	}
@@ -452,7 +452,7 @@ func Unmarshal(obj reflect.Value, val []byte) (ok bool, err error) {
 	objType = objType.Elem()
 	objKind = objType.Kind()
 
-	if objKind == reflect.Ptr {
+	if objKind == reflect.Pointer {
 		// Variable is passed as **T.
 		if obj.IsNil() {
 			objType = objType.Elem()
@@ -677,7 +677,7 @@ func doEqual(v1, v2 reflect.Value) (err error) {
 	case reflect.Map:
 		return doEqualMap(v1, v2)
 
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if v1.IsNil() && v2.IsNil() {
 			return nil
 		}
@@ -769,7 +769,7 @@ func doEqualMap(v1, v2 reflect.Value) (err error) {
 // fields has equal value.
 // The type of both struct is already equal when this function called.
 func doEqualStruct(v1, v2 reflect.Value) (err error) {
-	var equalerType = reflect.TypeOf((*Equaler)(nil)).Elem()
+	var equalerType = reflect.TypeFor[Equaler]()
 	if v1.Type().Implements(equalerType) {
 		var m1 = v1.MethodByName(`Equal`)
 		var callIn = []reflect.Value{v2.Addr()}

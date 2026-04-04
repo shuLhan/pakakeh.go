@@ -523,7 +523,7 @@ func (reader *Reader) IsEqual(other *Reader) bool {
 		return false
 	}
 
-	for a := 0; a < l; a++ {
+	for a := range l {
 		if !reader.InputMetadata[a].IsEqual(&other.InputMetadata[a]) {
 			return false
 		}

@@ -152,10 +152,7 @@ func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, max
 		oldlen = len(old)
 
 		// Get minimal token to search in the newline left over.
-		minlen = minTokenLen
-		if oldlen < minlen {
-			minlen = oldlen
-		}
+		minlen = min(oldlen, minTokenLen)
 
 		// Search old token in newline, chunk by chunk.
 		x = 0
@@ -181,10 +178,7 @@ func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, max
 		oldlen = len(old)
 		newlen = len(newline)
 
-		minlen = oldlen
-		if newlen < minlen {
-			minlen = newlen
-		}
+		minlen = min(newlen, oldlen)
 
 		x, y = 0, 0
 		// start again from beginning...
@@ -264,11 +258,7 @@ func Bytes(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 	newlen := len(new)
 
 	minlen := 0
-	if oldlen < newlen {
-		minlen = oldlen
-	} else {
-		minlen = newlen
-	}
+	minlen = min(oldlen, newlen)
 
 	// Find the position of unmatched byte from the beginning.
 	x, y := 0, 0
@@ -326,19 +316,13 @@ func Bytes(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 	newleftlen := len(newleft)
 
 	// Get minimal token to search in the new left over.
-	minlen = DefMatchLen
-	if oldleftlen < DefMatchLen {
-		minlen = oldleftlen
-	}
+	minlen = min(oldleftlen, DefMatchLen)
 	xtoken := oldleft[:minlen]
 
 	xaty := inbytes.TokenFind(newleft, xtoken, 0)
 
 	// Get miniminal token to search in the old left over.
-	minlen = DefMatchLen
-	if newleftlen < DefMatchLen {
-		minlen = newleftlen
-	}
+	minlen = min(newleftlen, DefMatchLen)
 	ytoken := newleft[:minlen]
 
 	yatx := inbytes.TokenFind(oldleft, ytoken, 0)
@@ -411,10 +395,7 @@ func searchForward(atx, aty int, x, y *int, oldleft, newleft *[]byte) (
 	oldleftlen := len(*oldleft)
 	newleftlen := len(*newleft)
 
-	minlen := DefMatchLen
-	if oldleftlen < minlen {
-		minlen = oldleftlen
-	}
+	minlen := min(oldleftlen, DefMatchLen)
 
 	// Loop through old line to find matching token
 	xaty := -1
@@ -428,10 +409,7 @@ func searchForward(atx, aty int, x, y *int, oldleft, newleft *[]byte) (
 		}
 	}
 
-	minlen = DefMatchLen
-	if newleftlen < minlen {
-		minlen = newleftlen
-	}
+	minlen = min(newleftlen, DefMatchLen)
 
 	yatx := -1
 	yy := 1

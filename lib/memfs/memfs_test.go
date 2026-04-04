@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 	"time"
 
@@ -393,13 +394,7 @@ func TestMemFS_Get(t *testing.T) {
 			continue
 		}
 
-		found := false
-		for _, expCT := range c.expContentType {
-			if expCT == got.ContentType {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(c.expContentType, got.ContentType)
 		if !found {
 			t.Errorf("expecting one of the Content-Type %v, got %s",
 				c.expContentType, got.ContentType)

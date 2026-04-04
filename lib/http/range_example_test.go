@@ -106,27 +106,25 @@ func ExampleParseRange() {
 	// bytes=0-9,10-19,-20
 }
 
-func ptrInt64(v int64) *int64 { return &v }
-
 func ExampleRange_Add() {
 	var listpos = []struct {
 		start *int64
 		end   *int64
 	}{
-		{ptrInt64(0), ptrInt64(9)},  // OK.
-		{ptrInt64(0), ptrInt64(5)},  // Overlap with [0,9].
-		{ptrInt64(9), ptrInt64(19)}, // Overlap with [0,9].
+		{new(int64(0)), new(int64(9))},  // OK.
+		{new(int64(0)), new(int64(5))},  // Overlap with [0,9].
+		{new(int64(9)), new(int64(19))}, // Overlap with [0,9].
 
-		{ptrInt64(10), ptrInt64(19)}, // OK.
-		{ptrInt64(19), ptrInt64(20)}, // Overlap with [10,19].
-		{ptrInt64(20), ptrInt64(19)}, // End less than start.
+		{new(int64(10)), new(int64(19))}, // OK.
+		{new(int64(19)), new(int64(20))}, // Overlap with [10,19].
+		{new(int64(20)), new(int64(19))}, // End less than start.
 
-		{nil, ptrInt64(10)}, // OK.
-		{nil, ptrInt64(20)}, // Overlap with [nil,10].
+		{nil, new(int64(10))}, // OK.
+		{nil, new(int64(20))}, // Overlap with [nil,10].
 
-		{ptrInt64(20), nil},          // Overlap with [nil,10].
-		{ptrInt64(30), ptrInt64(40)}, // Overlap with [20,nil].
-		{ptrInt64(30), nil},          // Overlap with [20,nil].
+		{new(int64(20)), nil},            // Overlap with [nil,10].
+		{new(int64(30)), new(int64(40))}, // Overlap with [20,nil].
+		{new(int64(30)), nil},            // Overlap with [20,nil].
 	}
 
 	var r = libhttp.NewRange(``)
@@ -153,7 +151,7 @@ func ExampleRange_Positions() {
 	var r = libhttp.NewRange(``)
 	fmt.Println(r.Positions()) // Empty positions.
 
-	r.Add(ptrInt64(10), ptrInt64(20))
+	r.Add(new(int64(10)), new(int64(20)))
 	fmt.Println(r.Positions())
 	// Output:
 	// []
@@ -165,7 +163,7 @@ func ExampleRange_String() {
 
 	fmt.Println(r.String()) // Empty range will return empty string.
 
-	r.Add(ptrInt64(0), ptrInt64(9))
+	r.Add(new(int64(0)), new(int64(9)))
 	fmt.Println(r.String())
 	// Output:
 	//

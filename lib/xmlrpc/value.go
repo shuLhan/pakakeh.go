@@ -105,7 +105,7 @@ func NewValue(in any) (out *Value) {
 			}
 		}
 
-	case reflect.Interface, reflect.Ptr:
+	case reflect.Interface, reflect.Pointer:
 		return NewValue(refv.Elem())
 
 	case reflect.Invalid, reflect.Complex64, reflect.Complex128,

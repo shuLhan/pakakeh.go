@@ -105,14 +105,13 @@ func TestParseTag_fromStruct(t *testing.T) {
 			{`a`, `b ": c`, `d`, ``},
 		}
 
-		adt   ADT
 		vtype reflect.Type
 		field reflect.StructField
 		tag   string
 		got   []string
 	)
 
-	vtype = reflect.TypeOf(adt)
+	vtype = reflect.TypeFor[ADT]()
 
 	for x := range vtype.NumField() {
 		field = vtype.Field(x)

@@ -34,7 +34,7 @@ func MarshalForm(in any) (out url.Values, err error) {
 		x         int
 	)
 
-	if inKind == reflect.Ptr {
+	if inKind == reflect.Pointer {
 		inType = inType.Elem()
 		inKind = inType.Kind()
 	}
@@ -166,7 +166,7 @@ func UnmarshalForm(in url.Values, out any) (err error) {
 		hasTag     bool
 	)
 
-	if rkind != reflect.Ptr {
+	if rkind != reflect.Pointer {
 		return fmt.Errorf("%s: expecting *T got %T", logp, out)
 	}
 
@@ -177,7 +177,7 @@ func UnmarshalForm(in url.Values, out any) (err error) {
 	vout = vout.Elem()
 	rtype = rtype.Elem()
 	rkind = rtype.Kind()
-	if rkind == reflect.Ptr {
+	if rkind == reflect.Pointer {
 		rtype = rtype.Elem()
 		rkind = rtype.Kind()
 		if rkind != reflect.Struct {
@@ -232,7 +232,7 @@ func UnmarshalForm(in url.Values, out any) (err error) {
 		rtype = fval.Type()
 		rkind = fval.Kind()
 
-		if rkind == reflect.Ptr {
+		if rkind == reflect.Pointer {
 			// F *T
 			rtype = rtype.Elem() // T <= *T
 			rkind = rtype.Kind()

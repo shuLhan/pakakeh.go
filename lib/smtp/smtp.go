@@ -7,6 +7,7 @@ package smtp
 import (
 	"bytes"
 	"errors"
+	"slices"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
@@ -207,12 +208,9 @@ func parseLocalDomain(data []byte, allow []byte) (out []byte) {
 			continue
 		}
 		found = false
-		for _, c := range allow {
-			if c == data[x] {
-				out = append(out, data[x])
-				found = true
-				break
-			}
+		if slices.Contains(allow, data[x]) {
+			out = append(out, data[x])
+			found = true
 		}
 		if found {
 			continue

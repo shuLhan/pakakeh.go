@@ -57,8 +57,7 @@ func TestNewUDPClientPool(t *testing.T) {
 
 		qname = "kilabit.info"
 		for range 10 {
-			wg.Add(1)
-			go func() {
+			wg.Go(func() {
 				var (
 					cl = clPool.Get()
 					q  = MessageQuestion{
@@ -71,8 +70,7 @@ func TestNewUDPClientPool(t *testing.T) {
 				if err != nil {
 					t.Log("Lookup error: ", err.Error())
 				}
-				wg.Done()
-			}()
+			})
 		}
 		wg.Wait()
 	}

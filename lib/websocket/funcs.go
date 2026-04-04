@@ -100,11 +100,7 @@ func Send(fd int, packet []byte, timeout time.Duration) (err error) {
 	}
 
 	for len(packet) > 0 {
-		if len(packet) < maxBuffer {
-			max = len(packet)
-		} else {
-			max = maxBuffer
-		}
+		max = min(len(packet), maxBuffer)
 
 		n, err = unix.Write(fd, packet[:max])
 		if err != nil {
