@@ -9,7 +9,7 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
-func TestUUIDv7_Scan(t *testing.T) {
+func TestUUID_Scan(t *testing.T) {
 	id := Parse(`019B76DA-A800-7000-8000-00000000001A`)
 
 	listCase := []struct {
@@ -42,7 +42,7 @@ func TestUUIDv7_Scan(t *testing.T) {
 	}
 }
 
-func TestUUIDv7_UnmarshalBinary(t *testing.T) {
+func TestUUID_UnmarshalBinary(t *testing.T) {
 	id := Parse(`019B76DA-A800-7000-8000-00000000001A`)
 
 	listCase := []struct {
@@ -77,7 +77,7 @@ func TestUUIDv7_UnmarshalBinary(t *testing.T) {
 	}
 }
 
-func TestUUIDv7_UnmarshalText(t *testing.T) {
+func TestUUID_UnmarshalText(t *testing.T) {
 	id := Parse(`019B76DA-A800-7000-8000-00000000001A`)
 
 	listCase := []struct {

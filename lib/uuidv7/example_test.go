@@ -47,7 +47,7 @@ func ExampleParse() {
 	// false 019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF 2026-03-09 14:20:01.123 +0000 UTC
 }
 
-func ExampleUUIDv7_Equal() {
+func ExampleUUID_Equal() {
 	id := uuidv7.Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`)
 	id2 := uuidv7.Parse(`019CD2F8-2AE3-774E-BFFF-FFFFFFFFFFFF`)
 
@@ -66,7 +66,7 @@ func ExampleUUIDv7_Equal() {
 	// uuidv7: not equal, want 019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF, got 019CD2F8-2AE3-774E-BFFF-FFFFFFFFFFFF
 }
 
-func ExampleUUIDv7_IsEqual() {
+func ExampleUUID_IsEqual() {
 	id := uuidv7.Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`)
 	other := uuidv7.Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFF0`)
 
@@ -78,7 +78,7 @@ func ExampleUUIDv7_IsEqual() {
 	// false
 }
 
-func ExampleUUIDv7_MarshalBinary() {
+func ExampleUUID_MarshalBinary() {
 	now := time.Date(2026, 3, 9, 14, 20, 0, 123456700, time.UTC)
 	uuidv7.Now = func() time.Time {
 		now = now.Add(time.Second)
@@ -98,7 +98,7 @@ func ExampleUUIDv7_MarshalBinary() {
 	fmt.Printf("Sent: %s\n", id)
 
 	dec := gob.NewDecoder(&buf)
-	var gotID uuidv7.UUIDv7
+	var gotID uuidv7.UUID
 	err = dec.Decode(&gotID)
 	if err != nil {
 		log.Fatal(err)
@@ -110,7 +110,7 @@ func ExampleUUIDv7_MarshalBinary() {
 	// Receive: 019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF
 }
 
-func ExampleUUIDv7_MarshalText() {
+func ExampleUUID_MarshalText() {
 	now := time.Date(2026, 3, 9, 14, 20, 0, 123456700, time.UTC)
 	uuidv7.Now = func() time.Time {
 		now = now.Add(time.Second)
@@ -121,7 +121,7 @@ func ExampleUUIDv7_MarshalText() {
 	}
 
 	type T struct {
-		ID uuidv7.UUIDv7
+		ID uuidv7.UUID
 	}
 
 	t := T{
@@ -145,8 +145,8 @@ func ExampleUUIDv7_MarshalText() {
 	// {ID:019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF}
 }
 
-func ExampleUUIDv7_Scan() {
-	var id uuidv7.UUIDv7
+func ExampleUUID_Scan() {
+	var id uuidv7.UUID
 
 	// Scan the value from the database:
 	//

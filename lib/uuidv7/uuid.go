@@ -31,9 +31,9 @@ var Rand = func() (v uint64) {
 	return v
 }
 
-// UUIDv7 defines the container for UUID version 7 that satisfy the
+// UUID defines the container for UUID version 7 that satisfy the
 // [database/sql], [encoding/gob], and [encoding/json].
-type UUIDv7 struct {
+type UUID struct {
 	// The high 8 octets store the unix timestamp in milliseconds (6
 	// octets), the version (4 bits), and clock precision (12 bits).
 	high uint64
@@ -44,13 +44,13 @@ type UUIDv7 struct {
 }
 
 // Generate generates new UUID version 7.
-func Generate() (id UUIDv7) {
+func Generate() (id UUID) {
 	now := Now()
 	generate(&now, &id)
 	return id
 }
 
-func generate(t *time.Time, id *UUIDv7) {
+func generate(t *time.Time, id *UUID) {
 	unixns := uint64(t.UnixNano())           // 1773066002123456700
 	millis := uint64(unixns / 1e6)           // 1773066002123
 	id.high = millis << 16                   // 0x019c_d2f8_1ecb_0000
@@ -63,15 +63,15 @@ func generate(t *time.Time, id *UUIDv7) {
 	id.low = variantMask | rand              // 0xbfff_ffff_ffff_ffff
 }
 
-// Parse parses the UUIDv7 formated string and return it as non-zero id.
-// If the string s is invalid UUIDv7 it will return zero id.
-func Parse(s string) (id UUIDv7) {
+// Parse parses the UUID formated string and return it as non-zero id.
+// If the string s is invalid UUID it will return zero id.
+func Parse(s string) (id UUID) {
 	id.UnmarshalText([]byte(s))
 	return id
 }
 
 // Bytes returns id as a stream of binary.
-func (id UUIDv7) Bytes() (data []byte) {
+func (id UUID) Bytes() (data []byte) {
 	data = make([]byte, 0, binary.MaxVarintLen64*2)
 	data = binary.BigEndian.AppendUint64(data, id.high)
 	data = binary.BigEndian.AppendUint64(data, id.low)
@@ -81,10 +81,10 @@ func (id UUIDv7) Bytes() (data []byte) {
 // Equal returns nil if id and v are equals.
 // This method implements [git.sr.ht/~shulhan/pakakeh.go/lib/reflect.Equaler]
 // interface.
-func (id *UUIDv7) Equal(v any) (err error) {
-	ptr, ok := v.(*UUIDv7)
+func (id *UUID) Equal(v any) (err error) {
+	ptr, ok := v.(*UUID)
 	if !ok {
-		other, ok := v.(UUIDv7)
+		other, ok := v.(UUID)
 		if !ok {
 			return fmt.Errorf(`uuidv7: Equal: want type %T, got %T`, &id, v)
 		}
@@ -100,29 +100,29 @@ func (id *UUIDv7) Equal(v any) (err error) {
 }
 
 // IsEqual returns true if id equal with other.
-func (id UUIDv7) IsEqual(other UUIDv7) bool {
+func (id UUID) IsEqual(other UUID) bool {
 	return id.high == other.high && id.low == other.low
 }
 
 // IsZero returns true if all bits is zero.
-func (id UUIDv7) IsZero() bool {
+func (id UUID) IsZero() bool {
 	return id.high == 0 && id.low == 0
 }
 
 // MarshalBinary encodes the id to binary for [encoding/gob].
-func (id UUIDv7) MarshalBinary() (data []byte, err error) {
+func (id UUID) MarshalBinary() (data []byte, err error) {
 	data = id.Bytes()
 	return data, nil
 }
 
 // MarshalText encodes the id to JSON for [encoding/json].
-func (id UUIDv7) MarshalText() (data []byte, err error) {
+func (id UUID) MarshalText() (data []byte, err error) {
 	v := id.String()
 	return []byte(v), nil
 }
 
 // UnmarshalBinary decodes the data into id for [encoding/gob].
-func (id *UUIDv7) UnmarshalBinary(data []byte) (err error) {
+func (id *UUID) UnmarshalBinary(data []byte) (err error) {
 	if len(data) != 16 {
 		return fmt.Errorf(`uuidv7: invalid length %d`, len(data))
 	}
@@ -136,7 +136,7 @@ func (id *UUIDv7) UnmarshalBinary(data []byte) (err error) {
 }
 
 // UnmarshalText decodes the JSON data into id for [encoding/json].
-func (id *UUIDv7) UnmarshalText(data []byte) (err error) {
+func (id *UUID) UnmarshalText(data []byte) (err error) {
 	src := make([]byte, 0, 32)
 	for _, c := range data {
 		if c == '-' {
@@ -172,7 +172,7 @@ func (id *UUIDv7) UnmarshalText(data []byte) (err error) {
 // Scan scans the raw database value into id.
 // This method implement [database/sql.Scanner] interface.
 // Column with NULL value will returns no error set it to zero UUID.
-func (id *UUIDv7) Scan(src any) (err error) {
+func (id *UUID) Scan(src any) (err error) {
 	switch v := src.(type) {
 	case []byte:
 		err = id.UnmarshalText(v)
@@ -189,9 +189,9 @@ func (id *UUIDv7) Scan(src any) (err error) {
 	return nil
 }
 
-// String returns the human readable format of UUIDv7 in the form of
+// String returns the human readable format of UUID in the form of
 // "0xxxxxxx-xxxx-7xxx-8xxx-xxxxxxxxxxxx".
-func (id UUIDv7) String() string {
+func (id UUID) String() string {
 	buf := make([]byte, 36)
 	sw := 56
 	x := 0
@@ -223,8 +223,8 @@ func (id UUIDv7) String() string {
 	return string(buf)
 }
 
-// Time returns the Unix epoch timestamp in milliseconds stored in the UUIDv7.
-func (id *UUIDv7) Time() time.Time {
+// Time returns the Unix epoch timestamp in milliseconds stored in the UUID.
+func (id *UUID) Time() time.Time {
 	millis := id.high >> 16
 	t := time.UnixMilli(int64(millis))
 	return t
@@ -232,7 +232,7 @@ func (id *UUIDv7) Time() time.Time {
 
 // Value returns the value for sending it to the database.
 // This method implements the [driver.Valuer] interface.
-func (id UUIDv7) Value() (v driver.Value, err error) {
+func (id UUID) Value() (v driver.Value, err error) {
 	v = id.String()
 	return v, nil
 }
