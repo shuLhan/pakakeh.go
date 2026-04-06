@@ -15,13 +15,13 @@ import (
 )
 
 func ExampleGenerate() {
-	// Begin mocking Now and Rand, DO NOT USE in production code.
+	// Begin mocking NowFunc and RandFunc, DO NOT USE in production code.
 	now := time.Date(2026, 3, 9, 14, 20, 0, 123456700, time.UTC)
-	uuidv7.Now = func() time.Time {
+	uuidv7.NowFunc = func() time.Time {
 		now = now.Add(time.Second)
 		return now
 	}
-	uuidv7.Rand = func() uint64 {
+	uuidv7.RandFunc = func() uint64 {
 		return 0xFFFF_FFFF_FFFF_FFFF
 	}
 
@@ -80,11 +80,11 @@ func ExampleUUID_IsEqual() {
 
 func ExampleUUID_MarshalBinary() {
 	now := time.Date(2026, 3, 9, 14, 20, 0, 123456700, time.UTC)
-	uuidv7.Now = func() time.Time {
+	uuidv7.NowFunc = func() time.Time {
 		now = now.Add(time.Second)
 		return now
 	}
-	uuidv7.Rand = func() uint64 {
+	uuidv7.RandFunc = func() uint64 {
 		return 0xFFFF_FFFF_FFFF_FFFF
 	}
 
@@ -112,11 +112,11 @@ func ExampleUUID_MarshalBinary() {
 
 func ExampleUUID_MarshalText() {
 	now := time.Date(2026, 3, 9, 14, 20, 0, 123456700, time.UTC)
-	uuidv7.Now = func() time.Time {
+	uuidv7.NowFunc = func() time.Time {
 		now = now.Add(time.Second)
 		return now
 	}
-	uuidv7.Rand = func() uint64 {
+	uuidv7.RandFunc = func() uint64 {
 		return 0xFFFF_FFFF_FFFF_FFFF
 	}
 

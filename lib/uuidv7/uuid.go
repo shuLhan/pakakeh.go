@@ -16,15 +16,17 @@ import (
 const hexTable = `0123456789ABCDEF`
 const variantMask uint64 = 0x8000_0000_0000_0000
 
-// Now defines the function variable that return the current time in UTC.
+// NowFunc defines the function variable that return the current time in UTC.
 // This identifier is exported to simplify testing.
-var Now = func() time.Time {
+var NowFunc = func() time.Time {
 	return time.Now().UTC()
 }
 
-// Rand defines the function variable that return a random uint64.
+// RandFunc defines the function variable that return a random uint64.
 // This identifier is exported to simplify testing.
-var Rand = func() (v uint64) {
+// User with Go 1.26 or later should use [testing/cryptotest.SetGlobalRandom]
+// function to mock the random generator.
+var RandFunc = func() (v uint64) {
 	b := make([]byte, 8)
 	rand.Read(b)
 	v, _ = binary.Uvarint(b)
@@ -45,7 +47,7 @@ type UUID struct {
 
 // Generate generates new UUID version 7.
 func Generate() (id UUID) {
-	now := Now()
+	now := NowFunc()
 	generate(&now, &id)
 	return id
 }
@@ -58,7 +60,7 @@ func generate(t *time.Time, id *UUID) {
 	prec := unixns - (millis * 1e6)          // 456700
 	clockPrec := uint64((prec * 4096) / 1e6) // 1870
 	id.high |= clockPrec                     // 0x019c_d2f8_1ecb_774e
-	rand := Rand()                           // 0xffff_ffff_ffff_ffff
+	rand := RandFunc()                       // 0xffff_ffff_ffff_ffff
 	rand >>= 2                               // 0x3fff_ffff_ffff_ffff
 	id.low = variantMask | rand              // 0xbfff_ffff_ffff_ffff
 }
