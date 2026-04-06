@@ -9,6 +9,42 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
+func TestUUID_Equal(t *testing.T) {
+	id := Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`)
+
+	listCase := []struct {
+		desc     string
+		v        any
+		expError string
+	}{{
+		desc:     `EmptyInterface`,
+		expError: `uuidv7: expecting type *uuidv7.UUID, got <nil>`,
+	}, {
+		desc:     `NotEqualTime`,
+		v:        Parse(`019CD2F8-1AE4-774E-BFFF-FFFFFFFFFFFF`),
+		expError: `uuidv7: not equal, want 019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF, got 019CD2F8-1AE4-774E-BFFF-FFFFFFFFFFFF`,
+	}, {
+		desc:     `NotEqualRand`,
+		v:        Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFF0`),
+		expError: `uuidv7: not equal, want 019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF, got 019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFF0`,
+	}, {
+		desc: `AsPointerUUID`,
+		v:    new(Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`)),
+	}, {
+		desc: `AsUUID`,
+		v:    Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`),
+	}}
+	var gotError string
+	for _, tc := range listCase {
+		gotError = ``
+		err := id.Equal(tc.v)
+		if err != nil {
+			gotError = err.Error()
+		}
+		test.Assert(t, tc.desc, tc.expError, gotError)
+	}
+}
+
 func TestUUID_Scan(t *testing.T) {
 	id := Parse(`019B76DA-A800-7000-8000-00000000001A`)
 
@@ -112,4 +148,23 @@ func TestUUID_UnmarshalText(t *testing.T) {
 		}
 		test.Assert(t, tc.desc, tc.exp, id.String())
 	}
+}
+
+func TestUUID_Value(t *testing.T) {
+	var id UUID
+	v, err := id.Value()
+	if err != nil {
+		t.Fatal(err)
+	}
+	test.Assert(t, `ValueZero`, v.(string), `00000000-0000-0000-0000-000000000000`)
+
+	err = id.Scan([]byte(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	v, err = id.Value()
+	if err != nil {
+		t.Fatal(err)
+	}
+	test.Assert(t, `ValueZero`, v.(string), `019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`)
 }

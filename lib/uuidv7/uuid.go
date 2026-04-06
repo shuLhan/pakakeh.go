@@ -88,7 +88,7 @@ func (id *UUID) Equal(v any) (err error) {
 	if !ok {
 		other, ok := v.(UUID)
 		if !ok {
-			return fmt.Errorf(`uuidv7: Equal: want type %T, got %T`, &id, v)
+			return fmt.Errorf(`uuidv7: expecting type *uuidv7.UUID, got %T`, v)
 		}
 		ptr = &other
 	}
@@ -173,7 +173,7 @@ func (id *UUID) UnmarshalText(data []byte) (err error) {
 
 // Scan scans the raw database value into id.
 // This method implement [database/sql.Scanner] interface.
-// Column with NULL value will returns no error set it to zero UUID.
+// Column with NULL value will returns no error and set id to zero.
 func (id *UUID) Scan(src any) (err error) {
 	switch v := src.(type) {
 	case []byte:
