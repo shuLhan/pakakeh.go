@@ -5,6 +5,7 @@ package sql_test
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/sql"
@@ -143,7 +144,7 @@ func ExampleMeta_Sub() {
 	var q = fmt.Sprintf(`SELECT %s FROM t WHERE id=$1 OR name IN (%s);`,
 		meta.Names(), metain.WhereHolders())
 
-	var qparams = sql.JoinValues(meta.WhereValues(), metain.WhereValues())
+	var qparams = slices.Concat(meta.WhereValues(), metain.WhereValues())
 
 	// db.QueryRow(q, qparams...).Scan(meta.ListValue...)
 
