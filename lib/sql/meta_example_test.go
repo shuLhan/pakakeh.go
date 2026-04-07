@@ -43,20 +43,19 @@ func ExampleMeta_BindWhere() {
 			int(1000),
 			string(`JohnDoe`),
 		}
-		idx int
 	)
 
-	idx = meta.BindWhere(``, vals[0])
-	fmt.Printf("WHERE id=$%d\n", idx)
+	opWhere := meta.BindWhere(``, `id`, `=`, vals[0])
+	fmt.Printf("%s\n", opWhere.String())
 
-	idx = meta.BindWhere(``, vals[1])
-	fmt.Printf("AND name=$%d\n", idx)
+	opWhere = meta.BindWhere(`AND`, `name`, `=`, vals[1])
+	fmt.Printf("%s\n", opWhere.String())
 
-	fmt.Println(meta.ListWhereValue)
+	fmt.Println(meta.WhereValues())
 
 	// Output:
-	// WHERE id=$1
-	// AND name=$2
+	// id = $1
+	//  AND name = $2
 	// [1000 JohnDoe]
 }
 
@@ -131,27 +130,27 @@ func ExampleMeta_Sub() {
 
 	meta.Bind(`id`, &t.ID)
 	meta.Bind(`name`, &t.Name)
-	meta.BindWhere(`id`, qid)
+	meta.BindWhere(``, `id`, `=`, qid)
 
 	var (
 		metain = meta.Sub()
 		qnames = []string{`hello`, `world`}
 	)
 
-	metain.BindWhere(``, qnames[0])
-	metain.BindWhere(``, qnames[1])
+	metain.BindWhere(``, ``, ``, qnames[0])
+	metain.BindWhere(``, ``, ``, qnames[1])
 
 	var q = fmt.Sprintf(`SELECT %s FROM t WHERE id=$1 OR name IN (%s);`,
-		meta.Names(), metain.Holders())
+		meta.Names(), metain.WhereHolders())
 
-	var qparams = sql.JoinValues(meta.ListWhereValue, metain.ListWhereValue)
+	var qparams = sql.JoinValues(meta.WhereValues(), metain.WhereValues())
 
 	// db.QueryRow(q, qparams...).Scan(meta.ListValue...)
 
 	fmt.Println(q)
 	fmt.Println(`SELECT #n=`, len(meta.ListValue))
-	fmt.Println(`WHERE=`, meta.ListWhereValue)
-	fmt.Println(`WHERE IN=`, metain.ListWhereValue)
+	fmt.Println(`WHERE=`, meta.WhereValues())
+	fmt.Println(`WHERE IN=`, metain.WhereValues())
 	fmt.Println(`qparams=`, qparams)
 
 	// Output:
@@ -180,23 +179,20 @@ func ExampleMeta_UpdateFields() {
 
 	meta.Bind(`id`, t.ID)
 	meta.Bind(`name`, t.Name)
-	meta.BindWhere(`id=`, qid)
-	meta.BindWhere(`AND name=`, qname)
+	meta.BindWhere(``, `id`, `=`, qid)
+	meta.BindWhere(`AND`, `name`, `=`, qname)
 
-	var q = fmt.Sprintf(`UPDATE t SET %s WHERE %s;`, meta.UpdateFields(), meta.WhereFields())
+	var q = fmt.Sprintf(`UPDATE t SET %s WHERE %s;`,
+		meta.UpdateFields(), meta.WhereFields())
 
 	// db.Exec(q, meta.UpdateValues()...);
 
 	fmt.Println(q)
-	fmt.Println(`SET=`, meta.ListValue)
-	fmt.Println(`WHERE=`, meta.ListWhereValue)
-	fmt.Println(`Exec=`, meta.UpdateValues())
+	fmt.Println(`UpdateValues=`, meta.UpdateValues())
 
 	// Output:
-	// UPDATE t SET id=$1,name=$2 WHERE id=$3 AND name=$4;
-	// SET= [2 world]
-	// WHERE= [1 hello]
-	// Exec= [2 world 1 hello]
+	// UPDATE t SET id=$1,name=$2 WHERE  id = $3 AND name = $4;
+	// UpdateValues= [2 world 1 hello]
 }
 
 func ExampleMeta_UpdateValues() {
@@ -217,47 +213,48 @@ func ExampleMeta_UpdateValues() {
 
 	meta.Bind(`id`, t.ID)
 	meta.Bind(`name`, t.Name)
-	meta.BindWhere(`id`, qid)
-	meta.BindWhere(`name`, qname)
+	meta.BindWhere(``, `id`, `=`, qid)
+	meta.BindWhere(`AND`, `name`, `=`, qname)
 
-	var q = fmt.Sprintf(`UPDATE t SET id=$%d,name=$%d WHERE id=$%d AND name=$%d;`, meta.Index...)
+	var q = fmt.Sprintf(`UPDATE t SET %s WHERE %s;`,
+		meta.UpdateFields(), meta.WhereFields())
 
 	// db.Exec(q, meta.UpdateValues()...);
 
 	fmt.Println(q)
-	fmt.Println(`Index=`, meta.Index)
-	fmt.Println(`SET=`, meta.ListValue)
-	fmt.Println(`WHERE=`, meta.ListWhereValue)
-	fmt.Println(`Exec=`, meta.UpdateValues())
+	fmt.Println(`UpdateValues=`, meta.UpdateValues())
 
 	// Output:
-	// UPDATE t SET id=$1,name=$2 WHERE id=$3 AND name=$4;
-	// Index= [1 2 3 4]
-	// SET= [2 world]
-	// WHERE= [1 hello]
-	// Exec= [2 world 1 hello]
+	// UPDATE t SET id=$1,name=$2 WHERE  id = $3 AND name = $4;
+	// UpdateValues= [2 world 1 hello]
 }
 
 func ExampleMeta_WhereFields() {
 	var meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
 
-	meta.BindWhere(`id=`, 1000)
-	meta.BindWhere(`AND name=`, `share`)
+	meta.BindWhere(``, `id`, `=`, 1000)
+	meta.BindWhere(`AND`, `name`, `=`, `share`)
 
-	fmt.Printf(`SELECT * FROM t WHERE %s;`, meta.WhereFields())
+	fmt.Printf("SELECT * FROM t WHERE %s;\n", meta.WhereFields())
+	fmt.Println(meta.WhereValues())
+
 	// Output:
-	// SELECT * FROM t WHERE id=$1 AND name=$2;
+	// SELECT * FROM t WHERE  id = $1 AND name = $2;
+	// [1000 share]
 }
 
 func ExampleMeta_WhereHolders() {
 	var meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
 
-	meta.BindWhere(`id`, 1000)
-	meta.BindWhere(`name`, `share`)
+	meta.BindWhere(``, ``, ``, 1000)
+	meta.BindWhere(``, ``, ``, `share`)
 
-	fmt.Printf(`SELECT * FROM t WHERE id IN (%s);`, meta.WhereHolders())
+	fmt.Printf("SELECT * FROM t WHERE id IN (%s);\n", meta.WhereHolders())
+	fmt.Println(meta.WhereValues())
+
 	// Output:
 	// SELECT * FROM t WHERE id IN ($1,$2);
+	// [1000 share]
 }
 
 func ExampleMeta_deleteOnPostgresql() {
@@ -267,18 +264,18 @@ func ExampleMeta_deleteOnPostgresql() {
 		qname = `hello`
 	)
 
-	meta.BindWhere(`id=`, qid)
-	meta.BindWhere(`OR name=`, qname)
+	meta.BindWhere(``, `id`, `=`, qid)
+	meta.BindWhere(`OR`, `name`, `=`, qname)
 
 	var q = fmt.Sprintf(`DELETE FROM t WHERE %s;`, meta.WhereFields())
 
-	// db.Exec(q, meta.ListWhereValue...)
+	// db.Exec(q, meta.WhereValues()...)
 
 	fmt.Println(q)
-	fmt.Println(meta.ListWhereValue)
+	fmt.Println(meta.WhereValues())
 
 	// Output:
-	// DELETE FROM t WHERE id=$1 OR name=$2;
+	// DELETE FROM t WHERE  id = $1 OR name = $2;
 	// [1 hello]
 }
 
@@ -326,19 +323,19 @@ func ExampleMeta_selectOnPostgresql() {
 
 	meta.Bind(`id`, &t.ID)
 	meta.Bind(`name`, &t.Name)
-	meta.BindWhere(`id=`, qid)
-	meta.BindWhere(`OR name=`, qname)
+	meta.BindWhere(``, `id`, `=`, qid)
+	meta.BindWhere(`OR`, `name`, `=`, qname)
 
 	var q = fmt.Sprintf(`SELECT %s FROM t WHERE %s;`, meta.Names(), meta.WhereFields())
 
-	// db.QueryRow(q, meta.ListWhereValue...).Scan(meta.ListValue...)
+	// db.QueryRow(q, meta.WhereValues()...).Scan(meta.ListValue...)
 
 	fmt.Println(q)
-	fmt.Println(`WHERE=`, meta.ListWhereValue)
+	fmt.Println(`WHERE=`, meta.WhereValues())
 	fmt.Println(len(meta.ListValue))
 
 	// Output:
-	// SELECT id,name FROM t WHERE id=$1 OR name=$2;
+	// SELECT id,name FROM t WHERE  id = $1 OR name = $2;
 	// WHERE= [1 hello]
 	// 2
 }
@@ -357,7 +354,6 @@ func ExampleMeta_subquery() {
 		subid = 500
 		t     Table
 		qb    strings.Builder
-		idx   int
 	)
 
 	meta.Bind(`id`, &t.ID)
@@ -367,21 +363,22 @@ func ExampleMeta_subquery() {
 	fmt.Fprintf(&qb, `SELECT %s FROM t WHERE 1=1`, meta.Names())
 
 	if id != 0 {
-		idx = meta.BindWhere(``, id)
-		fmt.Fprintf(&qb, ` AND id = $%d`, idx)
+		op := meta.BindWhere(`AND`, `id`, `=`, id)
+		qb.WriteString(op.String())
 	}
 	if subid != 0 {
-		idx = meta.BindWhere(``, subid)
-		fmt.Fprintf(&qb, ` AND sub_id = (SELECT id FROM u WHERE u.id = $%d);`, idx)
+		op := meta.BindWhere(``, `u.id`, `=`, subid)
+		fmt.Fprintf(&qb, ` AND sub_id = (SELECT id FROM u WHERE %s);`,
+			op.String())
 	}
 
-	// db.Exec(qb.String(),meta.ListWhereValue...).Scan(meta.ListValue...)
+	// db.Exec(qb.String(),meta.WhereValues()...).Scan(meta.ListValue...)
 
 	fmt.Println(qb.String())
-	fmt.Println(meta.ListWhereValue)
+	fmt.Println(meta.WhereValues())
 
 	// Output:
-	// SELECT id,sub_id,name FROM t WHERE 1=1 AND id = $1 AND sub_id = (SELECT id FROM u WHERE u.id = $2);
+	// SELECT id,sub_id,name FROM t WHERE 1=1 AND id = $1 AND sub_id = (SELECT id FROM u WHERE  u.id = $2);
 	// [1 500]
 }
 
@@ -408,20 +405,20 @@ func ExampleMeta_subqueryWithIndex() {
 	fmt.Fprintf(&qb, `SELECT %s FROM t WHERE 1=1`, meta.Names())
 	if id != 0 {
 		qb.WriteString(` AND id = $%d`)
-		meta.BindWhere(`id`, id)
+		meta.BindWhere(``, `id`, `=`, id)
 	}
 	if subid != 0 {
 		qb.WriteString(` AND sub_id = (SELECT id FROM u WHERE u.id = $%d);`)
-		meta.BindWhere(`sub_id`, subid)
+		meta.BindWhere(``, `u.id`, `=`, subid)
 	}
 
 	var q = fmt.Sprintf(qb.String(), meta.Index...)
 
-	// db.Exec(q, meta.ListWhereValue...).Scan(meta.ListValue...)
+	// db.Exec(q, meta.WhereValues()...).Scan(meta.ListValue...)
 
 	fmt.Println(q)
 	fmt.Println(meta.Index)
-	fmt.Println(meta.ListWhereValue)
+	fmt.Println(meta.WhereValues())
 
 	// Output:
 	// SELECT id,sub_id,name FROM t WHERE 1=1 AND id = $1 AND sub_id = (SELECT id FROM u WHERE u.id = $2);

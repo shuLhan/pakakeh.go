@@ -28,13 +28,8 @@ type Meta struct {
 	// select.
 	ListValue []any
 
-	// ListWhereCond contains list of condition to be joined with
-	// ListHolder.
-	// The text is a free form, does not need to be a column name.
-	ListWhereCond []string
-
-	// ListWhereValue contains list of values for where condition.
-	ListWhereValue []any
+	// listOpWhere contains list of WHERE conditions.
+	listOpWhere []OpWhere
 
 	// Index collect all holder integer value, as in "1,2,3,...".
 	Index []any
@@ -42,8 +37,8 @@ type Meta struct {
 	nholder int
 }
 
-// NewMeta create new Meta using specific driver name.
-// The driver affect the ListHolder value.
+// NewMeta creates new Meta using specific driver name and DML operations.
+// The driver affect the [Meta.ListHolder] value.
 func NewMeta(driverName string, dmlKind DMLKind) (meta *Meta) {
 	meta = &Meta{
 		driver: driverName,
@@ -52,7 +47,7 @@ func NewMeta(driverName string, dmlKind DMLKind) (meta *Meta) {
 	return meta
 }
 
-// Bind column name and variable for DML INSERT, SELECT, or UPDATE.
+// Bind binds column name and variable for DML INSERT, SELECT, or UPDATE.
 // It is a no-op for DML DELETE.
 func (meta *Meta) Bind(colName string, val any) {
 	if meta.kind == DMLKindDelete {
@@ -84,42 +79,52 @@ func (meta *Meta) Bind(colName string, val any) {
 	}
 }
 
-// BindWhere bind value for where condition.
+// BindWhere binds the value val for DML WHERE condition.
 //
-// The cond string is optional, can be a column name with operator or any
-// text like "AND col=" or "OR col=".
+// The logic parameter defines the logical operator like "OR"
+// and "AND" for joining multiple BindWhere.
 //
-// It return the length of [Meta.ListHolder].
+// The col parameter defines the column name to be compared with val.
+//
+// The comp parameter defines the comparison for col and val, like "=" for
+// equality or "!=" for non-equality.
 //
 // It is a no-operation for DML INSERT.
-func (meta *Meta) BindWhere(cond string, val any) int {
+func (meta *Meta) BindWhere(logic, col, comp string, val any) (whereOp *OpWhere) {
 	if meta.kind == DMLKindInsert {
-		return 0
+		return nil
 	}
 
-	meta.ListWhereCond = append(meta.ListWhereCond, cond)
-	meta.ListWhereValue = append(meta.ListWhereValue, val)
+	whereOp = &OpWhere{
+		logic:  logic,
+		column: col,
+		comp:   comp,
+		val:    val,
+	}
 
 	meta.nholder++
 	meta.Index = append(meta.Index, meta.nholder)
 	if meta.driver == DriverNamePostgres {
-		meta.ListHolder = append(meta.ListHolder, fmt.Sprintf(`$%d`, meta.nholder))
+		whereOp.holder = fmt.Sprintf(`$%d`, meta.nholder)
 	} else {
-		meta.ListHolder = append(meta.ListHolder, DefaultPlaceHolder)
+		whereOp.holder = DefaultPlaceHolder
 	}
-	return meta.nholder
+
+	meta.listOpWhere = append(meta.listOpWhere, *whereOp)
+
+	return whereOp
 }
 
-// Holders generate string of holder, for example "$1, $2, ...", for DML
-// INSERT-VALUES.
+// Holders returns string of holders joined with comma ",";
+// for example "$1, $2, ...", for INSERT-VALUES.
 func (meta *Meta) Holders() string {
 	return strings.Join(meta.ListHolder, `,`)
 }
 
-// Names generate string of column names, for example "col1, col2, ...", for
+// Names returns string of column names, for example "col1, col2, ...", for
 // DML INSERT or SELECT.
 //
-// It will return an empty string if kind is DML UPDATE or DELETE.
+// It will return an empty string if kind is UPDATE or DELETE.
 func (meta *Meta) Names() string {
 	if meta.kind == DMLKindUpdate || meta.kind == DMLKindDelete {
 		return ``
@@ -127,7 +132,7 @@ func (meta *Meta) Names() string {
 	return strings.Join(meta.ListName, `,`)
 }
 
-// Sub return the child of Meta for building subquery.
+// Sub returns the child of Meta for building subquery.
 func (meta *Meta) Sub() (sub *Meta) {
 	sub = &Meta{
 		driver:  meta.driver,
@@ -137,10 +142,10 @@ func (meta *Meta) Sub() (sub *Meta) {
 	return sub
 }
 
-// UpdateFields generate string of "col1=<holder>, col2=<holder>, ..." for
+// UpdateFields returns string of "col1=<holder>, col2=<holder>, ..." for
 // DML UPDATE.
 //
-// It will return an empty string if kind is not UPDATE.
+// It will return an empty string if kind is not DML UPDATE.
 func (meta *Meta) UpdateFields() string {
 	if meta.kind != DMLKindUpdate {
 		return ``
@@ -162,7 +167,7 @@ func (meta *Meta) UpdateFields() string {
 	return sb.String()
 }
 
-// UpdateValues return the merged of ListValue and ListWhereValue for DML
+// UpdateValues returns the merged of ListValue and list WhereValues for DML
 // UPDATE.
 //
 // It will return nil if kind is not DML UPDATE.
@@ -171,38 +176,26 @@ func (meta *Meta) UpdateValues() (listVal []any) {
 		return nil
 	}
 	listVal = append(listVal, meta.ListValue...)
-	listVal = append(listVal, meta.ListWhereValue...)
+	listVal = append(listVal, meta.WhereValues()...)
 	return listVal
 }
 
-// WhereFields merge the ListWhereCond and ListHolder.
-//
+// WhereFields returns the DML for WHERE query, as in "col=$? AND y!=$?...".
 // It will return an empty string if kind is DML INSERT.
 func (meta *Meta) WhereFields() string {
 	if meta.kind == DMLKindInsert {
 		return ``
 	}
 
-	var (
-		off int
-		sb  strings.Builder
-		x   int
-	)
-
-	if meta.kind == DMLKindUpdate || meta.kind == DMLKindInsert {
-		off = len(meta.ListValue)
-	}
-	for ; x < len(meta.ListWhereCond); x++ {
-		if x > 0 {
-			sb.WriteByte(' ')
-		}
-		fmt.Fprintf(&sb, `%s%s`, meta.ListWhereCond[x], meta.ListHolder[off+x])
+	var sb strings.Builder
+	for _, op := range meta.listOpWhere {
+		sb.WriteString(op.String())
 	}
 	return sb.String()
 }
 
-// WhereHolders generate string of holder, for example "$1,$2, ...", based
-// on number of item added with [Meta.BindWhere].
+// WhereHolders returns string of holders joining by comma, for example
+// "$1,$2, ...", based on number of item added with [Meta.BindWhere].
 // Similar to method Holders but for where condition.
 //
 // It will return an empty string if kind is DML INSERT.
@@ -210,5 +203,21 @@ func (meta *Meta) WhereHolders() string {
 	if meta.kind == DMLKindInsert {
 		return ``
 	}
-	return strings.Join(meta.ListHolder, `,`)
+	var sb strings.Builder
+	for x, op := range meta.listOpWhere {
+		if x > 0 {
+			sb.WriteString(`,`)
+		}
+		sb.WriteString(op.holder)
+	}
+	return sb.String()
+}
+
+// WhereValues returns list of values in WHERE conditions.
+func (meta *Meta) WhereValues() (list []any) {
+	list = make([]any, 0, len(meta.listOpWhere))
+	for _, op := range meta.listOpWhere {
+		list = append(list, op.val)
+	}
+	return list
 }
