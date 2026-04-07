@@ -23,14 +23,14 @@ const (
 	sqlExtension = ".sql"
 )
 
-// Client provide a wrapper for generic database instance.
+// Client provides a wrapper for generic database instance.
 type Client struct {
 	*sql.DB
 	ClientOptions
 	TableNames []string // List of tables in database.
 }
 
-// NewClient create and initialize new database client.
+// NewClient creates and initializes new database client.
 func NewClient(opts ClientOptions) (cl *Client, err error) {
 	db, err := sql.Open(opts.DriverName, opts.DSN)
 	if err != nil {
@@ -45,7 +45,7 @@ func NewClient(opts ClientOptions) (cl *Client, err error) {
 	return cl, nil
 }
 
-// FetchTableNames return the table names in current database schema sorted
+// FetchTableNames returns the table names in current database schema sorted
 // in ascending order.
 func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 	var logp = `FetchTableNames`
@@ -93,7 +93,12 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 	return cl.TableNames, nil
 }
 
-// Migrate the database using list of SQL files inside a directory.
+// Meta returns new instance of [Meta] for DML kind.
+func (cl *Client) Meta(kind DMLKind) *Meta {
+	return NewMeta(cl.DriverName, kind)
+}
+
+// Migrate migratest the database using list of SQL files inside a directory.
 // Each SQL file in directory will be executed in alphabetical order based on
 // the last state.
 //
@@ -183,8 +188,8 @@ func (cl *Client) Migrate(tableMigration string, fs *memfs.MemFS) (err error) {
 	return nil
 }
 
-// migrateInit get the last file in table migration or if its not exist create
-// the migration table.
+// migrateInit returns the last file in table migration or if its not exist
+// create the migration table.
 func (cl *Client) migrateInit(tableMigration string) (lastFile string, err error) {
 	lastFile, err = cl.migrateLastFile(tableMigration)
 	if err == nil {
@@ -199,8 +204,8 @@ func (cl *Client) migrateInit(tableMigration string) (lastFile string, err error
 	return "", nil
 }
 
-// migrateLastFile return the last finished migration or empty string if table
-// migration does not exist.
+// migrateLastFile returns the last finished migration or empty string if
+// table migration does not exist.
 func (cl *Client) migrateLastFile(tableMigration string) (file string, err error) {
 	q := `
 		SELECT filename
