@@ -17,11 +17,10 @@ var (
 	DefDelimiter = byte('\n')
 )
 
-// Data represent additions, deletions, and changes between two text.
-// If no difference found, the IsMatched will be true.
+// Data stores additions, deletions, and changes between two texts.
 type Data struct {
-	Adds    text.Lines
-	Dels    text.Lines
+	Adds    []Line
+	Dels    []Line
 	Changes LineChanges
 
 	IsMatched bool
@@ -29,13 +28,13 @@ type Data struct {
 
 // Text search the difference between two texts.
 func Text(before, after []byte, level int) (diffs Data) {
-	beforeLines := text.ParseLines(before)
-	afterLines := text.ParseLines(after)
+	beforeLines := ParseLines(before)
+	afterLines := ParseLines(after)
 	return Lines(beforeLines, afterLines, level)
 }
 
 // Lines search the difference between two Lines.
-func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
+func Lines(oldlines, newlines []Line, level int) (diffs Data) {
 	oldlen := len(oldlines)
 	newlen := len(newlines)
 	x := 0
@@ -43,34 +42,30 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 
 	for x < oldlen {
 		if y == newlen {
-			// New text has been full examined. Leave out the old
-			// text that means deletion at the end of text.
+			// New text has been fully examined.
+			// The rest is the old text.
+			// That means deletion at the end of text.
 			diffs.PushDel(oldlines[x])
-			oldlines[x].V = nil
 			x++
 			continue
 		}
 
 		// Compare old line with new line.
-		if IsEqual(oldlines[x].V, newlines[y].V) {
-			oldlines[x].V = nil
-			newlines[y].V = nil
+		if IsEqual(oldlines[x].Val, newlines[y].Val) {
 			x++
 			y++
 			continue
 		}
 
 		// Check for whitespace changes
-		oldlinetrim := bytes.TrimSpace(oldlines[x].V)
-		newlinetrim := bytes.TrimSpace(newlines[y].V)
+		oldlinetrim := bytes.TrimSpace(oldlines[x].Val)
+		newlinetrim := bytes.TrimSpace(newlines[y].Val)
 		oldtrimlen := len(oldlinetrim)
 		newtrimlen := len(newlinetrim)
 
 		// Both are empty, probably one of them is changing
-		if oldtrimlen <= 0 && newtrimlen <= 0 {
+		if oldtrimlen == 0 && newtrimlen == 0 {
 			diffs.PushChange(oldlines[x], newlines[y])
-			oldlines[x].V = nil
-			newlines[y].V = nil
 			x++
 			y++
 			continue
@@ -79,7 +74,6 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 		// Old is empty or contain only whitespaces.
 		if oldtrimlen <= 0 {
 			diffs.PushDel(oldlines[x])
-			oldlines[x].V = nil
 			x++
 			continue
 		}
@@ -87,20 +81,17 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 		// New is empty or contain only whitespaces.
 		if newtrimlen <= 0 {
 			diffs.PushAdd(newlines[y])
-			newlines[y].V = nil
 			y++
 			continue
 		}
 
-		ratio, _, _ := BytesRatio(oldlines[x].V, newlines[y].V,
+		ratio, _, _ := BytesRatio(oldlines[x].Val, newlines[y].Val,
 			DefMatchLen)
 
 		if ratio > DefMatchRatio {
 			// Ratio of similar bytes is higher than minimum
 			// expectation. So, it must be changes
 			diffs.PushChange(oldlines[x], newlines[y])
-			oldlines[x].V = nil
-			newlines[y].V = nil
 			x++
 			y++
 			continue
@@ -115,8 +106,6 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 		// Both line is missing, its mean changes on current line
 		if !foundx && !foundy {
 			diffs.PushChange(oldlines[x], newlines[y])
-			oldlines[x].V = nil
-			newlines[y].V = nil
 			x++
 			y++
 			continue
@@ -126,7 +115,6 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 		if !foundx && foundy {
 			for ; x < yatx && x < oldlen; x++ {
 				diffs.PushDel(oldlines[x])
-				oldlines[x].V = nil
 			}
 			continue
 		}
@@ -135,7 +123,6 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 		if foundx && !foundy {
 			for ; y < xaty && y < newlen; y++ {
 				diffs.PushAdd(newlines[y])
-				newlines[y].V = nil
 			}
 			continue
 		}
@@ -150,7 +137,6 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 			case addlen < dellen:
 				for ; y < xaty && y < newlen; y++ {
 					diffs.PushAdd(newlines[y])
-					newlines[y].V = nil
 				}
 
 			case addlen == dellen:
@@ -158,15 +144,12 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 				for x < yatx && y < xaty {
 					diffs.PushChange(oldlines[x],
 						newlines[y])
-					oldlines[x].V = nil
-					newlines[y].V = nil
 					x++
 					y++
 				}
 			default:
 				for ; x < yatx && x < oldlen; x++ {
 					diffs.PushDel(oldlines[x])
-					oldlines[x].V = nil
 				}
 			}
 			continue
@@ -176,13 +159,12 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 	// Check if there is a left over from new text.
 	for ; y < newlen; y++ {
 		diffs.PushAdd(newlines[y])
-		newlines[y].V = nil
 	}
 
 	if level == LevelWords {
 		// Process each changes to find modified chunkes.
 		for x, change := range diffs.Changes {
-			adds, dels := Bytes(change.Old.V, change.New.V, 0, 0)
+			adds, dels := Bytes(change.Old.Val, change.New.Val, 0, 0)
 			diffs.Changes[x].Adds = adds
 			diffs.Changes[x].Dels = dels
 		}
@@ -208,17 +190,17 @@ func (diffs *Data) checkIsMatched() {
 }
 
 // PushAdd will add new line to diff set.
-func (diffs *Data) PushAdd(new text.Line) {
+func (diffs *Data) PushAdd(new Line) {
 	diffs.Adds = append(diffs.Adds, new)
 }
 
 // PushDel will add deletion line to diff set.
-func (diffs *Data) PushDel(old text.Line) {
+func (diffs *Data) PushDel(old Line) {
 	diffs.Dels = append(diffs.Dels, old)
 }
 
 // PushChange set to diff data.
-func (diffs *Data) PushChange(old, new text.Line) {
+func (diffs *Data) PushChange(old, new Line) {
 	change := NewLineChange(old, new)
 
 	diffs.Changes = append(diffs.Changes, *change)
@@ -227,7 +209,7 @@ func (diffs *Data) PushChange(old, new text.Line) {
 // GetAllAdds return chunks of additions including in line changes.
 func (diffs *Data) GetAllAdds() (chunks text.Chunks) {
 	for _, add := range diffs.Adds {
-		chunks = append(chunks, text.Chunk{StartAt: 0, V: add.V})
+		chunks = append(chunks, text.Chunk{StartAt: 0, V: add.Val})
 	}
 	chunks = append(chunks, diffs.Changes.GetAllAdds()...)
 	return
@@ -236,7 +218,7 @@ func (diffs *Data) GetAllAdds() (chunks text.Chunks) {
 // GetAllDels return chunks of deletions including in line changes.
 func (diffs *Data) GetAllDels() (chunks text.Chunks) {
 	for _, del := range diffs.Dels {
-		chunks = append(chunks, text.Chunk{StartAt: 0, V: del.V})
+		chunks = append(chunks, text.Chunk{StartAt: 0, V: del.Val})
 	}
 	chunks = append(chunks, diffs.Changes.GetAllDels()...)
 	return
@@ -244,29 +226,25 @@ func (diffs *Data) GetAllDels() (chunks text.Chunks) {
 
 // String return formatted data.
 func (diffs Data) String() (s string) {
-	var (
-		sb     strings.Builder
-		line   text.Line
-		change LineChange
-	)
+	var sb strings.Builder
 
 	if len(diffs.Dels) > 0 {
 		sb.WriteString("----\n")
-		for _, line = range diffs.Dels {
-			fmt.Fprintf(&sb, "%d - %q\n", line.N, line.V)
+		for _, line := range diffs.Dels {
+			fmt.Fprintf(&sb, "%d - %q\n", line.Num, line.Val)
 		}
 	}
 
 	if len(diffs.Adds) > 0 {
 		sb.WriteString("++++\n")
-		for _, line = range diffs.Adds {
-			fmt.Fprintf(&sb, "%d + %q\n", line.N, line.V)
+		for _, line := range diffs.Adds {
+			fmt.Fprintf(&sb, "%d + %q\n", line.Num, line.Val)
 		}
 	}
 
 	if len(diffs.Changes) > 0 {
 		sb.WriteString("--++\n")
-		for _, change = range diffs.Changes {
+		for _, change := range diffs.Changes {
 			sb.WriteString(change.String())
 		}
 	}

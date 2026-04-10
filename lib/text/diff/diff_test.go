@@ -222,8 +222,8 @@ func TestText(t *testing.T) {
 
 		expStr = string(exp)
 		if !reflect.DeepEqual(expStr, got) {
-			t.Fatalf("%s - %s: LevelLines not matched:\n<<< want:\n%s\n<<< got:\n%s",
-				c.textBefore, c.textAfter, expStr, got)
+			t.Fatalf("%s not matched:\n<<< want:\n%s\n<<< got:\n%s",
+				c.diffLevelLines, expStr, got)
 		}
 
 		diffs = Text(before, after, LevelWords)
@@ -236,8 +236,8 @@ func TestText(t *testing.T) {
 
 		expStr = string(exp)
 		if !reflect.DeepEqual(expStr, got) {
-			t.Fatalf("%s - %s: LevelWords not matched:\n<<< want:\n%s\n<<< got:\n%s",
-				c.textBefore, c.textAfter, expStr, got)
+			t.Fatalf("%s not matched:\n<<< want:\n%s\n<<< got:\n%s",
+				c.diffLevelWords, expStr, got)
 		}
 	}
 }

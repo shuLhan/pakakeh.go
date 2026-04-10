@@ -4,11 +4,6 @@
 package diff
 
 import (
-	"bufio"
-	"errors"
-	"io"
-	"os"
-
 	inbytes "git.sr.ht/~shulhan/pakakeh.go/internal/bytes"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 )
@@ -29,38 +24,6 @@ const (
 	// change.
 	DefMatchRatio = 0.7
 )
-
-// ReadLines return lines in the file `f`.
-func ReadLines(f string) (lines text.Lines, e error) {
-	var fd *os.File
-
-	fd, e = os.Open(f)
-	if e != nil {
-		return
-	}
-
-	var (
-		reader = bufio.NewReader(fd)
-		n      = 1
-		line   []byte
-	)
-	for {
-		line, e = reader.ReadBytes(DefDelimiter)
-		if e != nil {
-			if errors.Is(e, io.EOF) {
-				break
-			}
-			return lines, e
-		}
-
-		lines = append(lines, text.Line{N: n, V: line})
-		n++
-	}
-
-	e = fd.Close()
-
-	return lines, e
-}
 
 // IsEqual compare two slice of bytes and return true if equal or false
 // otherwise.
@@ -192,14 +155,14 @@ func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, max
 // findLine return true if line is found in text beginning at line `startat`.
 // It also return line number of matching line.
 // If no match found, it will return false and `startat` value.
-func findLine(line text.Line, text text.Lines, startat int) (
+func findLine(line Line, text []Line, startat int) (
 	found bool,
 	n int,
 ) {
 	textlen := len(text)
 
 	for n = startat; n < textlen; n++ {
-		if IsEqual(line.V, text[n].V) {
+		if IsEqual(line.Val, text[n].Val) {
 			return true, n
 		}
 	}

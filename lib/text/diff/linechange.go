@@ -15,12 +15,12 @@ type LineChange struct {
 	Adds text.Chunks
 	Dels text.Chunks
 
-	Old text.Line
-	New text.Line
+	Old Line
+	New Line
 }
 
 // NewLineChange create a pointer to new LineChange object.
-func NewLineChange(old, new text.Line) *LineChange {
+func NewLineChange(old, new Line) *LineChange {
 	return &LineChange{
 		Adds: text.Chunks{},
 		Dels: text.Chunks{},
@@ -36,8 +36,8 @@ func (change LineChange) String() string {
 		chunk text.Chunk
 	)
 
-	fmt.Fprintf(&sb, "%d - %q\n", change.Old.N, change.Old.V)
-	fmt.Fprintf(&sb, "%d + %q\n", change.New.N, change.New.V)
+	fmt.Fprintf(&sb, "%d - %q\n", change.Old.Num, change.Old.Val)
+	fmt.Fprintf(&sb, "%d + %q\n", change.New.Num, change.New.Val)
 
 	for _, chunk = range change.Dels {
 		fmt.Fprintf(&sb, "^%d - %q\n", chunk.StartAt, chunk.V)
