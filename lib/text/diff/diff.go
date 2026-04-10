@@ -19,9 +19,18 @@ var (
 
 // Data stores additions, deletions, and changes between two texts.
 type Data struct {
+	oldlines []Line
+	newlines []Line
+
 	Adds    []Line
 	Dels    []Line
 	Changes LineChanges
+
+	// Unified contains the result of [Unified] diff, without the label
+	// ("@@ ... @@") and context lines.
+	// To print the result of unified diff with context lines use
+	// [Data.WriteUnified].
+	Unified []Line
 
 	IsMatched bool
 }
@@ -35,10 +44,12 @@ func Text(before, after []byte, level int) (diffs Data) {
 
 // Lines search the difference between two Lines.
 func Lines(oldlines, newlines []Line, level int) (diffs Data) {
+	diffs.oldlines = oldlines
+	diffs.newlines = newlines
 	oldlen := len(oldlines)
 	newlen := len(newlines)
-	x := 0
-	y := 0
+	x := 0 // cursor for old.
+	y := 0 // cursor for new.
 
 	for x < oldlen {
 		if y == newlen {
@@ -52,6 +63,8 @@ func Lines(oldlines, newlines []Line, level int) (diffs Data) {
 
 		// Compare old line with new line.
 		if IsEqual(oldlines[x].Val, newlines[y].Val) {
+			oldlines[x].NumOther = newlines[y].Num
+			newlines[y].NumOther = oldlines[x].Num
 			x++
 			y++
 			continue
@@ -72,14 +85,14 @@ func Lines(oldlines, newlines []Line, level int) (diffs Data) {
 		}
 
 		// Old is empty or contain only whitespaces.
-		if oldtrimlen <= 0 {
+		if oldtrimlen == 0 {
 			diffs.PushDel(oldlines[x])
 			x++
 			continue
 		}
 
 		// New is empty or contain only whitespaces.
-		if newtrimlen <= 0 {
+		if newtrimlen == 0 {
 			diffs.PushAdd(newlines[y])
 			y++
 			continue
@@ -142,8 +155,7 @@ func Lines(oldlines, newlines []Line, level int) (diffs Data) {
 			case addlen == dellen:
 				// Both changes occur between lines
 				for x < yatx && y < xaty {
-					diffs.PushChange(oldlines[x],
-						newlines[y])
+					diffs.PushChange(oldlines[x], newlines[y])
 					x++
 					y++
 				}
@@ -191,19 +203,25 @@ func (diffs *Data) checkIsMatched() {
 
 // PushAdd will add new line to diff set.
 func (diffs *Data) PushAdd(new Line) {
+	new.Kind = LineKindAdd
 	diffs.Adds = append(diffs.Adds, new)
 }
 
 // PushDel will add deletion line to diff set.
 func (diffs *Data) PushDel(old Line) {
+	old.Kind = LineKindDel
 	diffs.Dels = append(diffs.Dels, old)
 }
 
 // PushChange set to diff data.
 func (diffs *Data) PushChange(old, new Line) {
+	if old.Num != new.Num {
+		old.NumOther, new.NumOther = new.Num, old.Num
+	}
 	change := NewLineChange(old, new)
-
 	diffs.Changes = append(diffs.Changes, *change)
+	diffs.PushDel(old)
+	diffs.PushAdd(new)
 }
 
 // GetAllAdds return chunks of additions including in line changes.
@@ -227,27 +245,17 @@ func (diffs *Data) GetAllDels() (chunks text.Chunks) {
 // String return formatted data.
 func (diffs Data) String() (s string) {
 	var sb strings.Builder
-
 	if len(diffs.Dels) > 0 {
 		sb.WriteString("----\n")
 		for _, line := range diffs.Dels {
-			fmt.Fprintf(&sb, "%d - %q\n", line.Num, line.Val)
+			fmt.Fprintln(&sb, line.String())
 		}
 	}
-
 	if len(diffs.Adds) > 0 {
 		sb.WriteString("++++\n")
 		for _, line := range diffs.Adds {
-			fmt.Fprintf(&sb, "%d + %q\n", line.Num, line.Val)
+			fmt.Fprintln(&sb, line.String())
 		}
 	}
-
-	if len(diffs.Changes) > 0 {
-		sb.WriteString("--++\n")
-		for _, change := range diffs.Changes {
-			sb.WriteString(change.String())
-		}
-	}
-
 	return sb.String()
 }

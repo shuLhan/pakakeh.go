@@ -6,13 +6,24 @@ package diff
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
+)
+
+// List of kind of line in [Data].
+const (
+	LineKindAdd   = '+'
+	LineKindDel   = '-'
+	LineKindLabel = '@'
+	LineKindNone  = 0
 )
 
 // Line represents single line from file or stream of bytes.
 type Line struct {
-	Val []byte // The line value.
-	Num int    // The line number, started from 1.
+	Val      []byte // The line value.
+	Kind     int    // The kind of changes.
+	Num      int    // The line number, started from 1.
+	NumOther int    // The line number of other file.
 }
 
 // ParseLines returns lines from reading raw bytes.
@@ -25,7 +36,8 @@ func ParseLines(raw []byte) (lines []Line) {
 	}
 	lines = make([]Line, 0, len(rawlines))
 	for x, line := range rawlines {
-		lines = append(lines, Line{Num: x + 1, Val: line})
+		l := Line{Num: x + 1, NumOther: x + 1, Val: line}
+		lines = append(lines, l)
 	}
 	return lines
 }
@@ -40,4 +52,14 @@ func ReadLines(file string) (lines []Line, err error) {
 	}
 	lines = ParseLines(raw)
 	return lines, nil
+}
+
+func WriteLines(w io.Writer, lines []Line) {
+	for _, line := range lines {
+		fmt.Fprintln(w, line.String())
+	}
+}
+
+func (line Line) String() string {
+	return fmt.Sprintf("%4d/%4d: %c%s", line.NumOther, line.Num, line.Kind, line.Val)
 }
