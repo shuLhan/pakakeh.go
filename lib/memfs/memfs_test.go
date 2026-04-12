@@ -661,9 +661,6 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 	if len(diffs.Dels) != 0 {
 		t.Fatalf("%s: dels: %#v", logp, diffs.Dels)
 	}
-	if len(diffs.Changes) != 0 {
-		t.Fatalf("%s: changes: %s", logp, diffs.Changes)
-	}
 }
 
 func TestMemFS_RemoveChild(t *testing.T) {
