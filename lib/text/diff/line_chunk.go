@@ -26,14 +26,14 @@ type LineChunk struct {
 //
 //	<OldLine>
 //	<NewLine>
-//	<StartAt>: <Kind><QuotedVal>
+//	^<StartAt> <Kind> <QuotedVal>
 //
-// The OldLine and NewLine print the line being compared, following the format
+// The OldLine and NewLine print the line being compared, using the format
 // from [Line.String].
-// The StartAt print the beginning position where characters differences found
-// between old and new line.
+// The StartAt print the beginning position where changes found between old
+// and new line.
 // The Kind print '-' for deletion or '+' for deletion.
-// The QuoteVal print the string difference.
+// The QuoteVal print the string difference in double quote.
 func (lchunk LineChunk) String() string {
 	var sb strings.Builder
 
@@ -43,10 +43,10 @@ func (lchunk LineChunk) String() string {
 	sb.WriteByte('\n')
 
 	for _, chunk := range lchunk.Dels {
-		fmt.Fprintf(&sb, "^%-4d: -%q\n", chunk.StartAt, chunk.V)
+		fmt.Fprintf(&sb, "^%-4d - %q\n", chunk.StartAt, chunk.V)
 	}
 	for _, chunk := range lchunk.Adds {
-		fmt.Fprintf(&sb, "^%-4d: +%q\n", chunk.StartAt, chunk.V)
+		fmt.Fprintf(&sb, "^%-4d + %q\n", chunk.StartAt, chunk.V)
 	}
 	return sb.String()
 }

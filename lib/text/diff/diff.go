@@ -7,6 +7,7 @@ package diff
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -233,6 +234,8 @@ func (diff *Data) PushChange(old, new Line) {
 	if old.Num != new.Num {
 		old.NumOther, new.NumOther = new.Num, old.Num
 	}
+	old.Kind = LineKindDel
+	new.Kind = LineKindAdd
 	change := LineChunk{
 		Old: old,
 		New: new,
@@ -288,6 +291,35 @@ func (diff Data) String() (s string) {
 		}
 	}
 	return sb.String()
+}
+
+// WriteLineChunks writes the formatted line changes and chunks differences
+// into w.
+// The format of output is,
+//
+//	--- <OldName>
+//	+++ <NewName>
+//	--++
+//	<LineChunk>
+//	...
+//
+// The OldName and NewName is the file name being compared.
+// See the [LineChunk.String] for the format of each LineChunk.
+func (diff Data) WriteLineChunks(w io.Writer) (err error) {
+	if len(diff.LineChunks) == 0 {
+		return nil
+	}
+	logp := `WriteLineChunks`
+	fmt.Fprintf(w, "--- %s\n", diff.OldName)
+	fmt.Fprintf(w, "+++ %s\n", diff.OldName)
+	fmt.Fprintln(w, `--++`)
+	for _, lchunk := range diff.LineChunks {
+		_, err = w.Write([]byte(lchunk.String()))
+		if err != nil {
+			return fmt.Errorf(`%s: %w`, logp, err)
+		}
+	}
+	return nil
 }
 
 // findLine returns true if line is found in the beginning of text start at

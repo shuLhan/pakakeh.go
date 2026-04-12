@@ -5,7 +5,7 @@ package diff
 
 import (
 	"os"
-	"reflect"
+	"strings"
 	"testing"
 
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
@@ -101,143 +101,121 @@ func TestBytesRatio(t *testing.T) {
 	}
 }
 
-func TestText(t *testing.T) {
-	t.Skip(`Unified output in progress`)
-	type testCase struct {
-		textBefore     string
-		textAfter      string
-		diffLevelLines string
-		diffLevelWords string
-	}
-
-	var cases = []testCase{{
-		textBefore:     `testdata/List_of_United_Nations.old`,
-		textAfter:      `testdata/List_of_United_Nations.new`,
-		diffLevelLines: `testdata/List_of_United_Nations_diff_LevelLines`,
-		diffLevelWords: `testdata/List_of_United_Nations_diff_LevelWords`,
+func TestFiles_LevelWords(t *testing.T) {
+	listCase := []struct {
+		desc    string
+		oldFile string
+		newFile string
+		exp     string
+	}{{
+		desc:    `List_of_United_Nations`,
+		oldFile: `testdata/List_of_United_Nations.old`,
+		newFile: `testdata/List_of_United_Nations.new`,
+		// No changes on chunk level.
 	}, {
-		textBefore:     `testdata/List_of_United_Nations.new`,
-		textAfter:      `testdata/List_of_United_Nations.old`,
-		diffLevelLines: `testdata/List_of_United_Nations_diff_LevelLines_reverse`,
-		diffLevelWords: `testdata/List_of_United_Nations_diff_LevelWords_reverse`,
+		desc:    `List_of_United_Nations.reverse`,
+		oldFile: `testdata/List_of_United_Nations.new`,
+		newFile: `testdata/List_of_United_Nations.old`,
+		// No changes on chunk level.
 	}, {
-		textBefore:     `testdata/Psusennes_II.old`,
-		textAfter:      `testdata/Psusennes_II.new`,
-		diffLevelLines: `testdata/Psusennes_II_diff_LevelLines`,
-		diffLevelWords: `testdata/Psusennes_II_diff_LevelWords`,
+		desc:    `Psusennes_II`,
+		oldFile: `testdata/Psusennes_II.old`,
+		newFile: `testdata/Psusennes_II.new`,
+		exp:     `testdata/Psusennes_II.chunks`,
 	}, {
-		textBefore:     `testdata/Psusennes_II.new`,
-		textAfter:      `testdata/Psusennes_II.old`,
-		diffLevelLines: `testdata/Psusennes_II_diff_LevelLines_reverse`,
-		diffLevelWords: `testdata/Psusennes_II_diff_LevelWords_reverse`,
+		desc:    `Psusennes_II.reverse`,
+		oldFile: `testdata/Psusennes_II.new`,
+		newFile: `testdata/Psusennes_II.old`,
+		exp:     `testdata/Psusennes_II.reverse.chunks`,
 	}, {
-		textBefore:     `testdata/Top_Gear_Series_14.old`,
-		textAfter:      `testdata/Top_Gear_Series_14.new`,
-		diffLevelLines: `testdata/Top_Gear_Series_14_diff_LevelLines`,
-		diffLevelWords: `testdata/Top_Gear_Series_14_diff_LevelWords`,
+		desc:    `Top_Gear_Series_14`,
+		oldFile: `testdata/Top_Gear_Series_14.old`,
+		newFile: `testdata/Top_Gear_Series_14.new`,
+		exp:     `testdata/Top_Gear_Series_14.chunks`,
 	}, {
-		textBefore:     `testdata/Top_Gear_Series_14.new`,
-		textAfter:      `testdata/Top_Gear_Series_14.old`,
-		diffLevelLines: `testdata/Top_Gear_Series_14_diff_LevelLines_reverse`,
-		diffLevelWords: `testdata/Top_Gear_Series_14_diff_LevelWords_reverse`,
+		desc:    `Top_Gear_Series_14.reverse`,
+		oldFile: `testdata/Top_Gear_Series_14.new`,
+		newFile: `testdata/Top_Gear_Series_14.old`,
+		exp:     `testdata/Top_Gear_Series_14.reverse.chunks`,
 	}, {
-		textBefore:     `testdata/empty3lines.txt`,
-		textAfter:      `testdata/empty5lines.txt`,
-		diffLevelLines: `testdata/empty_lines_diff_LevelLines`,
-		diffLevelWords: `testdata/empty_lines_diff_LevelWords`,
+		desc:    `empty_lines`,
+		oldFile: `testdata/empty3lines.txt`,
+		newFile: `testdata/empty5lines.txt`,
+		exp:     `testdata/empty_lines.chunks`,
 	}, {
-		textBefore:     `testdata/empty5lines.txt`,
-		textAfter:      `testdata/empty3lines.txt`,
-		diffLevelLines: `testdata/empty_lines_diff_LevelLines_reverse`,
-		diffLevelWords: `testdata/empty_lines_diff_LevelWords_reverse`,
+		desc:    `empty_lines.reverse`,
+		oldFile: `testdata/empty5lines.txt`,
+		newFile: `testdata/empty3lines.txt`,
+		exp:     `testdata/empty_lines.reverse.chunks`,
 	}, {
-		textBefore:     `testdata/peeps.old`,
-		textAfter:      `testdata/peeps.new`,
-		diffLevelLines: `testdata/peeps_diff_LevelLines`,
-		diffLevelWords: `testdata/peeps_diff_LevelWords`,
+		desc:    `peeps`,
+		oldFile: `testdata/peeps.old`,
+		newFile: `testdata/peeps.new`,
+		exp:     `testdata/peeps.chunks`,
 	}, {
-		textBefore:     `testdata/peeps.new`,
-		textAfter:      `testdata/peeps.old`,
-		diffLevelLines: `testdata/peeps_diff_LevelLines_reverse`,
-		diffLevelWords: `testdata/peeps_diff_LevelWords_reverse`,
+		desc:    `peeps.reverse`,
+		oldFile: `testdata/peeps.new`,
+		newFile: `testdata/peeps.old`,
+		exp:     `testdata/peeps.reverse.chunks`,
 	}, {
-		textBefore:     `testdata/text01.old`,
-		textAfter:      `testdata/text01.new`,
-		diffLevelLines: `testdata/text01_diff_LevelLines`,
-		diffLevelWords: `testdata/text01_diff_LevelWords`,
+		desc:    `text01`,
+		oldFile: `testdata/text01.old`,
+		newFile: `testdata/text01.new`,
+		exp:     `testdata/text01.chunks`,
 	}, {
-		textBefore:     `testdata/text01.new`,
-		textAfter:      `testdata/text01.old`,
-		diffLevelLines: `testdata/text01_diff_LevelLines_reverse`,
-		diffLevelWords: `testdata/text01_diff_LevelWords_reverse`,
+		desc:    `text01.reverse`,
+		oldFile: `testdata/text01.new`,
+		newFile: `testdata/text01.old`,
+		exp:     `testdata/text01.reverse.chunks`,
 	}, {
-		textBefore:     `testdata/text02.old`,
-		textAfter:      `testdata/text02.new`,
-		diffLevelLines: `testdata/text02_diff_LevelLines`,
-		diffLevelWords: `testdata/text02_diff_LevelWords`,
+		desc:    `text02`,
+		oldFile: `testdata/text02.old`,
+		newFile: `testdata/text02.new`,
+		exp:     `testdata/text02.chunks`,
 	}, {
-		textBefore:     `testdata/text02.new`,
-		textAfter:      `testdata/text02.old`,
-		diffLevelLines: `testdata/text02_diff_LevelLines_reverse`,
-		diffLevelWords: `testdata/text02_diff_LevelWords_reverse`,
+		desc:    `text02.reverse`,
+		oldFile: `testdata/text02.new`,
+		newFile: `testdata/text02.old`,
+		exp:     `testdata/text02.reverse.chunks`,
 	}, {
-		textBefore:     `testdata/the_singles_collection.old`,
-		textAfter:      `testdata/the_singles_collection.new`,
-		diffLevelLines: `testdata/the_singles_collection_diff_LevelLines`,
-		diffLevelWords: `testdata/the_singles_collection_diff_LevelWords`,
+		desc:    `the_singles_collection`,
+		oldFile: `testdata/the_singles_collection.old`,
+		newFile: `testdata/the_singles_collection.new`,
+		exp:     `testdata/the_singles_collection.chunks`,
 	}, {
-		textBefore:     `testdata/the_singles_collection.new`,
-		textAfter:      `testdata/the_singles_collection.old`,
-		diffLevelLines: `testdata/the_singles_collection_diff_LevelLines_reverse`,
-		diffLevelWords: `testdata/the_singles_collection_diff_LevelWords_reverse`,
+		desc:    `the_singles_collection.reverse`,
+		oldFile: `testdata/the_singles_collection.new`,
+		newFile: `testdata/the_singles_collection.old`,
+		exp:     `testdata/the_singles_collection.reverse.chunks`,
 	}}
 
-	var (
-		c      testCase
-		got    string
-		expStr string
-		err    error
-		before []byte
-		after  []byte
-		exp    []byte
-	)
-
-	for _, c = range cases {
-		before, err = os.ReadFile(c.textBefore)
+	var sb strings.Builder
+	for _, tc := range listCase {
+		diff, err := Files(tc.oldFile, tc.newFile, LevelWords)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf(`%s: %s`, tc.desc, err)
 		}
-		after, err = os.ReadFile(c.textAfter)
+		sb.Reset()
+		err = diff.WriteLineChunks(&sb)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf(`%s: %s`, tc.desc, err)
+		}
+		got := sb.String()
+
+		var exp string
+		if tc.exp != `` {
+			expb, err := os.ReadFile(tc.exp)
+			if err != nil {
+				t.Fatalf(`%s: %s`, tc.desc, err)
+			}
+			exp = string(expb)
 		}
 
-		diff := Text(before, after, LevelLines)
-		got = diff.String()
-
-		exp, err = os.ReadFile(c.diffLevelLines)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		expStr = string(exp)
-		if !reflect.DeepEqual(expStr, got) {
-			t.Fatalf("%s not matched:\n<<< want:\n%s\n<<< got:\n%s",
-				c.diffLevelLines, expStr, got)
-		}
-
-		diff = Text(before, after, LevelWords)
-		got = diff.String()
-
-		exp, err = os.ReadFile(c.diffLevelWords)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		expStr = string(exp)
-		if !reflect.DeepEqual(expStr, got) {
-			t.Fatalf("%s not matched:\n<<< want:\n%s\n<<< got:\n%s",
-				c.diffLevelWords, expStr, got)
+		if exp != got {
+			os.WriteFile(tc.exp, []byte(got), 0600)
+			t.Errorf("<<< want:\n%s\n", exp)
+			t.Errorf("<<< got:\n%s\n", got)
+			t.Fatalf(`%s: not matched`, tc.desc)
 		}
 	}
 }
