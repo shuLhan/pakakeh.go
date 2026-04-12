@@ -8,8 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"strings"
-
-	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 )
 
 // Data stores additions, deletions, and changes between two texts.
@@ -24,7 +22,7 @@ type Data struct {
 
 	Adds    []Line
 	Dels    []Line
-	Changes LineChanges
+	Changes []LineChange
 
 	// Unified contains the result of [Unified] diff, without the label
 	// ("@@ ... @@") and context lines.
@@ -221,24 +219,6 @@ func (diff *Data) checkIsMatched() {
 		return
 	}
 	diff.IsMatched = true
-}
-
-// GetAllAdds returns chunks of additions including the line changes.
-func (diff Data) GetAllAdds() (chunks text.Chunks) {
-	for _, add := range diff.Adds {
-		chunks = append(chunks, text.Chunk{StartAt: 0, V: add.Val})
-	}
-	chunks = append(chunks, diff.Changes.GetAllAdds()...)
-	return
-}
-
-// GetAllDels returns chunks of deletions including the line changes.
-func (diff Data) GetAllDels() (chunks text.Chunks) {
-	for _, del := range diff.Dels {
-		chunks = append(chunks, text.Chunk{StartAt: 0, V: del.Val})
-	}
-	chunks = append(chunks, diff.Changes.GetAllDels()...)
-	return
 }
 
 // PushAdd adds new line to slice of Adds.
