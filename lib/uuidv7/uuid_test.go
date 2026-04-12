@@ -156,7 +156,7 @@ func TestUUID_Value(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	test.Assert(t, `ValueZero`, v.(string), `00000000-0000-0000-0000-000000000000`)
+	test.Assert(t, `ValueZero`, nil, v)
 
 	err = id.Scan([]byte(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`))
 	if err != nil {

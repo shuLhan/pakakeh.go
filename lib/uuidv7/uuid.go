@@ -112,13 +112,21 @@ func (id UUID) IsZero() bool {
 }
 
 // MarshalBinary encodes the id to binary for [encoding/gob].
+// It will return nil if id is zero.
 func (id UUID) MarshalBinary() (data []byte, err error) {
+	if id.IsZero() {
+		return nil, nil
+	}
 	data = id.Bytes()
 	return data, nil
 }
 
 // MarshalText encodes the id to JSON for [encoding/json].
+// It will return nil if id is zero.
 func (id UUID) MarshalText() (data []byte, err error) {
+	if id.IsZero() {
+		return nil, nil
+	}
 	v := id.String()
 	return []byte(v), nil
 }
@@ -234,7 +242,11 @@ func (id *UUID) Time() time.Time {
 
 // Value returns the value for sending it to the database.
 // This method implements the [driver.Valuer] interface.
+// It will return nil if id is zero, per RFC 9562 section 5.9.
 func (id UUID) Value() (v driver.Value, err error) {
+	if id.IsZero() {
+		return nil, nil
+	}
 	v = id.String()
 	return v, nil
 }
