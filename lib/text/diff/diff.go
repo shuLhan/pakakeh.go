@@ -20,9 +20,9 @@ type Data struct {
 	oldlines []Line
 	newlines []Line
 
-	Adds    []Line
-	Dels    []Line
-	Changes []LineChange
+	Adds       []Line
+	Dels       []Line
+	LineChunks []LineChunk
 
 	// Unified contains the result of [Unified] diff, without the label
 	// ("@@ ... @@") and context lines.
@@ -184,10 +184,10 @@ func Lines(oldlines, newlines []Line, level int) (diff *Data) {
 
 	if level == LevelWords {
 		// Process each changes to find modified chunkes.
-		for x, change := range diff.Changes {
+		for x, change := range diff.LineChunks {
 			adds, dels := Bytes(change.Old.Val, change.New.Val, 0, 0)
-			diff.Changes[x].Adds = adds
-			diff.Changes[x].Dels = dels
+			diff.LineChunks[x].Adds = adds
+			diff.LineChunks[x].Dels = dels
 		}
 	}
 
@@ -215,7 +215,7 @@ func (diff *Data) checkIsMatched() {
 	if len(diff.Dels) != 0 {
 		return
 	}
-	if len(diff.Changes) != 0 {
+	if len(diff.LineChunks) != 0 {
 		return
 	}
 	diff.IsMatched = true
@@ -227,14 +227,17 @@ func (diff *Data) PushAdd(new Line) {
 	diff.Adds = append(diff.Adds, new)
 }
 
-// PushChange adds the old and new line to Dels, Adds, and [Data.Changes]
+// PushChange adds the old and new line to Dels, Adds, and [Data.LineChunks]
 // respectively.
 func (diff *Data) PushChange(old, new Line) {
 	if old.Num != new.Num {
 		old.NumOther, new.NumOther = new.Num, old.Num
 	}
-	change := NewLineChange(old, new)
-	diff.Changes = append(diff.Changes, *change)
+	change := LineChunk{
+		Old: old,
+		New: new,
+	}
+	diff.LineChunks = append(diff.LineChunks, change)
 	diff.PushDel(old)
 	diff.PushAdd(new)
 }
