@@ -75,15 +75,10 @@ func ExampleAssert_struct() {
 }
 
 func ExampleAssert_string() {
-	var (
-		tw = test.BufferWriter{}
+	tw := test.BufferWriter{}
 
-		exp string
-		got string
-	)
-
-	exp = `a string`
-	got = `b string`
+	exp := `a string`
+	got := `b string`
 	test.Assert(&tw, ``, exp, got)
 	fmt.Println(tw.String())
 
@@ -94,44 +89,43 @@ func ExampleAssert_string() {
 	fmt.Println(tw.String())
 	// Output:
 	// !!! Assert: expecting string(a string), got string(b string)
-	// !!! :
-	// --++
-	// 0 - func (tw *BufferWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }
-	// 0 + func (tw *BufferWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
+	// !!! Assert: : not matched, see the diff below
+	// --- want
+	// +++ got
+	// @@ -1 +1 @@
+	// -func (tw *BufferWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }
+	// +func (tw *BufferWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
 }
 
 func ExampleAssert_string2() {
-	var (
-		tw = test.BufferWriter{}
-
-		exp string
-		got string
-	)
-
-	exp = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+	exp := `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 Fusce cursus libero in velit dapibus tincidunt.
 Vestibulum vulputate ipsum ac nisl viverra pharetra.
 Sed at mi in urna lobortis bibendum.
 Vivamus tempus enim in urna fermentum, non volutpat nisi lacinia.`
 
-	got = `Fusce cursus libero in velit dapibus tincidunt.
+	got := `Fusce cursus libero in velit dapibus tincidunt.
 Vestibulum vulputate ipsum ac nisl viverra pharetra.
 Sed at mi in urna lobortis bibendum.
 Sed pretium nisl ut dolor ullamcorper blandit.
 Sed faucibus felis iaculis, sagittis erat quis, tempor nisi.`
 
-	test.Assert(&tw, `Assert string`, exp, got)
+	tw := test.BufferWriter{}
+	test.Assert(&tw, `string`, exp, got)
 	fmt.Println(tw.String())
 
 	// Output:
-	// !!! Assert string:
-	// ---- EXPECTED
-	// 0 - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-	// ++++ GOT
-	// 4 + Sed faucibus felis iaculis, sagittis erat quis, tempor nisi.
-	// --++
-	// 4 - Vivamus tempus enim in urna fermentum, non volutpat nisi lacinia.
-	// 3 + Sed pretium nisl ut dolor ullamcorper blandit.
+	// !!! Assert: string: not matched, see the diff below
+	// --- want
+	// +++ got
+	// @@ -1,5 +1,5 @@
+	// -Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+	//  Fusce cursus libero in velit dapibus tincidunt.
+	//  Vestibulum vulputate ipsum ac nisl viverra pharetra.
+	//  Sed at mi in urna lobortis bibendum.
+	// -Vivamus tempus enim in urna fermentum, non volutpat nisi lacinia.
+	// +Sed pretium nisl ut dolor ullamcorper blandit.
+	// +Sed faucibus felis iaculis, sagittis erat quis, tempor nisi.
 }
 
 func ExampleLoadDataDir() {
