@@ -54,12 +54,24 @@ func ReadLines(file string) (lines []Line, err error) {
 	return lines, nil
 }
 
+// WriteLines writes each line in lines into w using the [Line.String] return
+// value.
 func WriteLines(w io.Writer, lines []Line) {
 	for _, line := range lines {
 		fmt.Fprintln(w, line.String())
 	}
 }
 
+// Strings returns the formatted line data.
+// The format is as follow,
+//
+//	<NumOther>/<Num>: <Kind><QuotedVal>
+//
+// The NumOther is line number from other text being compared.
+// The Num is line number.
+// The Kind is '-' for deletion or '+' for addition.
+// The QuotedVal is double quoted line text, to help human compare and see the
+// changes for non-printable characters.
 func (line Line) String() string {
-	return fmt.Sprintf("%4d/%4d: %c%s", line.NumOther, line.Num, line.Kind, line.Val)
+	return fmt.Sprintf("%4d/%4d: %c%q", line.NumOther, line.Num, line.Kind, line.Val)
 }

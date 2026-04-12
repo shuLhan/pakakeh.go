@@ -52,16 +52,6 @@ func Files(oldfile, newfile string, level int) (diff *Data, err error) {
 	return diff, nil
 }
 
-// Text returns the difference between old and new text.
-func Text(old, new []byte, level int) (diff *Data) {
-	oldlines := ParseLines(old)
-	newlines := ParseLines(new)
-	diff = Lines(oldlines, newlines, level)
-	diff.OldName = `old`
-	diff.NewName = `new`
-	return diff
-}
-
 // Lines returns the difference between old and new lines.
 func Lines(oldlines, newlines []Line, level int) (diff *Data) {
 	diff = &Data{}
@@ -209,6 +199,16 @@ func Lines(oldlines, newlines []Line, level int) (diff *Data) {
 	return diff
 }
 
+// Text returns the difference between old and new text.
+func Text(old, new []byte, level int) (diff *Data) {
+	oldlines := ParseLines(old)
+	newlines := ParseLines(new)
+	diff = Lines(oldlines, newlines, level)
+	diff.OldName = `old`
+	diff.NewName = `new`
+	return diff
+}
+
 // checkIsMatched set the IsMatched to true if no changes found.
 func (diff *Data) checkIsMatched() {
 	if len(diff.Adds) != 0 {
@@ -223,19 +223,32 @@ func (diff *Data) checkIsMatched() {
 	diff.IsMatched = true
 }
 
-// PushAdd will add new line to diff set.
+// GetAllAdds returns chunks of additions including the line changes.
+func (diff Data) GetAllAdds() (chunks text.Chunks) {
+	for _, add := range diff.Adds {
+		chunks = append(chunks, text.Chunk{StartAt: 0, V: add.Val})
+	}
+	chunks = append(chunks, diff.Changes.GetAllAdds()...)
+	return
+}
+
+// GetAllDels returns chunks of deletions including the line changes.
+func (diff Data) GetAllDels() (chunks text.Chunks) {
+	for _, del := range diff.Dels {
+		chunks = append(chunks, text.Chunk{StartAt: 0, V: del.Val})
+	}
+	chunks = append(chunks, diff.Changes.GetAllDels()...)
+	return
+}
+
+// PushAdd adds new line to slice of Adds.
 func (diff *Data) PushAdd(new Line) {
 	new.Kind = LineKindAdd
 	diff.Adds = append(diff.Adds, new)
 }
 
-// PushDel will add deletion line to diff set.
-func (diff *Data) PushDel(old Line) {
-	old.Kind = LineKindDel
-	diff.Dels = append(diff.Dels, old)
-}
-
-// PushChange set to diff data.
+// PushChange adds the old and new line to Dels, Adds, and [Data.Changes]
+// respectively.
 func (diff *Data) PushChange(old, new Line) {
 	if old.Num != new.Num {
 		old.NumOther, new.NumOther = new.Num, old.Num
@@ -246,27 +259,39 @@ func (diff *Data) PushChange(old, new Line) {
 	diff.PushAdd(new)
 }
 
-// GetAllAdds return chunks of additions including in line changes.
-func (diff Data) GetAllAdds() (chunks text.Chunks) {
-	for _, add := range diff.Adds {
-		chunks = append(chunks, text.Chunk{StartAt: 0, V: add.Val})
-	}
-	chunks = append(chunks, diff.Changes.GetAllAdds()...)
-	return
+// PushDel adds deletion line to slice of Dels.
+func (diff *Data) PushDel(old Line) {
+	old.Kind = LineKindDel
+	diff.Dels = append(diff.Dels, old)
 }
 
-// GetAllDels return chunks of deletions including in line changes.
-func (diff Data) GetAllDels() (chunks text.Chunks) {
-	for _, del := range diff.Dels {
-		chunks = append(chunks, text.Chunk{StartAt: 0, V: del.Val})
-	}
-	chunks = append(chunks, diff.Changes.GetAllDels()...)
-	return
-}
-
-// String return formatted data.
+// String returns the additions and deletions with custom format.
+// The custom format as follow,
+//
+//	--- <OldName>
+//	+++ <NewName>
+//	----
+//	<NumOther>/ <Num>: <Kind><QuotedVal>
+//	++++
+//	<NumOther>/ <Num>: <Kind><Val>
+//
+// The lines after "----" is the deleted lines from the old text.
+// The lines after "++++" is the added lines from the new text.
+//
+// The NumOther is the line number from the other text.
+// The Num is the line number where line is deleted in old text, or added in
+// new text.
+//
+// The Kind is '-' for deletion or '+' for addition.
+//
+// The QuotedVal value is the line text printed inside double quotes.
 func (diff Data) String() (s string) {
+	if diff.IsMatched {
+		return ``
+	}
 	var sb strings.Builder
+	fmt.Fprintf(&sb, "--- %s\n", diff.OldName)
+	fmt.Fprintf(&sb, "+++ %s\n", diff.NewName)
 	if len(diff.Dels) > 0 {
 		sb.WriteString("----\n")
 		for _, line := range diff.Dels {
