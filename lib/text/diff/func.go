@@ -4,8 +4,6 @@
 package diff
 
 import (
-	"bytes"
-
 	inbytes "git.sr.ht/~shulhan/pakakeh.go/internal/bytes"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 )
@@ -27,10 +25,148 @@ const (
 	DefMatchRatio = 0.7
 )
 
-// BytesRatio compare two slice of bytes and return ratio of matching bytes.
-// The ratio in in range of 0.0 to 1.0, where 1.0 if both are similar, and 0.0
-// if no matchs even found.
-// `minTokenLen` define the minimum length of token for searching in both of
+// Bytes returns the character differences (additions and deletion) between
+// old and new bytes, start at specific position.
+func Bytes(old, new []byte, oldat, newat int) (adds, dels text.Chunks) {
+	oldlen := len(old)
+	newlen := len(new)
+
+	minlen := 0
+	minlen = min(oldlen, newlen)
+
+	// Find the position of unmatched byte from the beginning.
+	x, y := 0, 0
+	for ; x < minlen; x++ {
+		if old[x] != new[x] {
+			break
+		}
+	}
+	y = x
+
+	// Case 1: Check if addition or deletion is at the end.
+	if x == minlen {
+		if oldlen < newlen {
+			v := new[y:]
+			adds = append(adds, text.Chunk{StartAt: oldat + y, V: v})
+		} else {
+			v := old[x:]
+			dels = append(dels, text.Chunk{StartAt: oldat + x, V: v})
+		}
+		return adds, dels
+	}
+
+	// Find the position of unmatched byte from the end
+	xend := oldlen - 1
+	yend := newlen - 1
+
+	for xend >= x && yend >= y {
+		if old[xend] != new[yend] {
+			break
+		}
+		xend--
+		yend--
+	}
+
+	// Case 2: addition in new line.
+	if x == xend+1 {
+		v := new[y : yend+1]
+		adds = append(adds, text.Chunk{StartAt: newat + y, V: v})
+		return adds, dels
+	}
+
+	// Case 3: deletion in old line.
+	if y == yend+1 {
+		v := old[x : xend+1]
+		dels = append(dels, text.Chunk{StartAt: oldat + x, V: v})
+		return adds, dels
+	}
+
+	// Calculate possible match len.
+	// After we found similar bytes in the beginning and end of line, now
+	// we have `n` number of bytes left in old and new.
+	oldleft := old[x : xend+1]
+	newleft := new[y : yend+1]
+	oldleftlen := len(oldleft)
+	newleftlen := len(newleft)
+
+	// Get minimal token to search in the new left over.
+	minlen = min(oldleftlen, DefMatchLen)
+	xtoken := oldleft[:minlen]
+
+	xaty := inbytes.TokenFind(newleft, xtoken, 0)
+
+	// Get miniminal token to search in the old left over.
+	minlen = min(newleftlen, DefMatchLen)
+	ytoken := newleft[:minlen]
+
+	yatx := inbytes.TokenFind(oldleft, ytoken, 0)
+
+	// Case 4:
+	// We did not find matching token of x in y, its mean the some chunk
+	// in x and y has been replaced.
+	if xaty < 0 && yatx < 0 {
+		addsleft, delsleft := searchForward(oldat, newat, &x, &y, &oldleft,
+			&newleft)
+
+		if len(addsleft) > 0 {
+			adds = append(adds, addsleft...)
+		}
+		if len(delsleft) > 0 {
+			dels = append(dels, delsleft...)
+		}
+
+		// Check for possible empty left
+		if len(oldleft) == 0 {
+			if len(newleft) > 0 {
+				adds = append(adds, text.Chunk{
+					StartAt: oldat + x,
+					V:       newleft,
+				})
+			}
+			return adds, dels
+		}
+		if len(newleft) == 0 {
+			if len(oldleft) > 0 {
+				dels = append(dels, text.Chunk{
+					StartAt: newat + y,
+					V:       oldleft,
+				})
+			}
+			return adds, dels
+		}
+	}
+
+	// Case 5: is combination of case 2 and 3.
+	// Case 2: We found x token at y: xaty. Previous byte before that must
+	// be an addition.
+	if xaty >= 0 {
+		v := new[y : y+xaty]
+		adds = append(adds, text.Chunk{StartAt: newat + y, V: v})
+		newleft = new[y+xaty : yend+1]
+	} else if yatx >= 0 {
+		// Case 3: We found y token at x: yatx. Previous byte before that must
+		// be a deletion.
+		v := old[x : x+yatx]
+		dels = append(dels, text.Chunk{StartAt: oldat + x, V: v})
+		oldleft = old[x+yatx : xend+1]
+	}
+
+	addsleft, delsleft := Bytes(oldleft, newleft, oldat+x, newat+y)
+
+	if len(addsleft) > 0 {
+		adds = append(adds, addsleft...)
+	}
+	if len(delsleft) > 0 {
+		dels = append(dels, delsleft...)
+	}
+
+	return adds, dels
+}
+
+// BytesRatio returns the ratio of matching bytes between old and new.
+// The ratio in in range of 0.0 to 1.0, where 1.0 when both are similar, and
+// 0.0 when no single character matchs found.
+// The minTokenLen define the minimum length of token for searching in both of
 // slice.
 func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, maxlen int) {
 	x, y := 0, 0
@@ -126,193 +262,7 @@ func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, max
 	return ratio, m, maxlen
 }
 
-// findLine return true if line is found in text beginning at line `startat`.
-// It also return line number of matching line.
-// If no match found, it will return false and `startat` value.
-func findLine(line Line, text []Line, startat int) (
-	found bool,
-	n int,
-) {
-	textlen := len(text)
-
-	for n = startat; n < textlen; n++ {
-		if bytes.Equal(line.Val, text[n].Val) {
-			return true, n
-		}
-	}
-
-	return false, startat
-}
-
-// Bytes given two similar lines, find and return the differences (additions and
-// deletion) between them.
-//
-// Case 1: addition on new or deletion on old.
-//
-//	old: 00000
-//	new: 00000111
-//
-// or
-//
-//	old: 00000111
-//	new: 00000
-//
-// Case 2: addition on new line
-//
-//	old: 000000
-//	new: 0001000
-//
-// Case 3: deletion on old line (reverse of case 2)
-//
-//	old: 0001000
-//	new: 000000
-//
-// Case 4: change happened in the beginning
-//
-//	old: 11000
-//	new: 22000
-//
-// Case 5: both changed
-//
-//	old: 0001000
-//	new: 0002000
-func Bytes(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
-	oldlen := len(old)
-	newlen := len(new)
-
-	minlen := 0
-	minlen = min(oldlen, newlen)
-
-	// Find the position of unmatched byte from the beginning.
-	x, y := 0, 0
-	for ; x < minlen; x++ {
-		if old[x] != new[x] {
-			break
-		}
-	}
-	y = x
-
-	// Case 1: Check if addition or deletion is at the end.
-	if x == minlen {
-		if oldlen < newlen {
-			v := new[y:]
-			adds = append(adds, text.Chunk{StartAt: atx + y, V: v})
-		} else {
-			v := old[x:]
-			dels = append(dels, text.Chunk{StartAt: atx + x, V: v})
-		}
-		return adds, dels
-	}
-
-	// Find the position of unmatched byte from the end
-	xend := oldlen - 1
-	yend := newlen - 1
-
-	for xend >= x && yend >= y {
-		if old[xend] != new[yend] {
-			break
-		}
-		xend--
-		yend--
-	}
-
-	// Case 2: addition in new line.
-	if x == xend+1 {
-		v := new[y : yend+1]
-		adds = append(adds, text.Chunk{StartAt: aty + y, V: v})
-		return adds, dels
-	}
-
-	// Case 3: deletion in old line.
-	if y == yend+1 {
-		v := old[x : xend+1]
-		dels = append(dels, text.Chunk{StartAt: atx + x, V: v})
-		return adds, dels
-	}
-
-	// Calculate possible match len.
-	// After we found similar bytes in the beginning and end of line, now
-	// we have `n` number of bytes left in old and new.
-	oldleft := old[x : xend+1]
-	newleft := new[y : yend+1]
-	oldleftlen := len(oldleft)
-	newleftlen := len(newleft)
-
-	// Get minimal token to search in the new left over.
-	minlen = min(oldleftlen, DefMatchLen)
-	xtoken := oldleft[:minlen]
-
-	xaty := inbytes.TokenFind(newleft, xtoken, 0)
-
-	// Get miniminal token to search in the old left over.
-	minlen = min(newleftlen, DefMatchLen)
-	ytoken := newleft[:minlen]
-
-	yatx := inbytes.TokenFind(oldleft, ytoken, 0)
-
-	// Case 4:
-	// We did not find matching token of x in y, its mean the some chunk
-	// in x and y has been replaced.
-	if xaty < 0 && yatx < 0 {
-		addsleft, delsleft := searchForward(atx, aty, &x, &y, &oldleft,
-			&newleft)
-
-		if len(addsleft) > 0 {
-			adds = append(adds, addsleft...)
-		}
-		if len(delsleft) > 0 {
-			dels = append(dels, delsleft...)
-		}
-
-		// Check for possible empty left
-		if len(oldleft) == 0 {
-			if len(newleft) > 0 {
-				adds = append(adds, text.Chunk{
-					StartAt: atx + x,
-					V:       newleft,
-				})
-			}
-			return adds, dels
-		}
-		if len(newleft) == 0 {
-			if len(oldleft) > 0 {
-				dels = append(dels, text.Chunk{
-					StartAt: aty + y,
-					V:       oldleft,
-				})
-			}
-			return adds, dels
-		}
-	}
-
-	// Case 5: is combination of case 2 and 3.
-	// Case 2: We found x token at y: xaty. Previous byte before that must
-	// be an addition.
-	if xaty >= 0 {
-		v := new[y : y+xaty]
-		adds = append(adds, text.Chunk{StartAt: aty + y, V: v})
-		newleft = new[y+xaty : yend+1]
-	} else if yatx >= 0 {
-		// Case 3: We found y token at x: yatx. Previous byte before that must
-		// be a deletion.
-		v := old[x : x+yatx]
-		dels = append(dels, text.Chunk{StartAt: atx + x, V: v})
-		oldleft = old[x+yatx : xend+1]
-	}
-
-	addsleft, delsleft := Bytes(oldleft, newleft, atx+x, aty+y)
-
-	if len(addsleft) > 0 {
-		adds = append(adds, addsleft...)
-	}
-	if len(delsleft) > 0 {
-		dels = append(dels, delsleft...)
-	}
-
-	return adds, dels
-}
-
-func searchForward(atx, aty int, x, y *int, oldleft, newleft *[]byte) (
+func searchForward(oldat, newat int, x, y *int, oldleft, newleft *[]byte) (
 	adds, dels text.Chunks,
 ) {
 	oldleftlen := len(*oldleft)
@@ -347,8 +297,8 @@ func searchForward(atx, aty int, x, y *int, oldleft, newleft *[]byte) (
 
 	if xaty < 0 && yatx < 0 {
 		// still no token found, means whole chunk has been replaced.
-		dels = append(dels, text.Chunk{StartAt: atx + *x, V: *oldleft})
-		adds = append(adds, text.Chunk{StartAt: aty + *y, V: *newleft})
+		dels = append(dels, text.Chunk{StartAt: oldat + *x, V: *oldleft})
+		adds = append(adds, text.Chunk{StartAt: newat + *y, V: *newleft})
 		*oldleft = []byte{}
 		*newleft = []byte{}
 		return adds, dels
@@ -356,12 +306,12 @@ func searchForward(atx, aty int, x, y *int, oldleft, newleft *[]byte) (
 
 	// Some chunk has been replaced.
 	v := (*oldleft)[:xx]
-	dels = append(dels, text.Chunk{StartAt: atx + *x, V: v})
+	dels = append(dels, text.Chunk{StartAt: oldat + *x, V: v})
 	*oldleft = (*oldleft)[xx:]
 	*x += xx
 
 	v = (*newleft)[:yy]
-	adds = append(adds, text.Chunk{StartAt: aty + *y, V: v})
+	adds = append(adds, text.Chunk{StartAt: newat + *y, V: v})
 	*newleft = (*newleft)[yy:]
 	*y += yy
 

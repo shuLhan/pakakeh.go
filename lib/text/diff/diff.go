@@ -281,3 +281,22 @@ func (diff Data) String() (s string) {
 	}
 	return sb.String()
 }
+
+// findLine returns true if line is found in the beginning of text start at
+// line `startat`.
+// It also return line number of matching line.
+// If no match found, it will return false and `startat` value.
+func findLine(line Line, text []Line, startat int) (
+	found bool,
+	n int,
+) {
+	textlen := len(text)
+
+	for n = startat; n < textlen; n++ {
+		if bytes.Equal(line.Val, text[n].Val) {
+			return true, n
+		}
+	}
+
+	return false, startat
+}
