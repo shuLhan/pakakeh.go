@@ -151,11 +151,15 @@ func Bytes(old, new []byte, oldat, newat int) (adds, dels text.Chunks) {
 // 0.0 when no single character matchs found.
 // The minTokenLen define the minimum length of token for searching in both of
 // slice.
-func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, maxlen int) {
+//
+// It also return the number of characters match-ed and maximum length between
+// old and new.
+// The ratio is computed from match/maxlen.
+func BytesRatio(old, new []byte, minTokenLen int) (ratio float32, match int, maxlen int) {
 	x, y := 0, 0
 
 	oldlen := len(old)
-	newlen := len(newline)
+	newlen := len(new)
 	minlen := oldlen
 	maxlen = newlen
 	if newlen < oldlen {
@@ -170,10 +174,10 @@ func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, max
 	for {
 		// Count matching bytes from beginning of slice.
 		for x < minlen {
-			if old[x] != newline[y] {
+			if old[x] != new[y] {
 				break
 			}
-			m++
+			match++
 			x++
 			y++
 		}
@@ -189,10 +193,10 @@ func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, max
 		yend := newlen - 1
 
 		for xend >= x && yend >= y {
-			if old[xend] != newline[yend] {
+			if old[xend] != new[yend] {
 				break
 			}
-			m++
+			match++
 			xend--
 			yend--
 		}
@@ -204,20 +208,20 @@ func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, max
 
 		// Cut the matching bytes
 		old = old[x : xend+1]
-		newline = newline[y : yend+1]
+		new = new[y : yend+1]
 		oldlen = len(old)
 
-		// Get minimal token to search in the newline left over.
+		// Get minimal token to search in the new left over.
 		minlen = min(oldlen, minTokenLen)
 
-		// Search old token in newline, chunk by chunk.
+		// Search old token in new, chunk by chunk.
 		x = 0
 		y = -1
 		max := oldlen - minlen
 		for ; x < max; x++ {
 			token := old[x : x+minlen]
 
-			y = inbytes.TokenFind(newline, token, 0)
+			y = inbytes.TokenFind(new, token, 0)
 			if y > 0 {
 				break
 			}
@@ -230,9 +234,9 @@ func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, max
 
 		// Cut the changes
 		old = old[x:]
-		newline = newline[y:]
+		new = new[y:]
 		oldlen = len(old)
-		newlen = len(newline)
+		newlen = len(new)
 
 		minlen = min(newlen, oldlen)
 
@@ -240,9 +244,9 @@ func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, max
 		// start again from beginning...
 	}
 
-	ratio = float32(m) / float32(maxlen)
+	ratio = float32(match) / float32(maxlen)
 
-	return ratio, m, maxlen
+	return ratio, match, maxlen
 }
 
 func searchForward(oldat, newat int, x, y *int, oldleft, newleft *[]byte) (
