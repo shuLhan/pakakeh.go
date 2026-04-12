@@ -219,3 +219,17 @@ func TestFiles_LevelChunks(t *testing.T) {
 		}
 	}
 }
+
+func TestUnified_WithNewLine(t *testing.T) {
+	exp := "a\nb"
+	got := "a\nb\n"
+
+	var sb strings.Builder
+	diff := Unified([]byte(exp), []byte(got))
+	if diff.IsMatched {
+		return
+	}
+	diff.WriteUnified(&sb, 3)
+
+	t.Fatalf(`sb: %s`, sb.String())
+}

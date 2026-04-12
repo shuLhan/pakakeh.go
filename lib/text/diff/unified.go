@@ -105,6 +105,9 @@ func findInsertIndex(unified []Line, next *Line, start int) (idx int) {
 // The ncontext must be 0 or positive, otherwise it will be set to 0 (no
 // context added).
 func (diff Data) WriteUnified(w io.Writer, ncontext int) (err error) {
+	if len(diff.Unified) == 0 {
+		return nil
+	}
 	if ncontext < 0 {
 		ncontext = 0
 	}
