@@ -16,7 +16,7 @@ const defautlNumContext = 3
 // References,
 //   - https://www.gnu.org/software/diffutils/manual/html_node/Unified-Format.html
 //   - https://www.gnu.org/software/diffutils/manual/html_node/Hunks.html
-func Unified(old, new []byte) (diff Data) {
+func Unified(old, new []byte) (diff *Data) {
 	diff = Text(old, new, LevelLines)
 
 	// Mergeds the deletions and additions lines.
@@ -295,8 +295,8 @@ func completeHunk(hunk []Line) []Line {
 }
 
 func (diff Data) writeHunks(w io.Writer, hunks [][]Line, withLineNumber bool) (err error) {
-	fmt.Fprintln(w, `--- old`)
-	fmt.Fprintln(w, `+++ new`)
+	fmt.Fprintln(w, `--- `+diff.OldName)
+	fmt.Fprintln(w, `+++ `+diff.NewName)
 	for _, hunk := range hunks {
 		for _, line := range hunk {
 			switch line.Kind {

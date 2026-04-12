@@ -144,20 +144,6 @@ func findLine(line Line, text []Line, startat int) (
 	return false, startat
 }
 
-// Files compare two files.
-func Files(oldf, newf string, level int) (diffs Data, e error) {
-	oldlines, e := ReadLines(oldf)
-	if e != nil {
-		return
-	}
-	newlines, e := ReadLines(newf)
-	if e != nil {
-		return
-	}
-	diffs = Lines(oldlines, newlines, level)
-	return diffs, nil
-}
-
 // Bytes given two similar lines, find and return the differences (additions and
 // deletion) between them.
 //

@@ -194,7 +194,6 @@ func TestText(t *testing.T) {
 
 	var (
 		c      testCase
-		diffs  Data
 		got    string
 		expStr string
 		err    error
@@ -213,8 +212,8 @@ func TestText(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		diffs = Text(before, after, LevelLines)
-		got = diffs.String()
+		diff := Text(before, after, LevelLines)
+		got = diff.String()
 
 		exp, err = os.ReadFile(c.diffLevelLines)
 		if err != nil {
@@ -227,8 +226,8 @@ func TestText(t *testing.T) {
 				c.diffLevelLines, expStr, got)
 		}
 
-		diffs = Text(before, after, LevelWords)
-		got = diffs.String()
+		diff = Text(before, after, LevelWords)
+		got = diff.String()
 
 		exp, err = os.ReadFile(c.diffLevelWords)
 		if err != nil {
