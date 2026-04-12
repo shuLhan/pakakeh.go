@@ -4,6 +4,8 @@
 package diff
 
 import (
+	"bytes"
+
 	inbytes "git.sr.ht/~shulhan/pakakeh.go/internal/bytes"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 )
@@ -24,34 +26,6 @@ const (
 	// change.
 	DefMatchRatio = 0.7
 )
-
-// IsEqual compare two slice of bytes and return true if equal or false
-// otherwise.
-func IsEqual(oldb, newb []byte) (equal bool) {
-	oldblen := len(oldb)
-	newblen := len(newb)
-
-	// Do not compare the length, because we care about the index.
-
-	minlen := 0
-	switch {
-	case oldblen < newblen:
-		minlen = oldblen
-	case oldblen == newblen:
-		minlen = oldblen
-	default:
-		minlen = newblen
-	}
-
-	at := 0
-	for ; at < minlen; at++ {
-		if oldb[at] != newb[at] {
-			return
-		}
-	}
-
-	return oldblen == newblen
-}
 
 // BytesRatio compare two slice of bytes and return ratio of matching bytes.
 // The ratio in in range of 0.0 to 1.0, where 1.0 if both are similar, and 0.0
@@ -162,7 +136,7 @@ func findLine(line Line, text []Line, startat int) (
 	textlen := len(text)
 
 	for n = startat; n < textlen; n++ {
-		if IsEqual(line.Val, text[n].Val) {
+		if bytes.Equal(line.Val, text[n].Val) {
 			return true, n
 		}
 	}

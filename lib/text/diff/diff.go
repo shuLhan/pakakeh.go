@@ -62,7 +62,7 @@ func Lines(oldlines, newlines []Line, level int) (diffs Data) {
 		}
 
 		// Compare old line with new line.
-		if IsEqual(oldlines[x].Val, newlines[y].Val) {
+		if bytes.Equal(oldlines[x].Val, newlines[y].Val) {
 			oldlines[x].NumOther = newlines[y].Num
 			newlines[y].NumOther = oldlines[x].Num
 			x++
