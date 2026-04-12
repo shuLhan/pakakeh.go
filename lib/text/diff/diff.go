@@ -11,6 +11,27 @@ import (
 	"strings"
 )
 
+// DefMatchLen minimum number of bytes used for searching the next
+// matched chunk in line.
+const DefMatchLen = 5
+
+// DefMatchRatio define default minimum match ratio to be considered as
+// change.
+const DefMatchRatio = 0.7
+
+// List of comparison levels.
+const (
+	// LevelLines captures the differences on lines level.
+	// This will fills the [Data.Adds] and [Data.Dels] only.
+	LevelLines = iota
+
+	// LevelChunks captures the differences on character level, when
+	// changes is on the same line.
+	// This will fills the [Data.LineChunks], [Data.Adds], and
+	// [Data.Dels].
+	LevelChunks
+)
+
 // Data stores additions, deletions, and changes between two texts.
 type Data struct {
 	// OldName and NewName stores the file names being compared from
@@ -183,7 +204,7 @@ func Lines(oldlines, newlines []Line, level int) (diff *Data) {
 		diff.PushAdd(newlines[y])
 	}
 
-	if level == LevelWords {
+	if level == LevelChunks {
 		// Process each changes to find modified chunkes.
 		for x, change := range diff.LineChunks {
 			adds, dels := Bytes(change.Old.Val, change.New.Val, 0, 0)

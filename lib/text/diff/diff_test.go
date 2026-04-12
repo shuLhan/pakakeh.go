@@ -101,7 +101,7 @@ func TestBytesRatio(t *testing.T) {
 	}
 }
 
-func TestFiles_LevelWords(t *testing.T) {
+func TestFiles_LevelChunks(t *testing.T) {
 	listCase := []struct {
 		desc    string
 		oldFile string
@@ -191,7 +191,7 @@ func TestFiles_LevelWords(t *testing.T) {
 
 	var sb strings.Builder
 	for _, tc := range listCase {
-		diff, err := Files(tc.oldFile, tc.newFile, LevelWords)
+		diff, err := Files(tc.oldFile, tc.newFile, LevelChunks)
 		if err != nil {
 			t.Fatalf(`%s: %s`, tc.desc, err)
 		}

@@ -8,23 +8,6 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 )
 
-const (
-	// LevelLines define that we want only lines change set.
-	LevelLines = iota
-	// LevelWords define that we want the change not only capture the
-	// different per line, but also changes inside the line.
-	LevelWords
-)
-
-const (
-	// DefMatchLen minimum number of bytes used for searching the next
-	// matched chunk in line.
-	DefMatchLen = 5
-	// DefMatchRatio define default minimum match ratio to be considered as
-	// change.
-	DefMatchRatio = 0.7
-)
-
 // Bytes returns the character differences (additions and deletion) between
 // old and new bytes, start at specific position.
 func Bytes(old, new []byte, oldat, newat int) (adds, dels text.Chunks) {
