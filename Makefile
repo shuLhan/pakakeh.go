@@ -28,6 +28,8 @@ build:
 		-modcacherw \
 		$(BUILD_FLAGS) -o _bin/ ./cmd/...
 
+## Prevent git CLI to print errors in user's locale language.
+test: export LC_ALL=C.UTF-8
 test:
 	CGO_ENABLED=1 go test -failfast -timeout=2m -race -coverprofile=$(COVER_OUT) ./...
 	go tool cover -html=$(COVER_OUT) -o $(COVER_HTML)

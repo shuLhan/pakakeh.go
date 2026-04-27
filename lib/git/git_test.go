@@ -22,6 +22,9 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	// Prevent git CLI to print errors in user's locale language.
+	os.Setenv("LC_ALL", "C.UTF-8")
+
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
