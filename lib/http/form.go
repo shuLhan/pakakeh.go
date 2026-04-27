@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
 
 package http
 
@@ -144,11 +143,6 @@ func MarshalForm(in any) (out url.Values, err error) {
 //
 // If the input contains multiple values but the field type is not slice,
 // the field will be set using the first value.
-//
-// It will return an error if the out variable is not set-able (the type is
-// not a pointer to a struct).
-// It will not return an error if one of the input value is not match with
-// field type.
 func UnmarshalForm(in url.Values, out any) (err error) {
 	var (
 		logp  = `UnmarshalForm`
@@ -248,7 +242,8 @@ func UnmarshalForm(in url.Values, out any) (err error) {
 				for _, val = range vals {
 					err = libreflect.Set(fptr, val)
 					if err != nil {
-						continue
+						return fmt.Errorf(`%s: on field %s: %w`,
+							logp, field.Name, err)
 					}
 				}
 			} else {
@@ -257,14 +252,16 @@ func UnmarshalForm(in url.Values, out any) (err error) {
 				val = vals[0]
 				err = libreflect.Set(fptr, val)
 				if err != nil {
-					continue
+					return fmt.Errorf(`%s: on field %s: %w`,
+						logp, field.Name, err)
 				}
 			}
 		} else {
 			val = vals[0]
 			err = libreflect.Set(fptr, val)
 			if err != nil {
-				continue
+				return fmt.Errorf(`%s: on field %s: %w`,
+					logp, field.Name, err)
 			}
 		}
 	}

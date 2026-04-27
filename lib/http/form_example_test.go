@@ -139,7 +139,7 @@ func ExampleUnmarshalForm_error() {
 	// Output:
 	// UnmarshalForm: expecting *T got http.T
 	// UnmarshalForm: *http.T is not initialized
-	// {0}
+	// UnmarshalForm: on field Int: Set: invalid integer value: a
 
 }
 
