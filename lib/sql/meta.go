@@ -20,9 +20,15 @@ type Meta struct {
 	// ListName contains list of column name.
 	ListName []string
 
+	listParam []*param
+
 	// ListHolder contains list of column holder, as in "?" or "$x",
 	// depends on the driver.
 	ListHolder []string
+
+	// Stores the holders for bulk insert, for example
+	// "[[$1 $2] [$1 $3]]".
+	bulkHolders [][]string
 
 	// ListValue contains list of column values, either for insert or
 	// select.
@@ -79,6 +85,76 @@ func (meta *Meta) Bind(colName string, val any) {
 	}
 }
 
+// BindName binds the column name for bulk insert.
+// The argument unique=false allow setting the value only once in multiple
+// insert-values.
+//
+// See the examples in BulkInsert_postgres and BulkInsert_nonPostgres.
+func (meta *Meta) BindName(name string, unique bool) (err error) {
+	logp := `BindName`
+
+	for _, cur := range meta.listParam {
+		if cur.name == name {
+			return fmt.Errorf(`%s: duplicate name %s`, logp, name)
+		}
+	}
+	param := &param{
+		name:   name,
+		unique: unique,
+	}
+	meta.listParam = append(meta.listParam, param)
+	meta.ListName = append(meta.ListName, name)
+	return nil
+}
+
+// BindValues bind the values for bulk insert.
+// The number of arguments must match with the number of calls to
+// [Meta.BindName].
+//
+// See the examples in BulkInsert_postgres and BulkInsert_nonPostgres.
+func (meta *Meta) BindValues(values ...any) (err error) {
+	logp := `BindValues`
+	if len(values) != len(meta.listParam) {
+		return fmt.Errorf(`%s: invalid number of arguments, want %d`,
+			logp, len(meta.listParam))
+	}
+	holders := []string{}
+	var holder string
+	for x, param := range meta.listParam {
+		if meta.driver == DriverNamePostgres {
+			holder = meta.bindOnPostgres(param, values[x])
+		} else {
+			holder = meta.bindOnOthers(param, values[x])
+		}
+		holders = append(holders, holder)
+	}
+	meta.bulkHolders = append(meta.bulkHolders, holders)
+	return nil
+}
+
+func (meta *Meta) bindOnPostgres(prm *param, val any) string {
+	if !prm.unique && prm.holder != "" {
+		return prm.holder
+	}
+	meta.nholder++
+	meta.Index = append(meta.Index, meta.nholder)
+	prm.holder = fmt.Sprintf(`$%d`, meta.nholder)
+	meta.ListHolder = append(meta.ListHolder, prm.holder)
+	meta.ListValue = append(meta.ListValue, val)
+	return prm.holder
+}
+
+func (meta *Meta) bindOnOthers(prm *param, val any) string {
+	if prm.holder == "" {
+		prm.holder = DefaultPlaceHolder
+	}
+	meta.nholder++
+	meta.Index = append(meta.Index, meta.nholder)
+	meta.ListHolder = append(meta.ListHolder, prm.holder)
+	meta.ListValue = append(meta.ListValue, val)
+	return prm.holder
+}
+
 // BindWhere binds the value val for DML WHERE condition.
 //
 // The logic parameter defines the logical operator like "OR"
@@ -115,10 +191,30 @@ func (meta *Meta) BindWhere(logic, col, comp string, val any) (whereOp *OpWhere)
 	return whereOp
 }
 
+// BulkHolders returns the string query for bulk INSERT-VALUES.
+// For example, with Postgresql driver, it will return "($1,$2),($3,$4)".
+func (meta *Meta) BulkHolders() string {
+	var sb strings.Builder
+	for x, holders := range meta.bulkHolders {
+		if x > 0 {
+			sb.WriteString(`,`)
+		}
+		sb.WriteString(`(`)
+		sb.WriteString(strings.Join(holders, `,`))
+		sb.WriteString(`)`)
+	}
+	return sb.String()
+}
+
 // Holders returns string of holders joined with comma ",";
 // for example "$1, $2, ...", for INSERT-VALUES.
 func (meta *Meta) Holders() string {
 	return strings.Join(meta.ListHolder, `,`)
+}
+
+// InsertValues returns the list of value for executing INSERT statement.
+func (meta *Meta) InsertValues() []any {
+	return meta.ListValue
 }
 
 // Names returns string of column names, for example "col1, col2, ...", for

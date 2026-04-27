@@ -60,6 +60,90 @@ func ExampleMeta_BindWhere() {
 	// [1000 JohnDoe]
 }
 
+func ExampleMeta_bulkInsert_postgres() {
+	type Tag struct {
+		Name string
+		ID   int
+	}
+	type Document struct {
+		Tags []Tag
+		ID   int
+	}
+
+	meta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindInsert)
+	doc := Document{
+		ID: 1,
+		Tags: []Tag{{
+			ID:   100,
+			Name: `tag A`,
+		}, {
+			ID:   101,
+			Name: `tag B`,
+		}},
+	}
+
+	meta.BindName(`document_id`, false)
+	meta.BindName(`tag_id`, true)
+
+	for _, tag := range doc.Tags {
+		meta.BindValues(doc.ID, tag.ID)
+	}
+
+	var q = fmt.Sprintf(`INSERT INTO document_tag (%s) VALUES %s;`,
+		meta.Names(), meta.BulkHolders())
+
+	// db.Exec(q, meta.InsertValues()...)
+
+	fmt.Println(q)
+	fmt.Println(meta.InsertValues())
+
+	// Output:
+	// INSERT INTO document_tag (document_id,tag_id) VALUES ($1,$2),($1,$3);
+	// [1 100 101]
+}
+
+func ExampleMeta_bulkInsert_nonPostgres() {
+	type Tag struct {
+		Name string
+		ID   int
+	}
+	type Document struct {
+		Tags []Tag
+		ID   int
+	}
+
+	meta := sql.NewMeta(sql.DriverNameMysql, sql.DMLKindInsert)
+	doc := Document{
+		ID: 1,
+		Tags: []Tag{{
+			ID:   100,
+			Name: `tag A`,
+		}, {
+			ID:   101,
+			Name: `tag B`,
+		}},
+	}
+
+	meta.BindName(`document_id`, false)
+	meta.BindName(`tag_id`, true)
+
+	for _, tag := range doc.Tags {
+		meta.BindValues(doc.ID, tag.ID)
+	}
+
+	var q = fmt.Sprintf(`INSERT INTO document_tag (%s) VALUES %s;`,
+		meta.Names(), meta.BulkHolders())
+
+	// db.Exec(q, meta.InsertValues()...)
+
+	fmt.Println(q)
+	fmt.Println(meta.InsertValues())
+
+	// Output:
+	// INSERT INTO document_tag (document_id,tag_id) VALUES (?,?),(?,?);
+	// [1 100 1 101]
+}
+
 func ExampleMeta_Holders_mysql() {
 	type Table struct {
 		Name string
