@@ -62,9 +62,8 @@ func Assert(w Writer, name string, exp, got any) {
 	}
 	diffd.OldName = `want`
 	diffd.NewName = `got`
-	w.Errorf("!!! %s: %s: not matched, see the diff below\n", logp, name)
 	diffd.WriteUnified(&bb, 3)
-	w.Fatal(bb.String())
+	w.Fatalf("!!! %s: %s: not matched, see the diff below\n%s", logp, name, bb.String())
 	return
 
 out:
