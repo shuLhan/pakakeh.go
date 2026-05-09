@@ -6,4 +6,4 @@
 package pakakeh
 
 // Version of this module.
-var Version = `0.62.1`
+var Version = `0.63.0`

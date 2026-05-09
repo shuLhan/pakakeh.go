@@ -38,6 +38,181 @@ Legend,
 * 💧: Chores
 
 
+[#v0_63_0]
+== pakakeh.go v0.63.0 (2026-05-09)
+
+
+[#v0_63_0__lib_git]
+=== lib/git
+
+💧 Fix failed test due to user's locale language.
+
+If user set the LANGUAGE environment variables to id_ID, the error for
+git CLI will print the error message in Bahasa Indonesia.
+By setting the LC_ALL to C we make sure that the error message not
+getting translated.
+
+
+[#v0_63_0__lib_goanalysis]
+=== lib/goanalysis
+
+🌼 Update lists of analyzers.
+
+The `waitgroup` analyzer has been included into go vet, so we remove it.
+
+The following new analyzers are added: `atomicalign`, `deepequalserrors`,
+and `usesgenerics`.
+
+
+[#v0_63_0__lib_http]
+=== lib/http
+
+🪵 Return an error on `UnmarshalForm`.
+
+Previously, if UnmarshalForm cannot set the value of field, it will
+continue to the next field without returning any error.
+
+This flexibility may surprise the caller if they pass invalid value
+(without knowing it invalid) and expect data that are out of range or
+unexpected data.
+
+This changes make UnmarshalForm strict by returning any error during
+operation.
+
+
+[#v0_63_0__lib_sql]
+=== lib/sql
+
+🪵 Refactoring the `Meta.BindWhere` method.
+
+Changes the BindWhere parameters from two to four.
+The first parameter is the OR/AND logic.
+The second parameter is the column name.
+The third parameter is the operator like "=", "!=".
+The fourth parameter is the value.
+
+This is to prevent missing logic and operator, which happen frequently.
+
+🪵 The `JoinValues` function has been removed in favor of `slices.Concat`.
+
+🌱 Add method `Client.Meta`.
+The Meta method returns new instance of [Meta] based on the current
+client driver and kind argument.
+
+🌱 Support generating query for bulk insert.
+
+Given the following insert query
+
+	INSERT INTO (x,y) VALUES ($1, $2), ($1, $3);
+
+The new method `BindName("x", false)` will bind column name "x" with the
+same values for each subsequent calls to `BindValues`; while
+`BindName("y", true)` bind the column name "y" with unique values for
+each subsequent calls to `BindValues`.
+
+The new method `BindValues` bind the values for each record.
+
+The new method `BulkHolders` returns the query string, for example
+"($1,$2),$($1,$3)".
+
+The new method `InsertValues` returns the list of values for executing
+insert statement.
+
+
+[#v0_63_0__lib_test]
+=== lib/test
+
+🌼 Rewrite Assert to use `diff.Unified`.
+
+Using diff Unified improve the test output readability when two large
+strings are not match.
+
+
+[#v0_63_0__lib_text_diff]
+=== lib/text/diff
+
+The `diff` package has been receive major refactoring to support unified
+diff and to clean up the old codes.
+
+🪵 The first refactoring is to use local `Line` type instead from `lib/text`
+package.
+The reason for refactoring is we will add more fields to the Line type
+to handle unified diff.
+
+In the `ParseLines`, we changes the line number to start from 1, to make it
+consistent with `ReadLines` and file line numbering.
+This causes a lot of changes in the expectation files in the testdata.
+
+🪵 The function `IsEqual` has been removed in favor of `bytes.Equal`.
+
+🪵 The `LineChanges` type has been removed.
+
+Defining `[]T` as new type does not help on readability only make it
+confusing for future maintenances.
+
+🪵 The type `LineChange` has been renamed to `LineChunk`.
+In the struct Data we also rename field Changes to LineChunks.
+
+🪵 The `LevelWords` constant has been renamed to `LevelChunks`.
+Using Words seems like misleading since we capture the characters
+difference, not a word as in human language.
+
+🌱 Implements unified diff.
+
+Unified diff is the common diff output that we see, mostly in git diff
+output.
+
+The following new APIs are ready to use,
+
+- `Unified()` compare two stream of bytes and returns new instance of
+  `diff.Data`.
+- `Data.WriteUnified()` write the diff as unified format into argumen type
+  `io.Writer`.
+
+
+[#v0_63_0__lib_time]
+=== lib/time
+
+🌱 Add new type `Date`.
+
+A Date represents the calendar date.
+This type that can be used to represent PostgreSQL date.
+It provides encodes and decodes for [encoding/json] and [database/sql]
+with fixed format [time.DateOnly] or "2026-01-02".
+
+
+[#v0_63_0__lib_uuidv7]
+=== lib/uuidv7
+
+🪵 The `UUIDv7` type renamed to `UUID` for simplicity since the package name
+already have v7.
+
+🪵 The `Now` and `Rand` functions renamed to `NowFunc` and `RandFunc`.
+Using `Func` suffix in the function variable is common coding style in Go,
+which makes the exported variables easy to understand.
+
+🌱 The UUID now have method `IsEqual` to simplify checking for equality in
+if-condition.
+
+🌼 During Unmarshaling, if the UUID value being decoded is not valid, don't
+changes the current value.
+This fix the value that changes only half of the UUID part (high part) but
+not the other part (the low).
+
+🌼 The marshaling and `Value` methods now return nil if ID is zero.
+
+Per RFC 9562 Section 5.9,
+
+  A Nil UUID value can be useful to communicate the absence of any
+  other UUID value in situations that otherwise require or use a
+  128-bit UUID.
+  A Nil UUID can express the concept "no such value here".
+  Thus, it is reserved for such use as needed for
+  implementation-specific situations.
+
+In case of SQL, the Value method should return nil if ID is zero.
+
+
 [#v0_62_0]
 == pakakeh.go v0.62.0 (2026-04-04)
 //{{{
