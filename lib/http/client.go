@@ -435,7 +435,7 @@ func (client *Client) PutJSON(req ClientRequest) (res *ClientResponse, err error
 		params []byte
 	)
 
-	params, err = json.Marshal(params)
+	params, err = json.Marshal(req.Params)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
