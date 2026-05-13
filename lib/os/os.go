@@ -232,6 +232,28 @@ func IsFileExist(parent, relpath string) bool {
 	return true
 }
 
+// NormalizeForEnv returns the name that is valid for environment variable.
+// All other characters beside digit (0..9) and alpha (a..z A..Z) will be
+// replaced with "_".
+func NormalizeForEnv(name string) string {
+	if len(name) == 0 {
+		return ``
+	}
+	neo := make([]byte, 0, len(name)+1)
+	if ascii.IsDigit(name[0]) {
+		neo = append(neo, '_')
+	}
+	for _, c := range name {
+		b := byte(c)
+		if ascii.IsAlnum(b) {
+			neo = append(neo, b)
+		} else {
+			neo = append(neo, '_')
+		}
+	}
+	return string(neo)
+}
+
 // PathFold replace the path "in" with tilde "~" if its prefix match with
 // user's home directory from [os.UserHomeDir].
 func PathFold(in string) (out string, err error) {

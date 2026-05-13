@@ -228,6 +228,29 @@ func TestIsFileExist(t *testing.T) {
 	}
 }
 
+func TestNormalizeForEnv(t *testing.T) {
+	listCase := []struct {
+		name string
+		exp  string
+	}{{
+		name: ``,
+		exp:  ``,
+	}, {
+		name: `123`,
+		exp:  `_123`,
+	}, {
+		name: `a&b`,
+		exp:  `a_b`,
+	}, {
+		name: ` a![1]`,
+		exp:  `_a__1_`,
+	}}
+	for _, tcase := range listCase {
+		got := NormalizeForEnv(tcase.name)
+		test.Assert(t, tcase.name, tcase.exp, got)
+	}
+}
+
 func TestRmdirEmptyAll(t *testing.T) {
 	t.Cleanup(func() {
 		_ = os.Remove(`testdata/file`)
