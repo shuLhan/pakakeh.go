@@ -6,6 +6,7 @@ COVER_OUT:=cover.out
 COVER_HTML:=cover.html
 CPU_PROF:=cpu.prof
 MEM_PROF:=mem.prof
+TEST_OUT:=test.txt
 
 CIIGO := ${GOBIN}/ciigo
 VERSION := $(shell git describe --tags)
@@ -30,12 +31,27 @@ build:
 
 ## Prevent git CLI to print errors in user's locale language.
 test: export LC_ALL=C.UTF-8
+test: export CGO_ENABLED=1
 test:
-	CGO_ENABLED=1 go test -failfast -timeout=2m -race -coverprofile=$(COVER_OUT) ./...
+	go test -failfast -timeout=2m -race \
+		-coverprofile=$(COVER_OUT) ./... \
+		2>&1 | tee $(TEST_OUT)
 	go tool cover -html=$(COVER_OUT) -o $(COVER_HTML)
 
 test.prof:
 	go test -race -timeout=1m -cpuprofile $(CPU_PROF) -memprofile $(MEM_PROF) ./...
+
+.PHONY: test.top10
+test.top10: $(TEST_OUT)
+	@echo ""
+	@echo "=== Top 10 longest tests"
+	@cat $(TEST_OUT) | rg '\d+\.\d+s' | awk '{ print $$3" "$$2 }' \
+		| sort -r -h | head -10
+	@echo ""
+	@echo "=== Top 10 lowest coverages"
+	@cat $(TEST_OUT) | rg '\d+\.\d+s' | rg '\d+\.\d+%' \
+		| awk '{ print $$5" "$$2 }' \
+		| sort -h | head -10
 
 lint:
 	go run ./cmd/gocheck ./...

@@ -75,6 +75,7 @@
 /lib/websocket/testdata/lib
 /lib/websocket/testdata/pip-selfcheck.json
 /lib/websocket/testdata/server/server
+/test.txt
 bench_*
 cover.*
 share-tools/
