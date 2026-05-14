@@ -4,6 +4,7 @@
 package sshconfig
 
 import (
+	"path/filepath"
 	"testing"
 
 	"kilabit.info/pakakeh.go/lib/test"
@@ -69,10 +70,10 @@ func TestSectionSetDefaults(t *testing.T) {
 		},
 		exp: func(def Section) *Section {
 			def.IdentityFile = []string{
-				testParser.homeDir + "/.ssh/id_dsa",
-				testParser.homeDir + "/.ssh/id_ecdsa",
-				testParser.homeDir + "/.ssh/id_ed25519",
-				testParser.homeDir + "/.ssh/id_rsa",
+				filepath.Join(testParser.homeDir, `/.ssh/id_dsa`),
+				filepath.Join(testParser.homeDir, `/.ssh/id_ecdsa`),
+				filepath.Join(testParser.homeDir, `/.ssh/id_ed25519`),
+				filepath.Join(testParser.homeDir, `/.ssh/id_rsa`),
 			}
 			return &def
 		},
