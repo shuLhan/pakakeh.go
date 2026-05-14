@@ -6,8 +6,8 @@ package pasetov4
 import (
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestUnpackPublicToken(t *testing.T) {

@@ -18,9 +18,9 @@ import (
 	"math"
 	"math/big"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/knn"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/resampling"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/mining/knn"
+	"kilabit.info/pakakeh.go/lib/mining/resampling"
+	"kilabit.info/pakakeh.go/lib/tabula"
 )
 
 // Runtime for input and output.

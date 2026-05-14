@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	libbytes "kilabit.info/pakakeh.go/lib/bytes"
 )
 
 type empty struct{}

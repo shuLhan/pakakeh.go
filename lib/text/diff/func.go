@@ -4,8 +4,8 @@
 package diff
 
 import (
-	inbytes "git.sr.ht/~shulhan/pakakeh.go/internal/bytes"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
+	inbytes "kilabit.info/pakakeh.go/internal/bytes"
+	"kilabit.info/pakakeh.go/lib/text"
 )
 
 // Bytes returns the character differences (additions and deletion) between

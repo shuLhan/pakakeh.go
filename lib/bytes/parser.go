@@ -7,7 +7,7 @@ package bytes
 import (
 	"bytes"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	"kilabit.info/pakakeh.go/lib/ascii"
 )
 
 // Parser implement tokenize parser for stream of byte using one or more

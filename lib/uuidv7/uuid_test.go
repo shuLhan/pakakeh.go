@@ -6,7 +6,7 @@ package uuidv7
 import (
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestUUID_Equal(t *testing.T) {

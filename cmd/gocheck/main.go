@@ -7,10 +7,10 @@
 // See package [lib/goanalysis] for more information.
 //
 // [Analyzer]: https://pkg.go.dev/golang.org/x/tools/go/analysis#hdr-Analyzer
-// [lib/goanalysis]: https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/goanalysis/
+// [lib/goanalysis]: https://pkg.go.dev/kilabit.info/pakakeh.go/lib/goanalysis/
 package main
 
-import "git.sr.ht/~shulhan/pakakeh.go/lib/goanalysis"
+import "kilabit.info/pakakeh.go/lib/goanalysis"
 
 func main() {
 	goanalysis.Check()

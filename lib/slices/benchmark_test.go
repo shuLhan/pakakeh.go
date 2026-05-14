@@ -8,7 +8,7 @@ import (
 	"sort"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
+	"kilabit.info/pakakeh.go/lib/slices"
 )
 
 func BenchmarkSort_int(b *testing.B) {

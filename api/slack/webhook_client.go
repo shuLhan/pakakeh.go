@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"time"
 
-	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	libhttp "kilabit.info/pakakeh.go/lib/http"
 )
 
 // WebhookClient for slack.

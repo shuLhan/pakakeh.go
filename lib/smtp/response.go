@@ -8,8 +8,8 @@ import (
 	"errors"
 	"strconv"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	"kilabit.info/pakakeh.go/lib/ascii"
+	libbytes "kilabit.info/pakakeh.go/lib/bytes"
 )
 
 // Response represent a generic single or multilines response from server.

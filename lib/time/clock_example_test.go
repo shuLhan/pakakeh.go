@@ -6,7 +6,7 @@ package time_test
 import (
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/time"
+	"kilabit.info/pakakeh.go/lib/time"
 )
 
 func ExampleClock_After() {

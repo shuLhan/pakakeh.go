@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/text/diff"
+	"kilabit.info/pakakeh.go/lib/text/diff"
 )
 
 func ExampleFiles() {

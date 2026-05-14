@@ -9,7 +9,7 @@ import (
 	"encoding/xml"
 	"fmt"
 
-	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	liberrors "kilabit.info/pakakeh.go/lib/errors"
 )
 
 // Response contains the XML-RPC response.

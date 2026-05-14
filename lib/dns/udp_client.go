@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 // UDPClient for DNS with UDP connection.

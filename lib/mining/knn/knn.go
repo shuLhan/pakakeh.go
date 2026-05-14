@@ -9,7 +9,7 @@ import (
 	"math"
 	"sort"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/tabula"
 )
 
 const (

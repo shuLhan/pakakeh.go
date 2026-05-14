@@ -6,9 +6,9 @@
 // defined in [paseto-v2] and [paseto-v4].
 //
 // The paseto version 2 is available under sub package
-// [git.sr.ht/~shulhan/pakakeh.go/lib/paseto/v2] and the paseto version 4
+// [kilabit.info/pakakeh.go/lib/paseto/v2] and the paseto version 4
 // is available under sub package
-// [git.sr.ht/~shulhan/pakakeh.go/lib/paseto/v4].
+// [kilabit.info/pakakeh.go/lib/paseto/v4].
 //
 // [paseto-v2]: https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version2.md
 // [paseto-v4]: https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version4.md

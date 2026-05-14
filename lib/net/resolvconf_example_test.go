@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 func ExampleResolvConf_PopulateQuery() {

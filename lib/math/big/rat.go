@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/runes"
+	"kilabit.info/pakakeh.go/lib/runes"
 )
 
 var ratZero = NewRat(0)

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"testing/synctest"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestNewMessage(t *testing.T) {

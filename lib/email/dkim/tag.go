@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	"kilabit.info/pakakeh.go/lib/ascii"
 )
 
 type tagKey int

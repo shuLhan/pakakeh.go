@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/git"
+	"kilabit.info/pakakeh.go/lib/git"
 )
 
 func ExampleGit_IsIgnored() {

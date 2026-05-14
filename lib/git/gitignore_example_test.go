@@ -6,7 +6,7 @@ package git_test
 import (
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/git"
+	"kilabit.info/pakakeh.go/lib/git"
 )
 
 func ExampleGitignore_IsIgnored() {

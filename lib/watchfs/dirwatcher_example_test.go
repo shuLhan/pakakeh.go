@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs"
+	"kilabit.info/pakakeh.go/lib/watchfs"
 )
 
 func ExampleDirWatcher() {

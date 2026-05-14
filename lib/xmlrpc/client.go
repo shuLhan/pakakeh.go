@@ -12,8 +12,8 @@ import (
 	"net/url"
 	"time"
 
-	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	libhttp "kilabit.info/pakakeh.go/lib/http"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 const (

@@ -6,7 +6,7 @@ package http
 import (
 	"net/http"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"kilabit.info/pakakeh.go/lib/memfs"
 )
 
 // FSHandler define the function to inspect each GET request to Server

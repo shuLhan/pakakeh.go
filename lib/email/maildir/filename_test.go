@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestNewFilename(t *testing.T) {

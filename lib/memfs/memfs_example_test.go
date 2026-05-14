@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2"
+	"kilabit.info/pakakeh.go/lib/memfs"
+	"kilabit.info/pakakeh.go/lib/watchfs/v2"
 )
 
 func ExampleNew() {

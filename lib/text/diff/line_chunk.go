@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
+	"kilabit.info/pakakeh.go/lib/text"
 )
 
 // LineChunk represents a changes inside a line.

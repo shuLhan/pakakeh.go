@@ -12,7 +12,7 @@ import (
 	"runtime"
 	"strings"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	libbytes "kilabit.info/pakakeh.go/lib/bytes"
 )
 
 // List of known hosts file by OS.

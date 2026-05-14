@@ -7,7 +7,7 @@ package xmlrpc
 import (
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 type testStruct struct {

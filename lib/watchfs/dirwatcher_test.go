@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 // Test renaming sub-directory being watched.

@@ -9,7 +9,7 @@ _sourcedir=$pkgname
 
 pkgdesc="Miscellaneous CLI tools: ansua, bcrypt, epoch, ini, xtrk"
 arch=(x86_64)
-url='https://sr.ht/~shulhan/pakakeh.go'
+url='https://kilabit.info/project/pakakeh.go/'
 license=('BSD')
 conflicts=('share-tools')
 replaces=('share-tools')
@@ -22,13 +22,13 @@ makedepends=(
 provides=('pakakeh.go-tools')
 
 source=(
-	"$pkgname::git+https://git.sr.ht/~shulhan/pakakeh.go"
+	"$pkgname::git+https://git.kilabit.info/pakakeh.go"
 )
 
 ## For testing in local environment.
 #_sourcedir=pakakeh.go-tools-local
 #source=(
-#	"$_sourcedir::git+file:///home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go#branch=dev"
+#	"$_sourcedir::git+file:///home/ms/kilabit.info/_project/src/pakakeh.go#branch=dev"
 #)
 
 md5sums=(

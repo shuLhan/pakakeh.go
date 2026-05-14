@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"log"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/hexdump"
+	libbytes "kilabit.info/pakakeh.go/lib/bytes"
+	"kilabit.info/pakakeh.go/lib/hexdump"
 )
 
 func ExampleParse() {

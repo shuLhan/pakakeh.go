@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"testing"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	libbytes "kilabit.info/pakakeh.go/lib/bytes"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestParseMailbox(t *testing.T) {

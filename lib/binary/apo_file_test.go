@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/hexdump"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/hexdump"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 // Opening the ApoFile should create the file if its not exist, and write

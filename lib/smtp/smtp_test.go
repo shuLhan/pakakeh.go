@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	libcrypto "git.sr.ht/~shulhan/pakakeh.go/lib/crypto"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/email/dkim"
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	libcrypto "kilabit.info/pakakeh.go/lib/crypto"
+	"kilabit.info/pakakeh.go/lib/email/dkim"
+	libnet "kilabit.info/pakakeh.go/lib/net"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 const (

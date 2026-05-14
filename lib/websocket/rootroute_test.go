@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func testRouteHandler(t *testing.T, target string) RouteHandler {

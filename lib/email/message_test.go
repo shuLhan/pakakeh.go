@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/email/dkim"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/email/dkim"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestNewMultipart(t *testing.T) {

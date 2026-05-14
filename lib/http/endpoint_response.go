@@ -4,7 +4,7 @@
 
 package http
 
-import liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+import liberrors "kilabit.info/pakakeh.go/lib/errors"
 
 // EndpointResponse is one of the common HTTP response container that can be
 // used by Server implementor.

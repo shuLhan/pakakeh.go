@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
+	"kilabit.info/pakakeh.go/lib/ascii"
+	libnet "kilabit.info/pakakeh.go/lib/net"
+	"kilabit.info/pakakeh.go/lib/reflect"
 )
 
 // Message represent a DNS message.

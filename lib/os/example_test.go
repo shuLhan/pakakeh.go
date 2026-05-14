@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	libos "git.sr.ht/~shulhan/pakakeh.go/lib/os"
+	libos "kilabit.info/pakakeh.go/lib/os"
 )
 
 func ExampleEnvironments() {

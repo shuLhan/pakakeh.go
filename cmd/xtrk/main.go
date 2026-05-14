@@ -14,8 +14,8 @@ import (
 	"os"
 	"strings"
 
-	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
-	libos "git.sr.ht/~shulhan/pakakeh.go/lib/os"
+	pakakeh "kilabit.info/pakakeh.go"
+	libos "kilabit.info/pakakeh.go/lib/os"
 )
 
 const (

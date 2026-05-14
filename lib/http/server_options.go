@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"kilabit.info/pakakeh.go/lib/memfs"
 )
 
 // ServerOptions define an options to initialize HTTP server.
@@ -26,7 +26,7 @@ type ServerOptions struct {
 	// file, generated using memfs.MemFS.GoEmbed().
 	// Otherwise, it will try to read from file system directly.
 	//
-	// See https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/memfs#hdr-Go_embed
+	// See https://pkg.go.dev/kilabit.info/pakakeh.go/lib/memfs#hdr-Go_embed
 	Memfs *memfs.MemFS
 
 	// HandleFS inspect each GET request to Memfs.

@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/email/dkim"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/email/dkim"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 var (

@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"kilabit.info/pakakeh.go/lib/slices"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 // Claset define a dataset with class attribute.

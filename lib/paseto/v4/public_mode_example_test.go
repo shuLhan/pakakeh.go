@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"log"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
-	pasetov4 "git.sr.ht/~shulhan/pakakeh.go/lib/paseto/v4"
+	"kilabit.info/pakakeh.go/lib/paseto"
+	pasetov4 "kilabit.info/pakakeh.go/lib/paseto/v4"
 )
 
 func ExamplePublicMode_Sign() {

@@ -7,7 +7,7 @@ package tabula
 import (
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func initColReal(t *testing.T) (col *Column) {

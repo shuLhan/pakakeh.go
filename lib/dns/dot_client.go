@@ -11,7 +11,7 @@ import (
 	"net"
 	"time"
 
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 // DoTClient client for DNS over TLS.

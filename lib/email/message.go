@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/email/dkim"
+	"kilabit.info/pakakeh.go/lib/email/dkim"
 )
 
 // Message represent an unpacked internet message format.

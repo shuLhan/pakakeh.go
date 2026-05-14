@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"kilabit.info/pakakeh.go/lib/memfs"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 var (

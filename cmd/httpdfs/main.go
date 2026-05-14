@@ -14,10 +14,10 @@ import (
 	"syscall"
 	"time"
 
-	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
-	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/systemd"
+	pakakeh "kilabit.info/pakakeh.go"
+	libhttp "kilabit.info/pakakeh.go/lib/http"
+	"kilabit.info/pakakeh.go/lib/memfs"
+	"kilabit.info/pakakeh.go/lib/systemd"
 )
 
 const (

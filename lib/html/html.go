@@ -18,7 +18,7 @@ import (
 
 	"golang.org/x/net/html"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	"kilabit.info/pakakeh.go/lib/ascii"
 )
 
 // NormalizeForID given an input string normalize it to HTML ID.

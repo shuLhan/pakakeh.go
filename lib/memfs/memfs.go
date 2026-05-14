@@ -17,11 +17,11 @@ import (
 	"strings"
 	"time"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
-	libhtml "git.sr.ht/~shulhan/pakakeh.go/lib/html"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2"
+	libbytes "kilabit.info/pakakeh.go/lib/bytes"
+	libhtml "kilabit.info/pakakeh.go/lib/html"
+	"kilabit.info/pakakeh.go/lib/slices"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
+	"kilabit.info/pakakeh.go/lib/watchfs/v2"
 )
 
 const (

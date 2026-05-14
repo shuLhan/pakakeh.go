@@ -11,8 +11,8 @@ package gini
 import (
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"kilabit.info/pakakeh.go/lib/slices"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 // Gini contain slice of sorted index, slice of partition values, slice of Gini

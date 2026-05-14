@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
+	"kilabit.info/pakakeh.go/lib/mlog"
 )
 
 // Endpoint represent route that will be handled by server.

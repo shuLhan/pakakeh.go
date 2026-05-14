@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test/httptest"
+	"kilabit.info/pakakeh.go/lib/test/httptest"
 )
 
 func ExampleSimulate() {

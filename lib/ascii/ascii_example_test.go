@@ -6,7 +6,7 @@ package ascii_test
 import (
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	"kilabit.info/pakakeh.go/lib/ascii"
 )
 
 func ExampleIsAlnum() {

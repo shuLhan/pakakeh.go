@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestCachesQuery(t *testing.T) {

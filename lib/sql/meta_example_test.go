@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/sql"
+	"kilabit.info/pakakeh.go/lib/sql"
 )
 
 func ExampleMeta_Bind() {

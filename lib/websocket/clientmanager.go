@@ -9,7 +9,7 @@ import (
 	"slices"
 	"sync"
 
-	libslices "git.sr.ht/~shulhan/pakakeh.go/lib/slices"
+	libslices "kilabit.info/pakakeh.go/lib/slices"
 )
 
 // ClientManager manage list of active websocket connections on server.

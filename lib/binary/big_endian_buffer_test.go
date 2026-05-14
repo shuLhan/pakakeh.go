@@ -11,8 +11,8 @@ import (
 	"reflect"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/binary"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/binary"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestBigEndianBuffer(t *testing.T) {

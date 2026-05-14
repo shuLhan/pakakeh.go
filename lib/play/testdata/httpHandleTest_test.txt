@@ -31,7 +31,7 @@ Connection: close
 Content-Type: application/json
 Set-Cookie: sid=c4832036755b3539; Path=/; Max-Age=604800; SameSite=Strict
 
-{"data":"ok  \tgit.sr.ht/~shulhan/pakakeh.go/lib/play/testdata Xs\n","code":200}
+{"data":"ok  \tkilabit.info/pakakeh.go/lib/play/testdata Xs\n","code":200}
 
 >>> invalidFile
 package test

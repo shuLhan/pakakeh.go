@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/paseto"
 )
 
 const (

@@ -16,8 +16,8 @@ import (
 	"testing"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/text/diff"
+	"kilabit.info/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/text/diff"
 )
 
 var (

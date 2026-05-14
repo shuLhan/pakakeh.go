@@ -4,7 +4,7 @@
 
 package email
 
-import "git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+import "kilabit.info/pakakeh.go/lib/ascii"
 
 var specialChars, _ = ascii.MakeSet(`()<>[]:;@\,"`)
 

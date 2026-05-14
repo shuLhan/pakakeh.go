@@ -9,7 +9,7 @@ import (
 	"net"
 	"strings"
 
-	libdns "git.sr.ht/~shulhan/pakakeh.go/lib/dns"
+	libdns "kilabit.info/pakakeh.go/lib/dns"
 )
 
 // List of possible result code as described in RFC 7208 section 2.6.

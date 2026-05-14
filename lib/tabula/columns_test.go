@@ -7,7 +7,7 @@ package tabula
 import (
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
+	"kilabit.info/pakakeh.go/lib/reflect"
 )
 
 func TestRandomPickColumns(t *testing.T) {

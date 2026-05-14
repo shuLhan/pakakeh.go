@@ -6,7 +6,7 @@
 // [paseto-rfc-01].
 //
 // Deprecated: This package has been replaced with new standard, paseto v4.
-// See git.sr.ht/~shulhan/pakakeh.go/lib/paseto/v4.
+// See kilabit.info/pakakeh.go/lib/paseto/v4.
 //
 // See the examples below for quick reference.
 //
@@ -105,7 +105,7 @@ import (
 	"errors"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/paseto"
 	"golang.org/x/crypto/blake2b"
 )
 

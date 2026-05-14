@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/telemetry"
+	"kilabit.info/pakakeh.go/lib/telemetry"
 )
 
 func ExampleBufferForwarder() {

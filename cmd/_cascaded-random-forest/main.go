@@ -11,9 +11,9 @@ import (
 	"os"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier/crf"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/dsv"
+	"kilabit.info/pakakeh.go/lib/mining/classifier/crf"
+	"kilabit.info/pakakeh.go/lib/tabula"
 )
 
 const (

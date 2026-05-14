@@ -6,7 +6,7 @@ package http
 import (
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestSSEEndpoint(t *testing.T) {

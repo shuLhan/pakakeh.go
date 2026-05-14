@@ -8,8 +8,8 @@ import (
 	"errors"
 	"net/http"
 
-	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
+	liberrors "kilabit.info/pakakeh.go/lib/errors"
+	"kilabit.info/pakakeh.go/lib/mlog"
 )
 
 // CallbackErrorHandler define the function that can be used to handle an

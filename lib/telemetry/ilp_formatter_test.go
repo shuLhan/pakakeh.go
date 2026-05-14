@@ -6,7 +6,7 @@ package telemetry
 import (
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestIlpFormatter_Format(t *testing.T) {

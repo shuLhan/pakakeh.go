@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	libhttp "kilabit.info/pakakeh.go/lib/http"
+	libnet "kilabit.info/pakakeh.go/lib/net"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestClient(t *testing.T) {

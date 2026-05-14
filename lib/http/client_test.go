@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestClient_Download(t *testing.T) {

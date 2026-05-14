@@ -7,7 +7,7 @@ import (
 	"crypto/rsa"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestSignatureParse(t *testing.T) {

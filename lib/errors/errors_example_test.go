@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"log"
 
-	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	liberrors "kilabit.info/pakakeh.go/lib/errors"
 )
 
 func ExampleE_Is() {

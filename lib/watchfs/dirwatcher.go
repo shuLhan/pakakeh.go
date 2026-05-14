@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"kilabit.info/pakakeh.go/lib/memfs"
 )
 
 const (

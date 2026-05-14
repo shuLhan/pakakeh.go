@@ -11,8 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 var jsonSample = []string{

@@ -9,13 +9,13 @@ import (
 	"log"
 	"os"
 
-	"git.sr.ht/~shulhan/pakakeh.go/api/slack"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
+	"kilabit.info/pakakeh.go/api/slack"
+	"kilabit.info/pakakeh.go/lib/mlog"
 )
 
 func ExampleMultiLogger() {
 	// The following example import package
-	// "git.sr.ht/~shulhan/pakakeh.go/api/slack".
+	// "kilabit.info/pakakeh.go/api/slack".
 
 	var (
 		buf   = bytes.Buffer{}

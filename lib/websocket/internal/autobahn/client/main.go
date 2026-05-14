@@ -11,8 +11,8 @@ import (
 	"log"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/websocket"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/websocket/internal/autobahn"
+	"kilabit.info/pakakeh.go/lib/websocket"
+	"kilabit.info/pakakeh.go/lib/websocket/internal/autobahn"
 )
 
 func main() {

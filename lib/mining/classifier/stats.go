@@ -4,7 +4,7 @@
 package classifier
 
 import (
-	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
+	"kilabit.info/pakakeh.go/lib/dsv"
 )
 
 // Stats define list of statistic values.

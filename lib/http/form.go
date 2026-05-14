@@ -9,8 +9,8 @@ import (
 	"reflect"
 	"strings"
 
-	libreflect "git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	libreflect "kilabit.info/pakakeh.go/lib/reflect"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 const (

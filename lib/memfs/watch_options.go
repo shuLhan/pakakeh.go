@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2"
+	"kilabit.info/pakakeh.go/lib/watchfs/v2"
 )
 
 // DefaultWatchFile define default file name to be watch for changes.

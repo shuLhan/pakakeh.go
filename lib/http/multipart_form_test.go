@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test/mock"
+	"kilabit.info/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test/mock"
 )
 
 func TestGenerateFormData(t *testing.T) {

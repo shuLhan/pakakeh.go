@@ -7,8 +7,8 @@ package test
 import (
 	"bytes"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/text/diff"
+	"kilabit.info/pakakeh.go/lib/reflect"
+	"kilabit.info/pakakeh.go/lib/text/diff"
 )
 
 // Assert compares two interfaces values, exp and got for equality.

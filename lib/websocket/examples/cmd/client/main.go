@@ -30,8 +30,8 @@ import (
 	"sync"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/websocket"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/websocket/examples"
+	"kilabit.info/pakakeh.go/lib/websocket"
+	"kilabit.info/pakakeh.go/lib/websocket/examples"
 )
 
 const (

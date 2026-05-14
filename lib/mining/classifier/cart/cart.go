@@ -17,11 +17,11 @@ package cart
 import (
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/gain/gini"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/tree/binary"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/mining/gain/gini"
+	"kilabit.info/pakakeh.go/lib/mining/tree/binary"
+	"kilabit.info/pakakeh.go/lib/numbers"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
+	"kilabit.info/pakakeh.go/lib/tabula"
 )
 
 const (

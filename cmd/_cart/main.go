@@ -11,9 +11,9 @@ import (
 	"os"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier/cart"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/dsv"
+	"kilabit.info/pakakeh.go/lib/mining/classifier/cart"
+	"kilabit.info/pakakeh.go/lib/tabula"
 )
 
 type options struct {

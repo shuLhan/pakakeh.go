@@ -7,7 +7,7 @@ import (
 	"io/fs"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestClient_Fsetstat(t *testing.T) {

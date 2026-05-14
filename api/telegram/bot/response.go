@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	"kilabit.info/pakakeh.go/lib/errors"
 )
 
 const (

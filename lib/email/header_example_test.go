@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/email"
+	"kilabit.info/pakakeh.go/lib/email"
 )
 
 func ExampleHeader_Filter() {

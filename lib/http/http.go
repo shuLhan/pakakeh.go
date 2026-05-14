@@ -87,7 +87,7 @@
 // of process on step 1, 2, and 4 will be handled by our library.
 //
 //	import (
-//		libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+//		libhttp "kilabit.info/pakakeh.go/lib/http"
 //	)
 //
 //	...
@@ -239,7 +239,7 @@ import (
 	"net/http"
 	"strings"
 
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 // List of header value for HTTP header Accept-Ranges.

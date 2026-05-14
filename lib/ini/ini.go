@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 const (

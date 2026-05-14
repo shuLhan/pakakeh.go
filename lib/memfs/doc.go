@@ -195,8 +195,8 @@
 // This allow quick development when changes only template or non-code
 // files.
 //
-// [November 2018]: https://git.sr.ht/~shulhan/pakakeh.go/commit/05b02c7b
+// [November 2018]: https://git.kilabit.info/pakakeh.go/commit/05b02c7b
 // [go-bindata]: https://github.com/shuLhan/go-bindata
 // [Go version 1.16]: https://go.dev/doc/go1.16
-// [Migrate]: https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/sql#Client.Migrate
+// [Migrate]: https://pkg.go.dev/kilabit.info/pakakeh.go/lib/sql#Client.Migrate
 package memfs

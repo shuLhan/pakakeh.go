@@ -6,7 +6,7 @@ package dns
 import (
 	"fmt"
 
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 // RDataSRV define a resource record for type SRV.

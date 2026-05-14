@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	"kilabit.info/pakakeh.go/lib/ascii"
 )
 
 // DefDataFileSuffix the suffix of file name that will be loaded by

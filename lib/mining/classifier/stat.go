@@ -7,8 +7,8 @@ package classifier
 import (
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/dsv"
+	"kilabit.info/pakakeh.go/lib/tabula"
 )
 
 // Stat hold statistic value of classifier, including TP rate, FP rate, precision,

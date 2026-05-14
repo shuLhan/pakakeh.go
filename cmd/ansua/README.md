@@ -1,7 +1,6 @@
 <!--
-SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
-
 SPDX-License-Identifier: BSD-3-Clause
+SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
 -->
 
 # ansua
@@ -42,6 +41,4 @@ GNU/Linux,
 
 ## LINKS
 
-Repository: https://git.sr.ht/~shulhan/pakakeh.go
-
-Issue: https://todo.sr.ht/~shulhan/pakakeh.go
+Repository: https://git.kilabit.info/pakakeh.go/tree/cmd/ansua/

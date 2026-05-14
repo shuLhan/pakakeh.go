@@ -7,8 +7,8 @@ package bytes_test
 import (
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	"kilabit.info/pakakeh.go/lib/ascii"
+	libbytes "kilabit.info/pakakeh.go/lib/bytes"
 )
 
 func ExampleCutUntilToken() {

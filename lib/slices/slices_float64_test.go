@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/numbers"
+	"kilabit.info/pakakeh.go/lib/slices"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestCount_float64(t *testing.T) {

@@ -9,9 +9,9 @@ import (
 	"os"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/dsv"
+	"kilabit.info/pakakeh.go/lib/mining/classifier"
+	"kilabit.info/pakakeh.go/lib/tabula"
 )
 
 // Global options to run for each test.

@@ -112,7 +112,7 @@ import (
 	"fmt"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/paseto"
 )
 
 // UnpackPublicToken unpacks the v4 public token into msg.

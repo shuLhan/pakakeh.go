@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
+	"kilabit.info/pakakeh.go/lib/text"
 )
 
 func compareChunks(t *testing.T, adds, dels text.Chunks, expAdds, expDels []string) {

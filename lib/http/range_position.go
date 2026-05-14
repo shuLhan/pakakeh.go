@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 // RangePosition contains the parsed value of Content-Range header.

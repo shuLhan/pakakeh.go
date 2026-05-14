@@ -1,8 +1,9 @@
 <!-- SPDX-License-Identifier: BSD-3-Clause -->
 <!-- SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info> -->
 
-[![GoDoc](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/dsv?status.svg)](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/dsv)
-[![Go Report Card](https://goreportcard.com/badge/git.sr.ht/~shulhan/pakakeh.go/lib/dsv)](https://goreportcard.com/report/git.sr.ht/~shulhan/pakakeh.go/lib/dsv)
+# dsv
+
+[GoDoc](https://pkg.go.dev/kilabit.info/pakakeh.go/lib/dsv)
 
 Package `dsv` is a Go library for working with delimited separated value (DSV).
 
@@ -292,10 +293,10 @@ for {
 ### Using different Dataset
 
 Default dataset used by Reader is
-[tabula.Dataset](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#Dataset).
+[tabula.Dataset](https://pkg.go.dev/kilabit.info/pakakeh.go/lib/tabula#Dataset).
 
 You can extend and implement
-[DatasetInterface](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#DatasetInterface)
+[DatasetInterface](https://pkg.go.dev/kilabit.info/pakakeh.go/lib/tabula#DatasetInterface)
 and use it in reader object, either by
 
 - passing it in the second parameter in `NewReader`, for example,
@@ -324,7 +325,7 @@ and use it in reader object, either by
 Since we use tabula package to manage data, any features in those package
 can be used in our dataset.
 For more information see [tabula
-package](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula).
+package](https://pkg.go.dev/kilabit.info/pakakeh.go/lib/tabula).
 
 ## Limitations
 

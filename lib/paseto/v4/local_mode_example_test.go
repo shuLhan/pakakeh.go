@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 
-	pasetov4 "git.sr.ht/~shulhan/pakakeh.go/lib/paseto/v4"
+	pasetov4 "kilabit.info/pakakeh.go/lib/paseto/v4"
 )
 
 func ExampleLocalMode() {

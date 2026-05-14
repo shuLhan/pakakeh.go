@@ -81,7 +81,7 @@ func (id UUID) Bytes() (data []byte) {
 }
 
 // Equal returns nil if id and v are equals.
-// This method implements [git.sr.ht/~shulhan/pakakeh.go/lib/reflect.Equaler]
+// This method implements [kilabit.info/pakakeh.go/lib/reflect.Equaler]
 // interface.
 func (id *UUID) Equal(v any) (err error) {
 	ptr, ok := v.(*UUID)

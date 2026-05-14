@@ -21,11 +21,11 @@ import (
 	"testing"
 	"time"
 
-	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
-	libhttptest "git.sr.ht/~shulhan/pakakeh.go/lib/test/httptest"
+	liberrors "kilabit.info/pakakeh.go/lib/errors"
+	"kilabit.info/pakakeh.go/lib/memfs"
+	libnet "kilabit.info/pakakeh.go/lib/net"
+	"kilabit.info/pakakeh.go/lib/test"
+	libhttptest "kilabit.info/pakakeh.go/lib/test/httptest"
 )
 
 func TestRegisterDelete(t *testing.T) {

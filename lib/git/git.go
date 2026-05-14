@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ini"
+	"kilabit.info/pakakeh.go/lib/ini"
 )
 
 const (
@@ -146,7 +146,7 @@ func Clone(remoteURL, dest string) (err error) {
 
 // Equal return true if `v` is instance of `*Git` and has the same working
 // directory.
-// This implement [git.sr.ht/~shulhan/pakakeh.go/lib/reflect.Equaler]
+// This implement [kilabit.info/pakakeh.go/lib/reflect.Equaler]
 // interface.
 func (git *Git) Equal(v any) bool {
 	if v == nil {

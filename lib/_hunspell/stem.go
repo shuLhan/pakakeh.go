@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 // Stem contains the word and its attributes.

@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2"
+	"kilabit.info/pakakeh.go/lib/reflect"
+	"kilabit.info/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/watchfs/v2"
 )
 
 type directFileInfo struct {

@@ -15,12 +15,12 @@ import (
 	"math"
 	"sort"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier/rf"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/mining/classifier"
+	"kilabit.info/pakakeh.go/lib/mining/classifier/rf"
+	"kilabit.info/pakakeh.go/lib/numbers"
+	"kilabit.info/pakakeh.go/lib/slices"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
+	"kilabit.info/pakakeh.go/lib/tabula"
 )
 
 const (

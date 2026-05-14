@@ -19,9 +19,9 @@ import (
 	"strings"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
+	"kilabit.info/pakakeh.go/lib/ascii"
+	"kilabit.info/pakakeh.go/lib/memfs"
+	"kilabit.info/pakakeh.go/lib/mlog"
 )
 
 const (

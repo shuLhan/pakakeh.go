@@ -161,5 +161,5 @@ func TestSum(t *testing.T) {
 	fmt.Printf(`%s`, rawbody)
 
 	// Output:
-	// {"data":"ok  \tgit.sr.ht/~shulhan/pakakeh.go/lib/play/testdata\tXs\n","code":200}
+	// {"data":"ok  \tkilabit.info/pakakeh.go/lib/play/testdata\tXs\n","code":200}
 }

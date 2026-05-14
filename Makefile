@@ -19,7 +19,7 @@ all: lint build test
 install:
 	go install ./cmd/...
 
-build: BUILD_FLAGS=-ldflags "-s -w -X 'git.sr.ht/~shulhan/pakakeh.go.Version=$(VERSION)'"
+build: BUILD_FLAGS=-ldflags "-s -w -X 'kilabit.info/pakakeh.go.Version=$(VERSION)'"
 build:
 	mkdir -p _bin/
 	go build \
@@ -58,7 +58,7 @@ lint:
 	go vet ./...
 
 $(CIIGO):
-	go install git.sr.ht/~shulhan/ciigo/cmd/ciigo
+	go install kilabit.info/ciigo/cmd/ciigo
 
 docs: $(CIIGO)
 	ciigo convert _doc

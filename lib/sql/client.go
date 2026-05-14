@@ -15,8 +15,8 @@ import (
 	"sort"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
+	"kilabit.info/pakakeh.go/lib/memfs"
+	"kilabit.info/pakakeh.go/lib/reflect"
 )
 
 const (

@@ -12,9 +12,9 @@ import (
 	"strconv"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
-	libdns "git.sr.ht/~shulhan/pakakeh.go/lib/dns"
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	"kilabit.info/pakakeh.go/lib/ascii"
+	libdns "kilabit.info/pakakeh.go/lib/dns"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 const (

@@ -9,8 +9,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/hexdump"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/hexdump"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestMessageIsExpired(t *testing.T) {

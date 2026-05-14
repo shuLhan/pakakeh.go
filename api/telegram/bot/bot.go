@@ -16,8 +16,8 @@ import (
 	"strconv"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/errors"
-	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	"kilabit.info/pakakeh.go/lib/errors"
+	libhttp "kilabit.info/pakakeh.go/lib/http"
 )
 
 // List of message parse mode.

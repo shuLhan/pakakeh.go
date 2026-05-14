@@ -4,7 +4,7 @@
 package http
 
 import (
-	libpath "git.sr.ht/~shulhan/pakakeh.go/lib/path"
+	libpath "kilabit.info/pakakeh.go/lib/path"
 )
 
 // List of kind for route.

@@ -7,7 +7,7 @@ package yahoo
 import (
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/contact"
+	"kilabit.info/pakakeh.go/lib/contact"
 )
 
 // List of field type.

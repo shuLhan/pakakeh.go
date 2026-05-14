@@ -6,7 +6,7 @@ package strings
 import (
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestRowIsEqual(t *testing.T) {

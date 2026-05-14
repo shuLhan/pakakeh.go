@@ -10,8 +10,8 @@ import (
 	"log"
 	"net/http"
 
-	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
-	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	liberrors "kilabit.info/pakakeh.go/lib/errors"
+	libhttp "kilabit.info/pakakeh.go/lib/http"
 )
 
 // HTTPHandleFormat define the HTTP handler for [Go.Format].

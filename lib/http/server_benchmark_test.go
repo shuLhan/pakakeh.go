@@ -18,7 +18,7 @@ import (
 // $ benchstat bench_handleDelete_before.txt bench_handleDelete_after.txt
 // goos: linux
 // goarch: amd64
-// pkg: git.sr.ht/~shulhan/pakakeh.go/lib/http
+// pkg: kilabit.info/pakakeh.go/lib/http
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 //
 //	│ bench_handleDelete_before.txt │ bench_handleDelete_after.txt  │
@@ -86,7 +86,7 @@ func BenchmarkServer_handleDelete(b *testing.B) {
 //
 // goos: linux
 // goarch: amd64
-// pkg: git.sr.ht/~shulhan/pakakeh.go/lib/http
+// pkg: kilabit.info/pakakeh.go/lib/http
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 //
 //	│ bench_registerDelete_before.txt │   bench_registerDelete_after.txt    │

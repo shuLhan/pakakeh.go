@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"log"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/paseto"
 )
 
 func ExamplePublicMode() {

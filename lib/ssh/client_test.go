@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/sshconfig"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/sshconfig"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 // TestNewClient_KeyError test SSH to server with host key does not exist in

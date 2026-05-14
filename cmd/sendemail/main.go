@@ -12,8 +12,8 @@ import (
 	"log"
 	"os"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/email"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/smtp"
+	"kilabit.info/pakakeh.go/lib/email"
+	"kilabit.info/pakakeh.go/lib/smtp"
 )
 
 const (

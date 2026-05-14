@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/contact"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/contact"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 const (

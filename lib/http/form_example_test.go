@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/math/big"
+	"kilabit.info/pakakeh.go/lib/math/big"
 )
 
 func ExampleMarshalForm() {

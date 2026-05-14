@@ -6,7 +6,7 @@ package smtp_test
 import (
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/smtp"
+	"kilabit.info/pakakeh.go/lib/smtp"
 )
 
 func ExampleParsePath() {

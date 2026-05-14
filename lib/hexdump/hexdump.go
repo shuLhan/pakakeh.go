@@ -12,7 +12,7 @@ import (
 	"io"
 	"strconv"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	"kilabit.info/pakakeh.go/lib/bytes"
 )
 
 // Parse parse the default output of [hexdump(1)] utility from parameter in

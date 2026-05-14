@@ -15,8 +15,8 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test/mock"
+	"kilabit.info/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test/mock"
 )
 
 func TestEncryptOaep(t *testing.T) {

@@ -11,7 +11,7 @@ import (
 	"log"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/uuidv7"
+	"kilabit.info/pakakeh.go/lib/uuidv7"
 )
 
 func ExampleGenerate() {

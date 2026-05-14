@@ -12,8 +12,8 @@ import (
 	"regexp"
 	"testing"
 
-	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	libhttp "kilabit.info/pakakeh.go/lib/http"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestGo_HTTPHandleFormat(t *testing.T) {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
 
-module git.sr.ht/~shulhan/pakakeh.go
+module kilabit.info/pakakeh.go
 
 go 1.26.0
 
@@ -20,6 +20,6 @@ require (
 	golang.org/x/sync v0.20.0 // indirect
 )
 
-replace golang.org/x/crypto => git.sr.ht/~shulhan/go-x-crypto v0.51.1-0.20260509111418-c27adc710d5b
+replace golang.org/x/crypto => kilabit.info/go-x-crypto v0.51.1-0.20260509111418-c27adc710d5b
 
 //replace golang.org/x/term => ../../../golang.org/x/term

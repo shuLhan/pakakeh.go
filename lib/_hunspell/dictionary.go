@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 type dictionary struct {

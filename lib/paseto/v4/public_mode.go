@@ -13,7 +13,7 @@ import (
 	"slices"
 	"sync"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/paseto"
 )
 
 // PublicHeader defines the public header in generated token.

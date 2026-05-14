@@ -10,8 +10,8 @@ import (
 	"log"
 	"os"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	libbytes "kilabit.info/pakakeh.go/lib/bytes"
+	"kilabit.info/pakakeh.go/lib/tabula"
 )
 
 const (

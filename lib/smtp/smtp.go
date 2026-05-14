@@ -9,7 +9,7 @@ import (
 	"errors"
 	"slices"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	"kilabit.info/pakakeh.go/lib/ascii"
 )
 
 // List of SMTP status codes.

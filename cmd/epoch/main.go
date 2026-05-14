@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
+	pakakeh "kilabit.info/pakakeh.go"
 )
 
 const usage = `= epoch

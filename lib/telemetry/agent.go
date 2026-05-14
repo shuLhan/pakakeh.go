@@ -9,7 +9,7 @@ import (
 	"log"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
+	"kilabit.info/pakakeh.go/lib/mlog"
 )
 
 const (

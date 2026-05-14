@@ -14,7 +14,7 @@ import (
 	"io"
 	"net/http"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/contact"
+	"kilabit.info/pakakeh.go/lib/contact"
 )
 
 const (

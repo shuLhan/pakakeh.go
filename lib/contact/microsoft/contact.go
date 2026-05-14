@@ -4,7 +4,7 @@
 package microsoft
 
 import (
-	"git.sr.ht/~shulhan/pakakeh.go/lib/contact"
+	"kilabit.info/pakakeh.go/lib/contact"
 )
 
 // Contact define Microsoft Live's contact format.

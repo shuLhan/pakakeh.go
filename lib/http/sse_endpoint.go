@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"time"
 
-	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	liberrors "kilabit.info/pakakeh.go/lib/errors"
 )
 
 const defKeepAliveInterval = 5 * time.Second

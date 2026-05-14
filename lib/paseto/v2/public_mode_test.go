@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestPublicMode_UnpackHTTPRequest(t *testing.T) {

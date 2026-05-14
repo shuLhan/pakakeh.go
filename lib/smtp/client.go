@@ -16,8 +16,8 @@ import (
 	"os"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/email"
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	"kilabit.info/pakakeh.go/lib/email"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 // Client for SMTP.

@@ -4,7 +4,7 @@
 package smtp
 
 import (
-	"git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	"kilabit.info/pakakeh.go/lib/errors"
 )
 
 // List of errors.

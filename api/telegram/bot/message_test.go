@@ -7,7 +7,7 @@ package bot
 import (
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestMessage_parseCommandArgs(t *testing.T) {

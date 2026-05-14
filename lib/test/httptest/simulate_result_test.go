@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	libhttptest "git.sr.ht/~shulhan/pakakeh.go/lib/test/httptest"
+	libhttptest "kilabit.info/pakakeh.go/lib/test/httptest"
 )
 
 func ExampleSimulateResult_DumpRequest() {

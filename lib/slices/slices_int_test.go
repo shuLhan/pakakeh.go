@@ -12,8 +12,8 @@ import (
 	"sort"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/slices"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestCount_int(t *testing.T) {

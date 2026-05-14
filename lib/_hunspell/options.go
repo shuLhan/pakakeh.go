@@ -14,7 +14,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 // In order to keep the struct aligned, each field is grouped by tag,

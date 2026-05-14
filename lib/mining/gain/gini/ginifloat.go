@@ -3,7 +3,7 @@
 
 package gini
 
-import "git.sr.ht/~shulhan/pakakeh.go/lib/slices"
+import "kilabit.info/pakakeh.go/lib/slices"
 
 // ComputeContinuFloat Given an attribute A and the target attribute T which contain
 // N classes in C, compute the information gain of A.

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestPushBack(t *testing.T) {

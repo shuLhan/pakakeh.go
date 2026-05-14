@@ -11,7 +11,7 @@ import (
 	"net"
 	"strings"
 
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 // ResourceRecord The answer, authority, and additional sections all share the

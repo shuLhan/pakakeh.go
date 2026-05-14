@@ -6,7 +6,7 @@ package pasetov2
 import (
 	"sync"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/paseto"
 )
 
 // keys contains and maintains list of public Keys and its configuration.

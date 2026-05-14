@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/hexdump"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/hexdump"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestParseZone(t *testing.T) {

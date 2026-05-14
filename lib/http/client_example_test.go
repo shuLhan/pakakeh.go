@@ -10,8 +10,8 @@ import (
 	"mime/multipart"
 	"strings"
 
-	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test/mock"
+	libhttp "kilabit.info/pakakeh.go/lib/http"
+	"kilabit.info/pakakeh.go/lib/test/mock"
 )
 
 func ExampleGenerateFormData() {

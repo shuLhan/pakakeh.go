@@ -9,9 +9,9 @@ import (
 	"os"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/hunspell"
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/hunspell"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestHunspell(t *testing.T) {

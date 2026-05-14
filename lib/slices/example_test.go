@@ -7,7 +7,7 @@ package slices_test
 import (
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
+	"kilabit.info/pakakeh.go/lib/slices"
 )
 
 func ExampleMax2() {

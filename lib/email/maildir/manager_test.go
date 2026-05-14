@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestManager_scanDir(t *testing.T) {

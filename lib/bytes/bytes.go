@@ -9,8 +9,8 @@ import (
 	"bytes"
 	"unicode"
 
-	inbytes "git.sr.ht/~shulhan/pakakeh.go/internal/bytes"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	inbytes "kilabit.info/pakakeh.go/internal/bytes"
+	"kilabit.info/pakakeh.go/lib/ascii"
 )
 
 // CutUntilToken cut text until we found token.

@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
 // DefRangeLimit limit of content served by server when [Range] request

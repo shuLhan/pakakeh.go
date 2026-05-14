@@ -13,8 +13,8 @@ import (
 	"runtime/debug"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/tabula"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 // assertFile compare content of two file, print error message and exit

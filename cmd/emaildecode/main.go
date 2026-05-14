@@ -19,8 +19,8 @@ import (
 	"log"
 	"os"
 
-	"git.sr.ht/~shulhan/pakakeh.go"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/email"
+	"kilabit.info/pakakeh.go"
+	"kilabit.info/pakakeh.go/lib/email"
 )
 
 var usage = `= emaildecode - CLI to decode email body
@@ -39,7 +39,7 @@ FILE
 == INFO
 
 Version: ` + pakakeh.Version + `
-Website: https://sr.ht/~shulhan/pakakeh.go/
+Website: https://kilabit.info/project/pakakeh.go/
 `
 
 const (

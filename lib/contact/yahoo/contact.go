@@ -6,7 +6,7 @@ package yahoo
 import (
 	"encoding/json"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/contact"
+	"kilabit.info/pakakeh.go/lib/contact"
 )
 
 // Contact define the contact item in response.

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/systemd"
+	"kilabit.info/pakakeh.go/lib/systemd"
 )
 
 func main() {

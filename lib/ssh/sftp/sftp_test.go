@@ -10,9 +10,9 @@ import (
 	"os"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ssh"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/sshconfig"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/ssh"
+	"kilabit.info/pakakeh.go/lib/sshconfig"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 const (

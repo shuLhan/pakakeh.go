@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"strings"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
-	libjson "git.sr.ht/~shulhan/pakakeh.go/lib/json"
-	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	libbytes "kilabit.info/pakakeh.go/lib/bytes"
+	libjson "kilabit.info/pakakeh.go/lib/json"
+	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
 // Mailbox represent an invidual mailbox.

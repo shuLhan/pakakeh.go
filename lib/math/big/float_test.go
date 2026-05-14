@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 func TestFloat_Clone(t *testing.T) {

@@ -10,7 +10,7 @@ package watchfs
 import (
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"kilabit.info/pakakeh.go/lib/memfs"
 )
 
 const defWatchDelay = 5 * time.Second

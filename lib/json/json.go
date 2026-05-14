@@ -199,7 +199,6 @@ func Unescape(in []byte, strict bool) (out []byte, err error) {
 						// (65535).
 						// We add it to make CodeQL
 						// happy
-						// https://git.sr.ht/~shulhan/pakakeh.go/security/code-scanning/48
 						return nil, fmt.Errorf(`Unescape: overflow when converting %s to rune`, uni.String())
 					}
 					buf.WriteRune(rune(dec))

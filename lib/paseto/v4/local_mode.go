@@ -12,7 +12,7 @@ import (
 	"slices"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/paseto"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/chacha20"
 )

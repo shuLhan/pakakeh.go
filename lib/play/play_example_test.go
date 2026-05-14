@@ -113,5 +113,5 @@ func TestSum(t *testing.T) {
 	fmt.Printf(`%s`, out)
 
 	//Output:
-	//ok  	git.sr.ht/~shulhan/pakakeh.go/lib/play/testdata Xs
+	//ok  	kilabit.info/pakakeh.go/lib/play/testdata Xs
 }

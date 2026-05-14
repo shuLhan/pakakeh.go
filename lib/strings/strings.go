@@ -9,7 +9,7 @@ package strings
 import (
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
+	"kilabit.info/pakakeh.go/lib/slices"
 )
 
 // AppendUniq append case-insensitive strings to slice of input without

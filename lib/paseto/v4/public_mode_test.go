@@ -12,8 +12,8 @@ import (
 	"testing/cryptotest"
 	"testing/synctest"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"kilabit.info/pakakeh.go/lib/paseto"
+	"kilabit.info/pakakeh.go/lib/test"
 )
 
 type testVectorPublic struct {
