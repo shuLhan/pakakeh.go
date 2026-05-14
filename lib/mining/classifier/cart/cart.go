@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
 
 // Package cart implement the Classification and Regression Tree by Breiman, et al.
 // CART is binary decision tree.

@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 
 // Program epoch print the current date and time (Unix seconds, milliseconds,
 // nanoseconds, local time, and UTC time) or the date and time based on the

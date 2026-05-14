@@ -5,8 +5,34 @@ version = 1
 
 [[annotations]]
 path = [
-	"**/testdata/**",
-	"lib/_hunspell/tests/**",
+	"lib/_hunspell/testdata/*",
+	"lib/_hunspell/tests/*",
+	"lib/crypto/testdata/*",
+	"lib/dns/testdata/*",
+	"lib/dsv/testdata/*",
+	"lib/email/dkim/testdata/*",
+	"lib/email/testdata/*",
+	"lib/git/testdata/beku_test.git/**",
+	"lib/http/testdata/*",
+	"lib/http/testdata/Server_HandleFS/**",
+	"lib/ini/testdata/*",
+	"lib/memfs/testdata/*",
+	"lib/memfs/testdata/direct/add/*",
+	"lib/mining/testdata/forensic_glass/*",
+	"lib/mining/testdata/iris/*",
+	"lib/mining/testdata/phoneme/*",
+	"lib/mining/testdata/wvc2010lnsmote/*",
+	"lib/os/testdata/*",
+	"lib/os/testdata/Copy/*",
+	"lib/os/testdata/exp_dir/**",
+	"lib/smtp/testdata/*",
+	"lib/ssh/sftp/testdata/*",
+	"lib/ssh/testdata/localhost/*",
+	"lib/sshconfig/testdata/*",
+	"lib/strings/testdata/parser/*",
+	"lib/test/testdata/*",
+	"lib/text/diff/testdata/*",
+	"lib/text/diff/testdata/unified/*",
 ]
 SPDX-FileCopyrightText = "2018 Shulhan <ms@kilabit.info>"
 SPDX-License-Identifier = "BSD-3-Clause"

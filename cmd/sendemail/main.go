@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
 
 // Program sendemail is command line interface that use lib/email and lib/smtp
 // to send email.

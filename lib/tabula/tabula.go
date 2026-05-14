@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2017 Shulhan <ms@kilabit.info>
-// in the LICENSE file.
 
 // Package tabula is a Go library for working with rows, columns, or matrix
 // (table), or in another terms working with data set.

@@ -70,7 +70,7 @@ func TestWatchDirInitialScan(t *testing.T) {
 			idxFile: map[string]node{
 				`testdata/inc/index.adoc`: node{
 					name: `testdata/inc/index.adoc`,
-					size: 7,
+					size: 110,
 					mode: 0644,
 				},
 				`testdata/inc/index.css`:  nodeExcluded,
@@ -80,7 +80,7 @@ func TestWatchDirInitialScan(t *testing.T) {
 		expFiles: map[string]os.FileInfo{
 			`testdata/inc/index.adoc`: &node{
 				name: `testdata/inc/index.adoc`,
-				size: 7,
+				size: 110,
 				mode: 0644,
 			},
 		},

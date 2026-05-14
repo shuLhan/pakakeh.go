@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2015 Mhd Sulhan <ms@kilabit.info>
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
 
 package gini
 

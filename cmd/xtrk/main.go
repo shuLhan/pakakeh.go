@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
 
 // Command xtrk is command line interface to uncompress and/or unarchive a
 // file.

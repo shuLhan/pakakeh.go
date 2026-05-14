@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
 
 // Package autobahn provides an helper to parse and print reports from
 // result of Autobahn test suite.

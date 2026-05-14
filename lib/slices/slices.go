@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
 
 // Package slices complement the standard [slices] package for working with
 // slices comparable and [cmp.Ordered] types.

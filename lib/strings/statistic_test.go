@@ -80,7 +80,7 @@ func TestCountCharSequence(t *testing.T) {
 		expCounts []int
 	}
 	var cases = []testCase{{
-		text:      `// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.`,
+		text:      `// Copyright 2016 M. Shulhan <ms@kilabit.info>. All rights reserved.`,
 		expChars:  []rune{'/', 'l'},
 		expCounts: []int{2, 2},
 	}, {
@@ -219,9 +219,9 @@ func TestCountUpperLower(t *testing.T) {
 	}
 
 	var cases = []testCase{{
-		text:     `// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.`,
+		text:     `// Copyright 2016 M. Shulhan <ms@kilabit.info>. All rights reserved.`,
 		expUpper: 4,
-		expLower: 44,
+		expLower: 43,
 	}}
 
 	var (
@@ -245,7 +245,7 @@ func TestMaxCharSequence(t *testing.T) {
 	}
 
 	var cases = []testCase{{
-		text:  `// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.`,
+		text:  `// Copyright 2016 M. Shulhan <ms@kilabit.info>. All rights reserved.`,
 		char:  '/',
 		count: 2,
 	}, {

@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
 
 // Program totp generate Time-based One-time Password from secret key.
 // This is just an example of implementation of [lib/totp]

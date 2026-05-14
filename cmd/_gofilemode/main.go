@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 
 // Program gofilemode inspect the Go file mode [1].
 // Usage,

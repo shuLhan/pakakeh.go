@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
 
 // Package sshconfig provide the [ssh_config(5)] parser and getter.
 //

@@ -42,7 +42,7 @@ func ExampleCountCharSequence() {
 }
 
 func ExampleCountDigit() {
-	var text = `// Copyright 2018 Mhd Sulhan <ms@kilabit.info>. All rights reserved.`
+	var text = `// Copyright 2018 M. Shulhan <ms@kilabit.info>. All rights reserved.`
 	fmt.Println(CountDigit(text))
 	// Output: 4
 }

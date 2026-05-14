@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 
 // Package slack provide a simple API for sending message to Slack using only
 // standard packages.

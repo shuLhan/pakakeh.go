@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
 
 // Command ini provide a command line interface to get and set values in the
 // [INI file format].

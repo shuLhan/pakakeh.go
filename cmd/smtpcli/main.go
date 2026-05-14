@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
 
 // Command smtpcli provide a command line interface to SMTP client protocol.
 // This is an example of implementation Client from

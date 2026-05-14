@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2016 Mhd Sulhan <ms@kilabit.info>
+// SPDX-FileCopyrightText: 2016 M. Shulhan <ms@kilabit.info>
 
 // Package rf implement ensemble of classifiers using random forest
 // algorithm by Breiman and Cutler.

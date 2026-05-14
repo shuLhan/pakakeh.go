@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2016 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2016 M. Shulhan <ms@kilabit.info>
 
 package classifier
 

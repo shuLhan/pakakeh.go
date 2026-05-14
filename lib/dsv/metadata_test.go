@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
-// Copyright 2015-2018, Shulhan <ms@kilabit.info>. All rights reserved.
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
 
 package dsv
 

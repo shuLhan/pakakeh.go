@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
 
 // Command ansua is CLI to help tracking time.
 // The ansua command run a timer on defined duration and optionally run a

@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
 
 // Package totp implement Time-Based One-Time Password Algorithm based on RFC
 // 6238 [1].

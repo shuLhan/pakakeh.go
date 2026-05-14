@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
 
 // Package ascii provide a library for working with ASCII characters.
 package ascii

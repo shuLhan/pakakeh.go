@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
 
 // Package bytes is the internal, shared functions for manipulating bytes,
 // created to prevent import cycle.

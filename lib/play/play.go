@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
 
 // Package play provides callable APIs and HTTP handlers to format, run, and
 // test Go code, similar to Go playground but using HTTP instead of
