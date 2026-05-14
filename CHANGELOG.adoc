@@ -38,9 +38,30 @@ Legend,
 * 💧: Chores
 
 
+[#v0_64_0]
+== pakakeh.go v0.64.0 (2026-05-15)
+
+This release migrate the Go module path to "kilabit.info/pakakeh.go".
+
+The repository also moved to https://git.kilabit.info/pakakeh.go/ .
+
+Other minor enhancements,
+
+🌱 lib/os: add function NormalizeForEnv.
+
+The NormalizeForEnv returns the string that is valid for environment
+variable.
+In other words, other characters beside digit (0..9) and alpha (a..z A..Z)
+in the argument will be replaced with "_".
+
+🌼 lib/http: fix the params in Client PutJSON.
+
+The argument for marshaling JSON use the empty params instead of from
+[ClientRequest.Params].
+
+
 [#v0_63_0]
 == pakakeh.go v0.63.0 (2026-05-09)
-
 
 [#v0_63_0__lib_git]
 === lib/git
