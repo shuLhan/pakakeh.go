@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"slices"
 	"strconv"
 	"time"
 
@@ -277,8 +278,8 @@ func (m *macro) expandLetter() (value []byte) {
 // become "[b a]".
 func reverseValues(in [][]byte) (out [][]byte) {
 	out = make([][]byte, 0, len(in))
-	for x := len(in) - 1; x >= 0; x-- {
-		out = append(out, in[x])
+	for _, v := range slices.Backward(in) {
+		out = append(out, v)
 	}
 	return
 }

@@ -8,6 +8,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"math/big"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -151,11 +152,11 @@ func (r *Rat) Humanize(thousandSep, decimalSep string) string {
 		out     = make([]rune, 0, len(intPart)+(len(intPart)/3))
 		i       = 0
 	)
-	for x := len(intPart) - 1; x >= 0; x-- {
+	for _, v := range slices.Backward(intPart) {
 		if i%3 == 0 && len(out) > 0 {
 			out = append(out, []rune(thousandSep)...)
 		}
-		out = append(out, intPart[x])
+		out = append(out, v)
 		i++
 	}
 	out = runes.Inverse(out)

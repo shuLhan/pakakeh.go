@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 	"testing"
 
@@ -393,9 +394,9 @@ func TestSortColumnsByIndex(t *testing.T) {
 	var idxReverse []int
 	var expReverse []string
 
-	for x := len(expSkip) - 1; x >= 0; x-- {
+	for x, v := range slices.Backward(expSkip) {
 		idxReverse = append(idxReverse, x)
-		expReverse = append(expReverse, expSkip[x])
+		expReverse = append(expReverse, v)
 	}
 
 	ds := reader.GetDataset().(tabula.DatasetInterface)
