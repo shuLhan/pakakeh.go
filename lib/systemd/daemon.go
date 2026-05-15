@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2026 M. Shulhan <ms@kilabit.info>
 
+//go:build linux
+
 package systemd
 
 import (
