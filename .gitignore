@@ -62,6 +62,8 @@
 /lib/mining/resampling/smote/testdata/phoneme.csv
 /lib/mining/testdata/phoneme/phoneme.csv
 /lib/os/testdata/Copy/output.txt
+/lib/os/testdata/input/exp.*
+/lib/os/testdata/input/exp_dir.*
 /lib/ssh/sftp/testdata/*.get
 /lib/websocket/examples/cmd/client/client
 /lib/websocket/examples/cmd/server/server

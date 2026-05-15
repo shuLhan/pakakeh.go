@@ -76,9 +76,6 @@ type archiveTimes struct {
 // The output directory, dirOutput, where the decompressed and/or unarchived
 // file stored will be created if not exist.
 // If its empty, it will set to current directory.
-//
-// On success, the compressed and/or archived file will be removed from the
-// file system.
 func Extract(fileInput, dirOutput string) (err error) {
 	var (
 		logp     = "Extract"
@@ -187,20 +184,6 @@ func Extract(fileInput, dirOutput string) (err error) {
 	err = fin.Close()
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
-	}
-
-	// Remove the archive file and/or compress files.
-	if len(xtrk.archFile) > 0 {
-		err = os.Remove(xtrk.archFile)
-		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
-	}
-	if len(xtrk.compFile) > 0 {
-		err = os.Remove(xtrk.compFile)
-		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
 	}
 
 	return nil
