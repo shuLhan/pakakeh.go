@@ -30,9 +30,10 @@ type ServerOptions struct {
 	Memfs *memfs.MemFS
 
 	// HandleFS inspect each GET request to Memfs.
+	// If nil it means all requests are allowed.
+	//
 	// Some usage of this handler is to check for authorization on
 	// specific path, handling redirect, and so on.
-	// If nil it means all request are allowed.
 	// See FSHandler for more information.
 	HandleFS FSHandler
 

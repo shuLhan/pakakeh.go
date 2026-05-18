@@ -11,18 +11,18 @@ import (
 
 // FSHandler define the function to inspect each GET request to Server
 // [memfs.MemFS] instance.
-// The node parameter contains the requested file inside the memfs or nil
-// if the file does not exist.
+// The node parameter contains the requested file inside the [memfs.MemFS] or
+// nil if the file does not exist.
 //
-// This function return two values: the node `out` that is used to process the
-// request and response; and the HTTP status code `statusCode` returned in
-// response.
-
-// Non-zero status code indicates that the function already response
-// to the request, and the server will return immediately.
+// The handler returns two values: the node out that is used to process the
+// request and response; and the HTTP statusCode for response.
 //
-// Zero status code indicates that the function did not process the request,
+// Non-zero statusCode indicates that the handler already response to the
+// request, and the server will stop processing request.
+//
+// Zero statusSode indicates that the handler did not process the request,
 // it is up to server to process the returned node `out`.
+//
 // The returned node `out` may be the same as `node`, modified, of completely
 // new.
 type FSHandler func(node *memfs.Node, res http.ResponseWriter, req *http.Request) (
