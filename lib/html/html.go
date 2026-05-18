@@ -15,6 +15,7 @@ package html
 
 import (
 	"bytes"
+	"slices"
 
 	"golang.org/x/net/html"
 
@@ -37,27 +38,27 @@ import (
 //
 // [Mozilla specification]: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id.
 func NormalizeForID(in string) (out string) {
-	var (
-		bin = []byte(in)
-		x   int
-		b   byte
-	)
+	var bin = make([]byte, 0, len(in))
 
-	for x, b = range bin {
+	for _, b := range []byte(in) {
 		if ascii.IsAlpha(b) {
 			if b >= 'A' && b <= 'Z' {
-				bin[x] = b + 32
+				bin = append(bin, b+32)
+			} else {
+				bin = append(bin, b)
 			}
-		} else if !(ascii.IsDigit(b) || b == '-' || b == '_') {
-			bin[x] = '_'
+			continue
 		}
+		if ascii.IsDigit(b) || b == '-' || b == '_' {
+			bin = append(bin, b)
+			continue
+		}
+		bin = append(bin, '_')
 	}
 	if len(bin) == 0 {
 		bin = append(bin, '_')
 	} else if !ascii.IsAlpha(bin[0]) && bin[0] != '_' {
-		bin = append(bin, '_')
-		copy(bin[1:], bin)
-		bin[0] = '_'
+		bin = slices.Insert(bin, 0, '_')
 	}
 
 	return string(bin)
