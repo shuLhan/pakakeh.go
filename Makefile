@@ -31,6 +31,9 @@ build:
 ## Prevent git CLI to print errors in user's locale language.
 test: export LC_ALL=C.UTF-8
 test: export CGO_ENABLED=1
+## TODO: remove after minimum go version in go.mod set to 1.27 or later.
+## See https://go-review.googlesource.com/c/go/+/773962.
+test: export GOEXPERIMENT=nojsonv2
 test:
 	go test -failfast -timeout=2m -race \
 		-coverprofile=$(COVER_OUT) ./... \
