@@ -10,8 +10,8 @@ import (
 )
 
 func ExampleScheduler_Next() {
-	// Override timeNow to make this example works.
-	timeNow = func() time.Time {
+	// Override NowFunc to make this example works.
+	NowFunc = func() time.Time {
 		return time.Date(2013, time.January, 20, 14, 26, 59, 0, time.UTC)
 	}
 
