@@ -133,6 +133,11 @@ func (id UUID) MarshalText() (data []byte, err error) {
 
 // UnmarshalBinary decodes the data into id for [encoding/gob].
 func (id *UUID) UnmarshalBinary(data []byte) (err error) {
+	if len(data) == 0 {
+		id.high = 0
+		id.low = 0
+		return nil
+	}
 	if len(data) != 16 {
 		return fmt.Errorf(`uuidv7: invalid length %d`, len(data))
 	}
@@ -147,6 +152,12 @@ func (id *UUID) UnmarshalBinary(data []byte) (err error) {
 
 // UnmarshalText decodes the JSON data into id for [encoding/json].
 func (id *UUID) UnmarshalText(data []byte) (err error) {
+	if len(data) == 0 {
+		id.high = 0
+		id.low = 0
+		return nil
+	}
+
 	src := make([]byte, 0, 32)
 	for _, c := range data {
 		if c == '-' {
