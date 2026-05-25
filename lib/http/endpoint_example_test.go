@@ -14,13 +14,12 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	libhttp "kilabit.info/pakakeh.go/lib/http"
 )
 
 func ExampleEndpoint_requestType() {
-	srv := libhttp.Server{}
+	server := libhttp.Server{}
 
 	// Here we defined an endpoint that accept form with "message"
 	// parameter
@@ -49,7 +48,7 @@ func ExampleEndpoint_requestType() {
 			return []byte(resp), nil
 		},
 	}
-	err := srv.RegisterEndpoint(epForm)
+	err := server.RegisterEndpoint(epForm)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,7 +59,7 @@ func ExampleEndpoint_requestType() {
 		req.Header.Set(libhttp.HeaderContentType, contentType)
 		w := httptest.NewRecorder()
 
-		srv.ServeHTTP(w, req)
+		server.ServeHTTP(w, req)
 		resp = w.Result()
 
 		respb, err := io.ReadAll(resp.Body)
@@ -92,84 +91,66 @@ func ExampleEndpoint_requestType() {
 	// Body: {"message":"hello"}
 }
 
+// Example on using custom [Endpoint.ErrorHandler].
 func ExampleEndpoint_errorHandler() {
-	var (
-		serverOpts = libhttp.ServerOptions{
-			Address: `127.0.0.1:8123`,
-		}
-		server *libhttp.Server
-	)
+	server := &libhttp.Server{}
 
-	server, _ = libhttp.NewServer(serverOpts)
+	// This endpoint have custom [Endpoint.ErrorHandler] that read the
+	// error code and message from query parameters.
 
-	var endpointError = libhttp.Endpoint{
+	endpointError := libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         "/",
 		RequestType:  libhttp.RequestTypeQuery,
 		ResponseType: libhttp.ResponseTypePlain,
 		Call: func(epr *libhttp.EndpointRequest) ([]byte, error) {
+			// Returning an error will call the ErrorHandler.
 			return nil, errors.New(epr.HTTPRequest.Form.Get(`error`))
 		},
 		ErrorHandler: func(epr *libhttp.EndpointRequest) {
-			epr.HTTPWriter.Header().Set(libhttp.HeaderContentType,
-				libhttp.ContentTypePlain)
-
 			codeMsg := strings.Split(epr.Error.Error(), ":")
+			var statusCode int
+			var body string
 			if len(codeMsg) != 2 {
-				epr.HTTPWriter.WriteHeader(http.StatusInternalServerError)
-				_, _ = epr.HTTPWriter.Write([]byte(epr.Error.Error()))
+				statusCode = http.StatusInternalServerError
+				body = epr.Error.Error()
 			} else {
-				code, _ := strconv.Atoi(codeMsg[0])
-				epr.HTTPWriter.WriteHeader(code)
-				_, _ = epr.HTTPWriter.Write([]byte(codeMsg[1]))
+				statusCode, _ = strconv.Atoi(codeMsg[0])
+				body = codeMsg[1]
 			}
+			epr.HTTPWriter.WriteHeader(statusCode)
+			_, _ = epr.HTTPWriter.Write([]byte(body))
 		},
 	}
 	_ = server.RegisterEndpoint(endpointError)
 
-	go func() {
-		_ = server.Start()
-	}()
-	defer func() {
-		_ = server.Stop(1 * time.Second)
-	}()
-	time.Sleep(1 * time.Second)
+	// Simulate request using httptest.
 
-	var (
-		clientOpts = libhttp.ClientOptions{
-			ServerURL: `http://` + serverOpts.Address,
+	testServe := func(q string) (resp *http.Response, respBody string) {
+		req := httptest.NewRequest(`GET`, endpointError.Path, nil)
+		req.URL.RawQuery = q
+		w := httptest.NewRecorder()
+
+		server.ServeHTTP(w, req)
+		resp = w.Result()
+
+		respb, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
 		}
-		client = libhttp.NewClient(clientOpts)
-	)
+		return resp, string(respb)
+	}
 
 	var params = url.Values{}
-	params.Set("error", "400:error with status code")
+	params.Set(`error`, `400:error with status code`)
+	resp, resBody := testServe(params.Encode())
+	fmt.Printf("%d: %s\n", resp.StatusCode, resBody)
 
-	var req = libhttp.ClientRequest{
-		Path:   `/`,
-		Params: params,
-	}
+	// Set the error message without status code.
 
-	var (
-		res *libhttp.ClientResponse
-		err error
-	)
-
-	res, err = client.Get(req)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	fmt.Printf("%d: %s\n", res.HTTPResponse.StatusCode, res.Body)
-
-	params.Set("error", "error without status code")
-
-	res, err = client.Get(req)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	fmt.Printf("%d: %s\n", res.HTTPResponse.StatusCode, res.Body)
+	params.Set(`error`, `error without status code`)
+	resp, resBody = testServe(params.Encode())
+	fmt.Printf("%d: %s\n", resp.StatusCode, resBody)
 
 	// Output:
 	// 400: error with status code
