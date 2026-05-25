@@ -9,13 +9,13 @@
 // The following enhancements are added to Server and Client,
 //
 //   - Simplify registering routing with key binding in Server
-//   - Add support for handling CORS in Server
+//   - Support for handling CORS in Server
 //   - Serving files using [memfs.MemFS] in Server
 //   - Simplify sending body with "application/x-www-form-urlencoded",
 //     "multipart/form-data", "application/json" with POST or PUT methods in
 //     Client.
-//   - Add support for [HTTP Range] in Server and Client
-//   - Add support for [Server-Sent Events] (SSE) in Server.
+//   - Support for [HTTP Range] in Server and Client
+//   - Support for [Server-Sent Events] (SSE) in Server.
 //     For client see the sub package [sseclient].
 //
 // # Problems
@@ -40,11 +40,11 @@
 // to minimize disk lookup, so the next call to the same file path may not
 // touch the hard storage back again.
 //
-// The second problem is regarding to handling API.
+// The second problem is regarding handling endpoint or handler.
 // We must check the request method, checking content-type, parsing query
-// parameter or POST form in every sub-handler of API.
-// Assume that we have an API with method POST and query parameter, the method
-// to handle it would be like these,
+// parameter or POST form in every handler.
+// Assume that we have an handler with method POST and query parameter, the
+// method to handle it would be like these,
 //
 //	handleAPILogin(res, req) {
 //		// (1) Check if method is POST
@@ -53,7 +53,7 @@
 //		// (4) Write response
 //	}
 //
-// The step number 1, 2, 4 needs to be written for every handler of our API.
+// The step number 1, 2, 4 needs to be written for every handler of our APIs.
 //
 // # Solutions
 //
@@ -63,7 +63,7 @@
 // lookup, and cache-miss on OS level.
 //
 // Serving file system is handled by package [memfs], which can be set on
-// [ServerOptions].
+// [ServerOptions.Memfs].
 // For example, to serve all content in directory "www", we can set the
 // [ServerOptions] to,
 //
@@ -81,8 +81,8 @@
 // There is a limit on size of file to be mapped on memory.
 // See the package "lib/memfs" for more information.
 //
-// The solution to the second problem is by mapping the registered request per
-// method and by path.
+// The solution to the second problem is by mapping the registered endpoint
+// per method and by path.
 // User just need to focus on step 3, handling on how to process request, all
 // of process on step 1, 2, and 4 will be handled by our library.
 //
@@ -149,7 +149,7 @@
 //
 // # Callback error handling
 //
-// Each [Endpoint] can have their own error handler.
+// Each [Endpoint] can have their own [Endpoint.ErrorHandler].
 // If its nil, it will default to [DefaultErrorHandler], which return the
 // error as JSON with the following format,
 //
@@ -242,13 +242,13 @@ import (
 	libnet "kilabit.info/pakakeh.go/lib/net"
 )
 
-// List of header value for HTTP header Accept-Ranges.
+// List of value for HTTP header Accept-Ranges.
 const (
 	AcceptRangesBytes = `bytes`
 	AcceptRangesNone  = `none`
 )
 
-// List of known "Content-Encoding" header values.
+// List of known value for HTTP header Content-Endpoint.
 const (
 	ContentEncodingBzip2    = `bzip2`
 	ContentEncodingCompress = `compress` // Using LZW.
@@ -256,7 +256,7 @@ const (
 	ContentEncodingDeflate  = `deflate` // Using zlib.
 )
 
-// List of known "Content-Type" header values.
+// List of known value for HTTP header Content-Type.
 const (
 	ContentTypeBinary              = `application/octet-stream`
 	ContentTypeEventStream         = `text/event-stream`
@@ -306,20 +306,19 @@ const (
 	HeaderXRealIP            = `X-Real-Ip`
 )
 
-var (
-	// ErrClientDownloadNoOutput define an error when Client's
-	// DownloadRequest does not define the Output.
-	ErrClientDownloadNoOutput = errors.New(`invalid or empty client download output`)
+// ErrClientDownloadNoOutput define an error when [DownloadRequest] does not
+// define the Output, see [Client.Download].
+var ErrClientDownloadNoOutput = errors.New(`invalid or empty client download output`)
 
-	// ErrEndpointAmbiguous define an error when registering path that
-	// already exist.  For example, after registering "/:x", registering
-	// "/:y" or "/z" on the same HTTP method will result in ambiguous.
-	ErrEndpointAmbiguous = errors.New(`ambigous endpoint`)
-)
+// ErrEndpointAmbiguous define an error when registering path that already
+// exist.
+// For example, after registering "/:x", registering "/:y" or "/z" on the same
+// HTTP method will result in ambiguous.
+var ErrEndpointAmbiguous = errors.New(`ambigous endpoint`)
 
-// IPAddressOfRequest get the client IP address from HTTP request header
+// IPAddressOfRequest returns the client IP address from HTTP request header
 // "X-Real-IP" or "X-Forwarded-For", which ever non-empty first.
-// If no headers present, use the default address.
+// If no headers present, return the defAddr.
 func IPAddressOfRequest(headers http.Header, defAddr string) (addr string) {
 	addr = headers.Get(HeaderXRealIP)
 	if len(addr) == 0 {
@@ -332,9 +331,11 @@ func IPAddressOfRequest(headers http.Header, defAddr string) (addr string) {
 	return addr
 }
 
-// ParseXForwardedFor parse the HTTP header "X-Forwarded-For" value from the
-// following format "client, proxy1, proxy2" into client address and list of
-// proxy addressess.
+// ParseXForwardedFor returns the HTTP header "X-Forwarded-For" value as
+// client address and list of proxy address.
+//
+// For example, given "client, proxy1, proxy2" it will return "client" as
+// client address and "[proxy1, proxy2]" as list of proxy address.
 func ParseXForwardedFor(val string) (clientAddr string, proxyAddrs []string) {
 	if len(val) == 0 {
 		return ``, nil
@@ -350,7 +351,7 @@ func ParseXForwardedFor(val string) (clientAddr string, proxyAddrs []string) {
 	return clientAddr, proxyAddrs
 }
 
-// setHeaders set the request headers.
+// setHeaders sets the request headers.
 func setHeaders(req *http.Request, headers http.Header) {
 	for k, v := range headers {
 		for x, hv := range v {

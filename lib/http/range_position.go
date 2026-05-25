@@ -25,7 +25,7 @@ type RangePosition struct {
 	content []byte
 }
 
-// ParseContentRange parse the HTTP header "Content-Range" value, as
+// ParseContentRange return the parsed HTTP header "Content-Range" value, as
 // response from server, with the following format,
 //
 //	Content-Range = unit SP valid-range / invalid-range
@@ -128,12 +128,12 @@ parselength:
 	return pos, nil
 }
 
-// Content return the range content body in multipart.
+// Content returns the range content from multipart's body.
 func (pos RangePosition) Content() []byte {
 	return pos.content
 }
 
-// ContentRange return the string that can be used for HTTP Content-Range
+// ContentRange returns the string that can be used in HTTP Content-Range
 // header value.
 func (pos RangePosition) ContentRange(unit string, size int64) (v string) {
 	if size == 0 {

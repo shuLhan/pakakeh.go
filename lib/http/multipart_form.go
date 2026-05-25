@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// CreateMultipartFileHeader create [multipart.FileHeader] from raw content
+// CreateMultipartFileHeader creates [multipart.FileHeader] from raw content
 // with optional filename.
 func CreateMultipartFileHeader(filename string, content []byte) (fh *multipart.FileHeader, err error) {
 	var (
@@ -76,7 +76,7 @@ func CreateMultipartFileHeader(filename string, content []byte) (fh *multipart.F
 	return fh, nil
 }
 
-// GenerateFormData generate "multipart/form-data" body from mpform.
+// GenerateFormData generates "multipart/form-data" body from [multipart.Form].
 func GenerateFormData(mpform *multipart.Form) (contentType, body string, err error) {
 	if mpform == nil {
 		return ``, ``, nil

@@ -17,10 +17,8 @@ const (
 	structTagKey = "form"
 )
 
-// MarshalForm marshal struct fields tagged with `form:` into [url.Values].
-//
+// MarshalForm encodes struct fields tagged with `form:` into [url.Values].
 // The rules for marshaling follow the same rules as in [UnmarshalForm].
-//
 // It will return an error if the input is not pointer to or a struct.
 func MarshalForm(in any) (out url.Values, err error) {
 	var (
@@ -128,10 +126,10 @@ func MarshalForm(in any) (out url.Values, err error) {
 	return out, nil
 }
 
-// UnmarshalForm read struct fields tagged with `form:` from out as key and
-// set its using the value from [url.Values] based on that key.
+// UnmarshalForm decodes the key-value in [url.Values] into struct out.
+// The key in [url.Values] is mapped to field tagged with `form:`.
 // If the field does not have `form:` tag but it is exported, then it will
-// use the field name, in case insensitive manner.
+// use the field name, in case-insensitive manner.
 //
 // Only the following types are supported: bool, int/intX, uint/uintX,
 // floatX, string, []byte, or type that implement

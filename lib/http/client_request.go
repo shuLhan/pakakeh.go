@@ -17,11 +17,13 @@ import (
 
 // ClientRequest define the parameters for each Client methods.
 type ClientRequest struct {
-	// Header additional header to be send on request.
+	// Additional header to be send on request.
+	// If the same header exist in [ClientOptions.Header] it will replace
+	// it.
 	// This field is optional.
 	Header http.Header
 
-	// Params define parameter to be send on request.
+	// Parameter to be send on request.
 	// This field is optional.
 	// It will converted based on Type rules below,
 	//
@@ -36,29 +38,28 @@ type ClientRequest struct {
 	//   in the body.
 	//
 	// * If Type is [RequestTypeJSON] and Params is not nil, the params
-	//   will be encoded as JSON in body using [json.Encode].
+	//   will be encoded to JSON and set in body.
 	Params any
 
 	body io.Reader
 
 	// The Path to resource on the server.
-	// This field is required, if its empty default to "/".
+	// This field is required, default to "/".
 	Path string
 
 	contentType string
 
 	// The HTTP method of request.
-	// This field is optional, if its empty default to RequestMethodGet
-	// (GET).
+	// This field is optional, default to [RequestMethodGet].
 	Method RequestMethod
 
 	// The Type of request.
-	// This field is optional, it's affect how the Params field encoded in
-	// the path or body.
+	// It's affect how the Params is encoded in the path or body.
+	// This field is optional.
 	Type RequestType
 }
 
-// toHTTPRequest convert the ClientRequest into the standard http.Request.
+// toHTTPRequest converts the ClientRequest to the standard [http.Request].
 func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request, err error) {
 	var (
 		logp              = `toHTTPRequest`
@@ -150,10 +151,8 @@ func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request,
 	return httpReq, nil
 }
 
-// paramsAsURLEncoded convert the Params as [url.Values] and return the
-// [Encode]d value.
-// If Params is nil or Params is not [url.Values], it will return an empty
-// string.
+// paramsAsURLEncoded returns the Params as encoded [url.Values] string.
+// If Params is not [url.Values], it will return an empty string.
 func (creq *ClientRequest) paramsAsURLEncoded() string {
 	if creq.Params == nil {
 		return ``
@@ -170,8 +169,7 @@ func (creq *ClientRequest) paramsAsURLEncoded() string {
 	return params.Encode()
 }
 
-// paramsAsMultipart convert the Params as [*multipart.Form] or nil if its
-// empty.
+// paramsAsMultipart returns the Params as [*multipart.Form].
 func (creq *ClientRequest) paramsAsMultipart() (params *multipart.Form) {
 	if creq.Params == nil {
 		return nil
@@ -187,7 +185,7 @@ func (creq *ClientRequest) paramsAsMultipart() (params *multipart.Form) {
 	return params
 }
 
-// paramsAsBytes convert the Params as []byte.
+// paramsAsBytes returns the Params as []byte.
 func (creq *ClientRequest) paramsAsBytes() (body []byte) {
 	if creq.Params == nil {
 		return nil

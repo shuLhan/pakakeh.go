@@ -3,13 +3,13 @@
 
 package http
 
-// Callback define a type of function for handling registered handler.
+// Callback defines function type for handling request in [Endpoint.Call].
 //
 // The function will have the query URL, request multipart form data,
-// and request body ready to be used in [EndpointRequest.HttpRequest] and
+// and request body ready to be used in [EndpointRequest.HTTPRequest] and
 // [EndpointRequest.RequestBody] fields.
 //
-// The [EndpointRequest.HttpWriter] can be used to write custom header or to
+// The [EndpointRequest.HTTPWriter] can be used to write custom header or to
 // write cookies but should not be used to write response body.
 //
 // The error return type should be an instance of *[liberrors.E], with

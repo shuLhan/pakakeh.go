@@ -15,23 +15,22 @@ const (
 
 // ClientOptions options for HTTP client.
 type ClientOptions struct {
-	// Headers define default headers that will be send in any request to
-	// server.
+	// Default headers that will be send in any request.
 	// This field is optional.
 	Headers http.Header
 
-	// ServerURL define the server address without path, for example
-	// "https://example.com" or "http://10.148.0.12:8080".
+	// The server address without path, for example "https://example.com"
+	// or "http://10.148.0.12:8080".
 	// This value should not changed during call of client's method.
 	// This field is required.
 	ServerURL string
 
-	// Timeout affect the http Transport Timeout and TLSHandshakeTimeout.
-	// This field is optional, if not set it will set to 10 seconds.
+	// Set the http Transport Timeout and TLSHandshakeTimeout.
+	// This field is optional, default to 10 seconds.
 	Timeout time.Duration
 
-	// AllowInsecure if its true, it will allow to connect to server with
-	// unknown certificate authority.
+	// Allow to connect to server with unknown or invalid certificate
+	// authority.
 	// This field is optional.
 	AllowInsecure bool
 }

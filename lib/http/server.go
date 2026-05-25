@@ -29,7 +29,7 @@ const (
 	corsWildcard = "*"
 )
 
-// Server define HTTP server.
+// Server defines a wrapper for standard [http.Server].
 type Server struct {
 	*http.Server
 
@@ -43,15 +43,13 @@ type Server struct {
 	routePuts    []*route
 
 	// Options for server, set by calling NewServer.
-	// This field is exported only for reference, for example logging in
-	// the Options when server started.
-	// Modifying the value of Options after server has been started may
-	// cause undefined effects.
+	// This field is exported only for reference.
+	// Modifying the value after server has been started may cause
+	// undefined effects.
 	Options ServerOptions
 }
 
-// NewServer create and initialize new HTTP server that serve root directory
-// with custom connection.
+// NewServer creates and initializes new HTTP server.
 func NewServer(opts ServerOptions) (srv *Server, err error) {
 	opts.init()
 
@@ -79,7 +77,9 @@ func NewServer(opts ServerOptions) (srv *Server, err error) {
 	return srv, nil
 }
 
-// RedirectTemp make the request to temporary redirect (307) to new URL.
+// RedirectTemp make the request to temporary redirect (307) to redirectURL.
+// This method should be used if server [ServerOptions.BasePath] is set, and
+// the redirectURL is handled by the same server.
 func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 	if len(redirectURL) == 0 {
 		redirectURL = "/"
@@ -93,14 +93,15 @@ func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-// RegisterEndpoint register the [Endpoint] based on Method.
-// If [Endpoint.Method] field is not set, it will default to GET.
-// The [Endpoint.Call] field MUST be set, or it will return an error.
+// RegisterEndpoint registers the [Endpoint] ep to be handled by Server.
+// The [Endpoint.Call] MUST be set or it will return an error.
 //
-// Endpoint with Method HEAD or OPTIONS does not have any effect because it
+// If [Endpoint.Method] is not set, it will default to GET.
+//
+// Endpoint with method HEAD or OPTIONS does not have any effect because it
 // already handled automatically by server.
 //
-// Endpoint with Method CONNECT or TRACE will return an error because its
+// Endpoint with method CONNECT or TRACE will return an error because it does
 // not supported, yet.
 func (srv *Server) RegisterEndpoint(ep Endpoint) (err error) {
 	var logp = `RegisterEndpoint`
@@ -138,18 +139,18 @@ func (srv *Server) RegisterEndpoint(ep Endpoint) (err error) {
 	return nil
 }
 
-// RegisterHandlerFunc register a pattern with a handler, similar to
-// [http.ServeMux.HandleFunc].
+// RegisterHandlerFunc registers an endpoint based on a pattern with an
+// handler, similar to [http.ServeMux.HandleFunc].
 // The pattern follow the Go 1.22 format:
 //
 //	[METHOD] PATH
 //
 // The METHOD is optional, default to GET.
-// The PATH must not contains the domain name and space.
+// The PATH must not contains the domain name and spaces.
 // Unlike standard library, variable in PATH is read using ":var" not
 // "{var}".
-// This endpoint will accept any content type and return the body as is;
-// it is up to the handler to read and set the content type and the response
+// This endpoint will accept any content-type and return the body as is;
+// it is up to the handler to read and set the content-type and the response
 // headers.
 //
 // If the METHOD and/or PATH is already registered it will panic.
@@ -179,8 +180,8 @@ func (srv *Server) RegisterHandleFunc(
 	}
 }
 
-// RegisterSSE register Server-Sent Events endpoint.
-// It will return an error if the [SSEEndpoint.Call] field is not set or
+// RegisterSSE registers Server-Sent Events endpoint.
+// It returns an error if the [SSEEndpoint.Call] field is not set, or
 // [ErrEndpointAmbiguous] if the same path is already registered.
 func (srv *Server) RegisterSSE(ep SSEEndpoint) (err error) {
 	var logp = `RegisterSSE`
@@ -234,13 +235,13 @@ func (srv *Server) registerDelete(ep *Endpoint) (err error) {
 	return nil
 }
 
-// RegisterEvaluator register HTTP middleware that will be called before
-// [Endpoint.Eval] and [Endpoint.Call] is called.
+// RegisterEvaluator registers server scope Evaluator that will be
+// called before [Endpoint.Eval] and [Endpoint.Call].
 func (srv *Server) RegisterEvaluator(eval Evaluator) {
 	srv.evals = append(srv.evals, eval)
 }
 
-// registerGet register HTTP method GET with callback to handle it.
+// registerGet registers HTTP method GET with callback to handle it.
 func (srv *Server) registerGet(ep *Endpoint) (err error) {
 	ep.Method = RequestMethodGet
 	ep.RequestType = RequestTypeQuery
@@ -263,7 +264,7 @@ func (srv *Server) registerGet(ep *Endpoint) (err error) {
 	return nil
 }
 
-// registerPatch register HTTP method PATCH with callback to handle it.
+// registerPatch registers HTTP method PATCH with callback to handle it.
 func (srv *Server) registerPatch(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePatches {
@@ -283,7 +284,7 @@ func (srv *Server) registerPatch(ep *Endpoint) (err error) {
 	return nil
 }
 
-// registerPost register HTTP method POST with callback to handle it.
+// registerPost registers HTTP method POST with callback to handle it.
 func (srv *Server) registerPost(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePosts {
@@ -303,7 +304,7 @@ func (srv *Server) registerPost(ep *Endpoint) (err error) {
 	return nil
 }
 
-// registerPut register HTTP method PUT with callback to handle it.
+// registerPut registers HTTP method PUT with callback to handle it.
 func (srv *Server) registerPut(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePuts {
@@ -323,7 +324,8 @@ func (srv *Server) registerPut(ep *Endpoint) (err error) {
 	return nil
 }
 
-// ServeHTTP handle mapping of client request to registered endpoints.
+// ServeHTTP serves the HTTP request from client using registered endpoints or
+// registered files in memory file system.
 func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if srv.shutdownIdleTimer != nil {
 		ok := srv.shutdownIdleTimer.Reset(srv.Options.ShutdownIdleDuration)
@@ -412,8 +414,8 @@ func (srv *Server) serve() (err error) {
 	return err
 }
 
-// Stop the server using Shutdown method. The wait is set default and minimum
-// to five seconds.
+// Stop the server using [http.Server.Shutdown] method.
+// The wait argument is optional, minimum to five seconds.
 func (srv *Server) Stop(wait time.Duration) (err error) {
 	if srv.shutdownIdleTimer != nil {
 		ok := srv.shutdownIdleTimer.Stop()
@@ -431,18 +433,18 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 	return srv.Server.Shutdown(ctx)
 }
 
-// getFSNode get the memfs Node based on the request path.
+// getFSNode returns the [memfs.Node] based on the request path.
 //
-// If the path is not exist, try path with ".html".
+// If the path is not exist, it will try path with ".html" suffix.
 //
 // If the path is directory and contains index.html, the node content for
 // index.html will be returned.
 //
 // If the path is directory and does not contains index.html and
-// [ServerOptions.EnableIndexHTML] is true, server will generate list of
-// content for index.html.
+// [ServerOptions.EnableIndexHTML] is true, server will generate list of files
+// in node as content for index.html.
 //
-// The redirectPath return whether the server should redirect first before
+// The redirectURL defines whether the server should redirect first before
 // serving the content to provide consistent canonical path that end with "/"
 // for directory that contains "index.html" or EnableIndexHTML is on.
 func (srv *Server) getFSNode(reqURL url.URL) (node *memfs.Node, redirectURL *url.URL) {
@@ -496,8 +498,8 @@ func (srv *Server) getFSNode(reqURL url.URL) (node *memfs.Node, redirectURL *url
 	return nodeIndexHTML, nil
 }
 
-// handleDelete handle the DELETE request by searching the registered route
-// and calling the endpoint.
+// handleDelete handles the DELETE request using registered endpoints.
+// It will response with [http.StatusNotFound] if request path is not exist.
 func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routeDeletes {
 		vals, ok := rute.Parse(req.URL.Path)
@@ -509,18 +511,19 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusNotFound)
 }
 
-// HandleFS handle the request as resource in the memory file system.
-// This method only works if the [ServerOptions.Memfs] is not nil.
+// HandleFS handles the request as resource in the memory file system (memfs).
+// This method is called when the [ServerOptions.Memfs] is set and the no path
+// exist in registered GET endpoints.
 //
-// If the request Path exists and [ServerOptions.HandleFS] is set and
-// returning [*memfs.Node] with non-zero HTTP `statusCode`, server will return
-// immediately.
+// If [ServerOptions.HandleFS] is set and its return non-zero HTTP
+// `statusCode`, server will stop processing request.
 //
-// If the request Path exists in file system, it will return 200 OK with the
-// header Content-Type set accordingly to the detected file type and the
-// response body set to the content of file.
+// If the request Path exists in memfs, it will return 200 OK with the header
+// Content-Type set to [memfs.Node.ContentType] and the response body set to
+// the [memfs.Node.Content].
 //
-// If the request Method is HEAD, only the header will be sent back to client.
+// If the request method is HEAD, only the headers will be sent back to
+// client, including Content-Length and Accept-Ranges.
 //
 // If the request Path is not exist it will return 404 Not Found.
 func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
@@ -804,13 +807,14 @@ func (srv *Server) handlePut(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusNotFound)
 }
 
-// HandleRange handle [HTTP Range] request using "bytes" unit.
+// HandleRange handles [HTTP Range] request using "bytes" unit.
 //
-// The body parameter contains the content of resource being requested that
-// implement Reader and Seeker.
+// The bodyRaange parameter contains the content of resource being requested
+// that implement [io.Reader] and [io.Seeker].
 //
 // If the [http.Request.Method] is not GET, or no "Range" in
-// [http.Request.Header], it will return all the body [RFC7233 S-3.1].
+// [http.Request.Header], it will return all the body per
+// RFC 7233 Section 3.1.
 //
 // The contentType is optional, if its empty, it will detected by
 // [http.ResponseWriter] during Write.
@@ -821,7 +825,6 @@ func (srv *Server) handlePut(res http.ResponseWriter, req *http.Request) {
 //     start position is greater than resource size.
 //
 // [HTTP Range]: https://datatracker.ietf.org/doc/html/rfc7233
-// [RFC7233 S-3.1]: https://datatracker.ietf.org/doc/html/rfc7233#section-3.1
 func HandleRange(res http.ResponseWriter, req *http.Request, bodyReader io.ReadSeeker, contentType string) {
 	var (
 		logp     = `HandleRange`

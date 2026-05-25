@@ -6,7 +6,11 @@ package http
 // RequestType define type of HTTP request.
 type RequestType string
 
-// List of valid request type.
+// List of valid [RequestType].
+// A request type is mapped to Content-Type, except for RequestTypeNone
+// and RequestTypeQuery.
+// For example, RequestTypeForm is mapped to
+// "application/x-www-form-urlencoded".
 const (
 	RequestTypeNone          RequestType = ``
 	RequestTypeQuery         RequestType = `query`
@@ -17,9 +21,9 @@ const (
 	RequestTypeXML           RequestType = `xml`
 )
 
-// String return the string representation of request type as in
+// String return the string representation of request type for
 // "Content-Type" header.
-// For RequestTypeNone or RequestTypeQuery it will return an empty string.
+// For [RequestTypeNone] or [RequestTypeQuery] it will return an empty string.
 func (rt RequestType) String() string {
 	switch rt {
 	case RequestTypeNone, RequestTypeQuery:

@@ -7,7 +7,8 @@ import (
 	"net/http"
 )
 
-// Evaluator evaluate the request.
-// If request is invalid, the error will tell the response code and the
-// error message to be written back to client.
+// Evaluator evaluates the request before [Endpoint.Call].
+// If request is invalid, the returned error contains the response code and
+// the error message to be written back to client, in that way the error
+// should be the instance of [liberrors.E]
 type Evaluator func(req *http.Request, reqBody []byte) error

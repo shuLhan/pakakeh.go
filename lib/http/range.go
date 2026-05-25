@@ -14,18 +14,20 @@ import (
 	libstrings "kilabit.info/pakakeh.go/lib/strings"
 )
 
-// DefRangeLimit limit of content served by server when [Range] request
-// without end, in example "0-".
+// DefRangeLimit default limit of content served by server when [Range]
+// request without end (in example "0-").
+// Current value is equal to 8 MB.
 const DefRangeLimit = 8388608
 
-// Range define the unit and list of start-end positions for resource.
+// Range defines the unit and list of start-end positions for handling HTTP
+// request with Content-Range.
 type Range struct {
 	unit      string
 	positions []*RangePosition
 }
 
-// NewRange create new Range with specified unit.
-// The default unit is "bytes" if its empty.
+// NewRange returns new Range with specified unit.
+// The default unit is "bytes".
 func NewRange(unit string) (r *Range) {
 	if len(unit) == 0 {
 		unit = AcceptRangesBytes
@@ -36,8 +38,8 @@ func NewRange(unit string) (r *Range) {
 	return r
 }
 
-// ParseMultipartRange parse "multipart/byteranges" response body.
-// Each Content-Range position and body part in the multipart will be stored
+// ParseMultipartRange returns parsed "multipart/byteranges" response body.
+// Each Content-Range position and body part in the multipart are stored
 // under [RangePosition].
 func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) {
 	var (
@@ -78,7 +80,9 @@ func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) 
 	return r, nil
 }
 
-// ParseRange parses raw range value in the following format,
+// ParseRange parses raw range value in v.
+//
+// Format of v,
 //
 //	range    = unit "=" position *("," position)
 //	unit     = 1*VCHAR
@@ -87,7 +91,7 @@ func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) 
 //	start    = 1*DIGIT
 //	end      = 1*DIGIT
 //
-// An invalid position will be skipped.
+// An invalid range position will be skipped.
 func ParseRange(v string) (r Range) {
 	var (
 		par = libstrings.NewParser(v, `=`)
@@ -184,14 +188,14 @@ func ParseRange(v string) (r Range) {
 	return r
 }
 
-// skipPosition Ignore any string until ','.
+// skipPosition ignores any character until ','.
 func skipPosition(par *libstrings.Parser, delim rune) {
 	for delim == '-' {
 		_, delim = par.Read()
 	}
 }
 
-// Add start and end as requested position to Range.
+// Add adds the start and end as requested position to Range.
 // The start and end position is inclusive, closed interval [start, end],
 // with end position must equal or greater than start position, unless its
 // zero.
@@ -284,17 +288,17 @@ ok:
 	return true
 }
 
-// IsEmpty return true if Range has no registered positions.
+// IsEmpty returns true if Range has no registered positions.
 func (r *Range) IsEmpty() bool {
 	return len(r.positions) == 0
 }
 
-// Positions return the list of range position.
+// Positions returns the list of range position.
 func (r *Range) Positions() []*RangePosition {
 	return r.positions
 }
 
-// String return the Range as value for HTTP header.
+// String returns the Range as value for HTTP header.
 // It will return an empty string if no position registered.
 func (r *Range) String() string {
 	if r.IsEmpty() {

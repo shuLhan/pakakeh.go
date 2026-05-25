@@ -31,7 +31,7 @@ var (
 )
 
 // Client is a wrapper for standard [http.Client] with simplified
-// usabilities, including setting default headers, uncompressing response
+// usabilities, including setting default headers and uncompressing response
 // body.
 type Client struct {
 	flateReader io.ReadCloser
@@ -42,11 +42,11 @@ type Client struct {
 	opts ClientOptions
 }
 
-// NewClient create and initialize new [Client].
+// NewClient returns initialized new [Client].
 //
-// The client will have [net.Dialer.KeepAlive] set to 30 seconds, with one
-// [http.Transport.MaxIdleConns], and 90 seconds
-// [http.Transport.IdleConnTimeout].
+// The client have [net.Dialer.KeepAlive] set to 30 seconds,
+// [http.Transport.MaxIdleConns] set to 1, and
+// [http.Transport.IdleConnTimeout] set to 90 seconds.
 func NewClient(opts ClientOptions) (client *Client) {
 	opts.init()
 
@@ -75,9 +75,10 @@ func NewClient(opts ClientOptions) (client *Client) {
 	return client
 }
 
-// Delete send the DELETE request to server using rpath as target endpoint
-// and params as query parameters.
-// On success, it will return the uncompressed response body.
+// Delete returns the response after sending DELETE request to server.
+// The request send to [ClientRequest.Path] with [ClientRequest.Params] as
+// query parameters.
+// The returned response body is uncompressed.
 func (client *Client) Delete(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 	if len(params) != 0 {
@@ -89,8 +90,8 @@ func (client *Client) Delete(req ClientRequest) (res *ClientResponse, err error)
 	return client.doRequest(req)
 }
 
-// Do overwrite the standard [http.Client.Do] to allow debugging request and
-// response, and to read and return the response body immediately.
+// Do wraps the standard [http.Client.Do] for reading and decompressing the
+// response body.
 func (client *Client) Do(req *http.Request) (res *ClientResponse, err error) {
 	var logp = `Do`
 
@@ -124,12 +125,12 @@ func (client *Client) Do(req *http.Request) (res *ClientResponse, err error) {
 	return res, nil
 }
 
-// Download a resource from remote server and write it into
+// Download downloads resource from remote server and write it into
 // [DownloadRequest.Output].
 //
 // If the [DownloadRequest.Output] is nil, it will return an error
 // [ErrClientDownloadNoOutput].
-// If server return HTTP code beside 200, it will return non-nil
+// If server return HTTP code other than 200, it will return non-nil
 // [http.Response] with an error.
 func (client *Client) Download(req DownloadRequest) (res *http.Response, err error) {
 	var (
@@ -174,24 +175,23 @@ out:
 	return res, err
 }
 
-// GenerateHTTPRequest generate [http.Request] from [ClientRequest].
+// GenerateHTTPRequest converts the [ClientRequest] to [*http.Request] with
+// body set based on [ClientRequest.Type].
 //
 // For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the
 // [ClientRequest.Params] value [should be nil] or [url.Values].
-// If its not nil, it will be converted as rules below.
 //
-// For HTTP method PATCH, POST, or PUT; the [ClientRequest.Params] will
+// For HTTP method PATCH, POST, or PUT; the [ClientRequest.Params] is
 // converted based on [ClientRequest.Type] rules below,
 //
-//   - If Type is [RequestTypeQuery] and Params is [url.Values] it
-//     will be send as query parameters in the Path.
+//   - If Type is [RequestTypeQuery] and Params is [url.Values] it will set
+//     the query parameters in Path.
 //   - If Type is [RequestTypeForm] and Params is [url.Values] it
-//     will be send as URL encoded in the body.
+//     will be set the body as URL encoded.
 //   - If Type is [RequestTypeMultipartForm] and Params type is
-//     [*multipart.Form], then it will send as multipart form in the
-//     body.
-//   - If Type is [RequestTypeJSON] and Params is not nil, the Params
-//     will be encoded as JSON in the body.
+//     [*multipart.Form], then it will set the bdoy as multipart form.
+//   - If Type is [RequestTypeJSON] and Params is not nil, it will set the
+//     body by encoding the Params into JSON.
 //
 // [should be nil]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET
 func (client *Client) GenerateHTTPRequest(req ClientRequest) (httpReq *http.Request, err error) {
@@ -267,9 +267,10 @@ func (client *Client) GenerateHTTPRequest(req ClientRequest) (httpReq *http.Requ
 	return httpReq, nil
 }
 
-// Get send the GET request to server using [ClientRequest.Path] as target
-// endpoint and [ClientRequest.Params] as query parameters.
-// On success, it will return the uncompressed response body.
+// Get returns the response from sending GET request to server using
+// [ClientRequest.Path] as target endpoint and [ClientRequest.Params] in query
+// parameters.
+// The returned response body is uncompressed.
 func (client *Client) Get(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 	if len(params) != 0 {
@@ -281,9 +282,8 @@ func (client *Client) Get(req ClientRequest) (res *ClientResponse, err error) {
 	return client.doRequest(req)
 }
 
-// Head send the HEAD request to rpath endpoint, with optional hdr and
-// params in query parameters.
-// The returned resBody shoule be always nil.
+// Head returns the response from sending HEAD request to the server.
+// The returned response body is nil.
 func (client *Client) Head(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 	if len(params) != 0 {
@@ -295,8 +295,8 @@ func (client *Client) Head(req ClientRequest) (res *ClientResponse, err error) {
 	return client.doRequest(req)
 }
 
-// Post send the POST request to rpath without setting "Content-Type".
-// If the params is not nil, it will send as query parameters in the rpath.
+// Post returns the response from sending the POST request to server.
+// The Params is send in query parameters.
 func (client *Client) Post(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 	if len(params) != 0 {
@@ -308,8 +308,8 @@ func (client *Client) Post(req ClientRequest) (res *ClientResponse, err error) {
 	return client.doRequest(req)
 }
 
-// PostForm send the POST request to rpath using
-// "application/x-www-form-urlencoded".
+// PostForm returns the response from sending the POST request to server.
+// The Params is send in body with content-type set to [ContentTypeForm].
 func (client *Client) PostForm(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 
@@ -320,18 +320,15 @@ func (client *Client) PostForm(req ClientRequest) (res *ClientResponse, err erro
 	return client.doRequest(req)
 }
 
-// PostFormData send the POST request to Path with all parameters is send
-// using "multipart/form-data".
+// PostFormData returns the response from sending the POST request to server.
+// The Params is send in body with content-type set to
+// [ContentTypeMultipartForm].
 func (client *Client) PostFormData(req ClientRequest) (res *ClientResponse, err error) {
-	var (
-		logp = `PostFormData`
-
-		params *multipart.Form
-	)
+	logp := `PostFormData`
 
 	req.contentType = req.Type.String()
 
-	params = req.paramsAsMultipart()
+	params := req.paramsAsMultipart()
 	if params == nil {
 		req.body = strings.NewReader(``)
 	} else {
@@ -350,9 +347,10 @@ func (client *Client) PostFormData(req ClientRequest) (res *ClientResponse, err 
 	return client.doRequest(req)
 }
 
-// PostJSON send the POST request with content type set to "application/json"
-// and Params encoded automatically to JSON.
-// The Params must be a type than can be marshalled with [json.Marshal] or
+// PostJSON returns the response from sending POST request to server.
+// The Params is encoded to JSON and send in body with content-type set to
+// [ContentTypeJSON].
+// Params must be a type than can be marshalled with [json.Marshal] or
 // type that implement [json.Marshaler].
 func (client *Client) PostJSON(req ClientRequest) (res *ClientResponse, err error) {
 	var (
@@ -373,8 +371,9 @@ func (client *Client) PostJSON(req ClientRequest) (res *ClientResponse, err erro
 	return client.doRequest(req)
 }
 
-// Put send the HTTP PUT request to rpath with optional, raw body.
-// The Content-Type can be set in the hdr.
+// Put returns the response from sending PUT request to server.
+// The Params is send in body as raw bytes without setting content-type.
+// The Content-Type can be set in the Header before calling this method.
 func (client *Client) Put(req ClientRequest) (*ClientResponse, error) {
 	var params = req.paramsAsBytes()
 
@@ -384,8 +383,8 @@ func (client *Client) Put(req ClientRequest) (*ClientResponse, error) {
 	return client.doRequest(req)
 }
 
-// PutForm send the PUT request with params set in body using content type
-// "application/x-www-form-urlencoded".
+// PutForm returns the response from sending PUT request to server.
+// The Params is send in body using content-type [ContentTypeForm].
 func (client *Client) PutForm(req ClientRequest) (*ClientResponse, error) {
 	var params = req.paramsAsURLEncoded()
 
@@ -396,8 +395,8 @@ func (client *Client) PutForm(req ClientRequest) (*ClientResponse, error) {
 	return client.doRequest(req)
 }
 
-// PutFormData send the PUT request with params set in body using content type
-// "multipart/form-data".
+// PutFormData returns the response from sending PUT request to server.
+// The Params is send in body with content-type [ContentTypeMultipartForm].
 func (client *Client) PutFormData(req ClientRequest) (res *ClientResponse, err error) {
 	var (
 		logp = `PutFormData`
@@ -426,8 +425,9 @@ func (client *Client) PutFormData(req ClientRequest) (res *ClientResponse, err e
 	return client.doRequest(req)
 }
 
-// PutJSON send the PUT request with content type set to "application/json"
-// and params encoded automatically to JSON.
+// PutJSON returns the response from sending PUT request to server.
+// The Params is encoded to JSON and send in body with content-type set to
+// [ContentTypeJSON].
 func (client *Client) PutJSON(req ClientRequest) (res *ClientResponse, err error) {
 	var (
 		logp   = `PutJSON`
@@ -446,8 +446,7 @@ func (client *Client) PutJSON(req ClientRequest) (res *ClientResponse, err error
 	return client.doRequest(req)
 }
 
-// Transport return the [http.Transport] that Client use in the
-// RoundTripper.
+// Transport returns the [http.Transport] that Client use.
 func (client *Client) Transport() (transport *http.Transport) {
 	transport, _ = client.Client.Transport.(*http.Transport)
 	return transport

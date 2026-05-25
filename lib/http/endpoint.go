@@ -12,31 +12,43 @@ import (
 	"kilabit.info/pakakeh.go/lib/mlog"
 )
 
-// Endpoint represent route that will be handled by server.
+// Endpoint represents route handled by server.
+// Endpoint can be set by calling [Server.RegisterEndpoint].
 // Each route have their own evaluator that will be evaluated after global
 // evaluators from server.
 type Endpoint struct {
-	// ErrorHandler define the function that will handle the error
-	// returned from Call.
+	// Function that handle the error from Call.
+	// This field is optional, default to [DefaultErrorHandler].
 	ErrorHandler CallbackErrorHandler
 
-	// Eval define evaluator for route that will be called after global
-	// evaluators and before callback.
+	// Evaluator for route that is called after global evaluators and
+	// before Call.
 	Eval Evaluator
 
-	// Call is the main process of route.
+	// The main function of route.
 	Call Callback
 
-	// Method contains HTTP method, default to GET.
+	// Define HTTP method, default to GET.
 	Method RequestMethod
 
-	// Path contains route to be served, default to "/" if its empty.
+	// Route to be served, default to "/".
 	Path string
 
-	// RequestType contains type of request, default to RequestTypeNone.
+	// The type of request, default to RequestTypeNone.
+	// RequestTypeNone and RequestTypeQuery accept any content-type.
+	// Client request with content-type that does not match with defines
+	// RequestType will be rejected.
+	//
+	// If set to [RequestTypeForm] or [RequestTypeQuery]
+	// server call [http.Request.ParseForm] to parse the request body into
+	// [http.Request.Form].
+	//
+	// If set to [RequestTypeMultipartForm] server call
+	// [http.Request.ParseMultipartForm].
 	RequestType RequestType
 
-	// ResponseType contains type of request, default to ResponseTypeNone.
+	// Type of response, default to ResponseTypeNone.
+	// If set, the content-type set based its String value.
 	ResponseType ResponseType
 }
 

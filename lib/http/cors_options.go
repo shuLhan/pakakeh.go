@@ -9,20 +9,20 @@ import (
 	"strings"
 )
 
-// CORSOptions define optional options for server to allow other servers to
-// access its resources.
+// CORSOptions defines options for server to allow other domains to access its
+// resources.
 type CORSOptions struct {
 	exposeHeaders string
 	maxAge        string
 
-	// AllowOrigins contains global list of cross-site Origin that are
-	// allowed during preflight requests by the OPTIONS method.
+	// AllowOrigins contains list of cross-site Origin that are allowed
+	// during preflight requests by the OPTIONS method.
 	// The list is case-sensitive.
 	// To allow all Origin, one must add "*" string to the list.
 	AllowOrigins []string
 
-	// AllowHeaders contains global list of allowed headers during
-	// preflight requests by the OPTIONS method.
+	// AllowHeaders contains list of allowed headers during preflight
+	// requests by the OPTIONS method.
 	// The list is case-insensitive.
 	// To allow all headers, one must add "*" string to the list.
 	AllowHeaders []string
@@ -45,7 +45,7 @@ type CORSOptions struct {
 	allowOriginsAll bool // flag to indicate wildcards on AllowOrigins.
 }
 
-// handle handle the CORS request.
+// handle handles the CORS request.
 //
 // Reference: https://www.html5rocks.com/static/images/cors_server_flowchart.png
 func (cors *CORSOptions) handle(res http.ResponseWriter, req *http.Request) {

@@ -16,25 +16,28 @@ import (
 
 // ServerOptions define an options to initialize HTTP server.
 type ServerOptions struct {
-	// Listener define the network listener to be used for serving HTTP
-	// connection.
-	// The Listener can be activated using systemd socket.
+	// The network listener to be used for serving HTTP connection.
+	// This field is optional, if set it will be used instead of Address.
 	Listener net.Listener
 
-	// Memfs contains the content of file systems to be served in memory.
+	// Memory file systems to be served when server running.
 	// The MemFS instance to be served should be already embedded in Go
-	// file, generated using memfs.MemFS.GoEmbed().
+	// file, generated using [memfs.MemFS.GoEmbed].
 	// Otherwise, it will try to read from file system directly.
 	//
 	// See https://pkg.go.dev/kilabit.info/pakakeh.go/lib/memfs#hdr-Go_embed
+	// for more information on how the creates Go embed file using memfs.
+	//
+	// This field is optional.
 	Memfs *memfs.MemFS
 
 	// HandleFS inspect each GET request to Memfs.
-	// If nil it means all requests are allowed.
+	// If nil the request will be handled using content from
+	// [memfs.MemFS.Get].
 	//
 	// Some usage of this handler is to check for authorization on
 	// specific path, handling redirect, and so on.
-	// See FSHandler for more information.
+	// See [FSHandler] for more information.
 	HandleFS FSHandler
 
 	// Address define listen address, using ip:port format.
@@ -43,37 +46,42 @@ type ServerOptions struct {
 
 	// BasePath define the base path or prefix to serve the HTTP request
 	// and response.
+	// Any trailing slash in the BasePath will be removed.
+	//
 	// Each request that server received will remove the BasePath first
-	// from the [http.Request.URL.Path] before passing to the handler.
+	// from the [http.Request.URL.Path] before passing it to the
+	// [Endpoint.Call].
+	//
 	// Each redirect that server sent will add the BasePath as the prefix
 	// to redirect URL.
 	//
-	// Any trailing slash in the BasePath will be removed.
+	// This field is optional.
 	BasePath string
 
 	// Conn contains custom HTTP server connection.
-	// This fields is optional.
+	// This fields is optional, it will replace the [Server.Server] field.
 	Conn *http.Server
 
-	// ErrorWriter define the writer where output from panic in handler
-	// will be written.  Basically this will create new log.Logger and set
-	// the default Server.ErrorLog.
-	// This field is optional, but if its set it will be used only if Conn
-	// is not set by caller.
+	// The writer where output from panic in handler will be written.
+	// It will create new [log.Logger] and set the default
+	// [http.Server.ErrorLog].
+	// This field is optional, and will be used only if Conn field is not
+	// set.
 	ErrorWriter io.Writer
 
-	// The options for Cross-Origin Resource Sharing.
+	// Options for Cross-Origin Resource Sharing (CORS).
+	// This field is optional.
 	CORS CORSOptions
 
-	// ShutdownIdleDuration define the duration where the server will
-	// automatically stop accepting new connection and then shutting down
-	// the server.
+	// The duration where the server will automatically stop accepting new
+	// connection and then shutting down the server.
+	// This field is optional.
 	ShutdownIdleDuration time.Duration
 
-	// If true, server generate index.html automatically if its not
-	// exist in the directory.
-	// The index.html contains the list of files inside the requested
-	// path.
+	// If true, server generates index.html automatically if the request
+	// path is directory without index.html in Memfs.
+	// The index.html contains the list of files inside the directory.
+	// This field is optional.
 	EnableIndexHTML bool
 }
 

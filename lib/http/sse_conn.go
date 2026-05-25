@@ -14,16 +14,16 @@ import (
 	"time"
 )
 
-// SSECallback define the handler for Server-Sent Events (SSE).
+// SSECallback defines the handler for Server-Sent Events (SSE).
 //
-// SSECallback type pass [SSEConn] that contains original HTTP request.
+// The SSECallback receives [SSEConn] that contains original HTTP request.
 // This allow the server to check for header "Last-Event-ID" and/or for
 // authentication.
 // Remember that "the original [http.Request.Body] must not be used"
 // according to [http.Hijacker] documentation.
 type SSECallback func(sse *SSEConn)
 
-// SSEConn define the connection when the SSE request accepted by server.
+// SSEConn defines the connection when the SSE request accepted by server.
 type SSEConn struct {
 	HTTPRequest *http.Request
 
@@ -35,7 +35,7 @@ type SSEConn struct {
 	bufrwMtx sync.Mutex
 }
 
-// WriteEvent write message with optional event type and id to client.
+// WriteEvent writes message with optional event type and id to client.
 //
 // The "event" parameter is optional.
 // If its empty, no "event:" line will be send to client.
@@ -73,7 +73,7 @@ func (ep *SSEConn) WriteEvent(event, data string, id *string) (err error) {
 	return nil
 }
 
-// WriteRaw write raw event message directly, without any parsing.
+// WriteRaw writes raw event msg directly, without any parsing.
 func (ep *SSEConn) WriteRaw(msg []byte) (err error) {
 	ep.bufrwMtx.Lock()
 	_, err = ep.bufrw.Write(msg)
@@ -86,10 +86,9 @@ func (ep *SSEConn) WriteRaw(msg []byte) (err error) {
 	return nil
 }
 
-// WriteRetry inform user how long they should wait, after disconnect,
-// before re-connecting back to server.
-//
-// The duration must be in millisecond.
+// WriteRetry writes "retry:" event to inform client how long they should
+// wait, after disconnect, before re-connecting back to server.
+// The retry duration must be in millisecond.
 func (ep *SSEConn) WriteRetry(retry time.Duration) (err error) {
 	_, err = fmt.Fprintf(ep.bufrw, "retry:%d\n\n", retry.Milliseconds())
 	if err != nil {
@@ -137,7 +136,7 @@ func (ep *SSEConn) writeData(buf *bytes.Buffer, data string, id *string) {
 	buf.WriteByte('\n')
 }
 
-// handshake write the last HTTP response to indicate the connection is
+// handshake writes the last HTTP response to indicate the connection is
 // accepted.
 func (ep *SSEConn) handshake() {
 	var (

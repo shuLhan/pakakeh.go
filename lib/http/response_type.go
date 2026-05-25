@@ -6,7 +6,7 @@ package http
 // ResponseType define the content type for HTTP response.
 type ResponseType string
 
-// List of valid response type.
+// List of valid [ResponseType].
 const (
 	// ResponseTypeNone skip writing header Content-Type and status
 	// code, it will handled manually by [Endpoint.Call].
@@ -18,8 +18,7 @@ const (
 	ResponseTypeXML    ResponseType = `xml`
 )
 
-// String return the string representation of ResponseType as in
-// "Content-Type" header.
+// String returns the string representation for "Content-Type" header.
 // For ResponseTypeNone it will return an empty string.
 func (restype ResponseType) String() string {
 	switch restype {
