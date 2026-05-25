@@ -805,19 +805,19 @@ func TestStatusError(t *testing.T) {
 		reqURL:        testServerURL + `/error/no-body?k=v`,
 		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusLengthRequired,
-		expBody:       `{"message":"Length required","code":411}`,
+		expBody:       ``, // ResponseTypeNone
 	}, {
 		desc:          "With registered error binary",
 		reqURL:        testServerURL + `/error/binary?k=v`,
 		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusLengthRequired,
-		expBody:       `{"message":"Length required","code":411}`,
+		expBody:       `Length required`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerURL + `/error/plain?k=v`,
 		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusLengthRequired,
-		expBody:       `{"message":"Length required","code":411}`,
+		expBody:       `Length required`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerURL + `/error/json?k=v`,
@@ -829,13 +829,13 @@ func TestStatusError(t *testing.T) {
 		reqURL:        testServerURL + `/error/no-code?k=v`,
 		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusInternalServerError,
-		expBody:       `{"message":"internal server error","name":"ERR_INTERNAL","code":500}`,
+		expBody:       `internal server error`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerURL + `/error/custom?k=v`,
 		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusInternalServerError,
-		expBody:       `{"message":"internal server error","name":"ERR_INTERNAL","code":500}`,
+		expBody:       `internal server error`,
 	}}
 
 	for _, c := range cases {
