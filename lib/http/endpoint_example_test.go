@@ -1,39 +1,118 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020 Shulhan <ms@kilabit.info>
 
-package http
+package http_test
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
+
+	libhttp "kilabit.info/pakakeh.go/lib/http"
 )
+
+func ExampleEndpoint_requestType() {
+	srv := libhttp.Server{}
+
+	// Here we defined an endpoint that accept form with "message"
+	// parameter
+	//
+	//	POST /myendpoint
+	//	Content-Type: application/x-www-form-urlencoded
+	//
+	//	message=<string>
+	//
+	// This endpoint will echo the message in JSON format.
+	// If we send "message=hello" it will return,
+	//
+	//	HTTP/1.1 200 OK
+	//	Content-Type: application/json
+	//
+	//	{"message":"hello"}
+
+	epForm := libhttp.Endpoint{
+		Method:       `POST`,
+		Path:         `/myendpoint`,
+		RequestType:  libhttp.RequestTypeForm,
+		ResponseType: libhttp.ResponseTypeJSON,
+		Call: func(epr *libhttp.EndpointRequest) ([]byte, error) {
+			gotMessage := epr.HTTPRequest.Form.Get(`message`)
+			resp := fmt.Sprintf(`{"message":%q}`, gotMessage)
+			return []byte(resp), nil
+		},
+	}
+	err := srv.RegisterEndpoint(epForm)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	testServe := func(contentType, body string) (resp *http.Response, respBody string) {
+		reqBody := io.NopCloser(bytes.NewBufferString(body))
+		req := httptest.NewRequest(`POST`, `/myendpoint`, reqBody)
+		req.Header.Set(libhttp.HeaderContentType, contentType)
+		w := httptest.NewRecorder()
+
+		srv.ServeHTTP(w, req)
+		resp = w.Result()
+
+		respb, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return resp, string(respb)
+	}
+
+	// Sending request with content-type other than
+	// "application/x-www-form-urlencoded" will return an error.
+
+	resp, respBody := testServe(libhttp.ContentTypeJSON, ``)
+
+	fmt.Printf("With Content-Type JSON: %s\n", resp.Status)
+	fmt.Printf("Body: %s\n", respBody)
+
+	// With valid content-type and message in body.
+
+	resp, respBody = testServe(libhttp.ContentTypeForm, `message=hello`)
+
+	fmt.Printf("With valid Content-Type: %s\n", resp.Status)
+	fmt.Printf("Body: %s\n", respBody)
+
+	// Output:
+	// With Content-Type JSON: 400 Bad Request
+	// Body: {"message":"invalid content type","code":400}
+	// With valid Content-Type: 200 OK
+	// Body: {"message":"hello"}
+}
 
 func ExampleEndpoint_errorHandler() {
 	var (
-		serverOpts = ServerOptions{
+		serverOpts = libhttp.ServerOptions{
 			Address: `127.0.0.1:8123`,
 		}
-		server *Server
+		server *libhttp.Server
 	)
 
-	server, _ = NewServer(serverOpts)
+	server, _ = libhttp.NewServer(serverOpts)
 
-	var endpointError = Endpoint{
-		Method:       RequestMethodGet,
+	var endpointError = libhttp.Endpoint{
+		Method:       libhttp.RequestMethodGet,
 		Path:         "/",
-		RequestType:  RequestTypeQuery,
-		ResponseType: ResponseTypePlain,
-		Call: func(epr *EndpointRequest) ([]byte, error) {
+		RequestType:  libhttp.RequestTypeQuery,
+		ResponseType: libhttp.ResponseTypePlain,
+		Call: func(epr *libhttp.EndpointRequest) ([]byte, error) {
 			return nil, errors.New(epr.HTTPRequest.Form.Get(`error`))
 		},
-		ErrorHandler: func(epr *EndpointRequest) {
-			epr.HTTPWriter.Header().Set(HeaderContentType, ContentTypePlain)
+		ErrorHandler: func(epr *libhttp.EndpointRequest) {
+			epr.HTTPWriter.Header().Set(libhttp.HeaderContentType,
+				libhttp.ContentTypePlain)
 
 			codeMsg := strings.Split(epr.Error.Error(), ":")
 			if len(codeMsg) != 2 {
@@ -57,22 +136,22 @@ func ExampleEndpoint_errorHandler() {
 	time.Sleep(1 * time.Second)
 
 	var (
-		clientOpts = ClientOptions{
+		clientOpts = libhttp.ClientOptions{
 			ServerURL: `http://` + serverOpts.Address,
 		}
-		client = NewClient(clientOpts)
+		client = libhttp.NewClient(clientOpts)
 	)
 
 	var params = url.Values{}
 	params.Set("error", "400:error with status code")
 
-	var req = ClientRequest{
+	var req = libhttp.ClientRequest{
 		Path:   `/`,
 		Params: params,
 	}
 
 	var (
-		res *ClientResponse
+		res *libhttp.ClientResponse
 		err error
 	)
 

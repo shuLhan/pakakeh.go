@@ -604,6 +604,7 @@ func TestRegisterPut(t *testing.T) {
 		if e != nil {
 			t.Fatal(e)
 		}
+		req.Header.Set(HeaderContentType, RequestTypeForm.String())
 
 		res, e := client.Do(req)
 		if e != nil {
@@ -796,36 +797,43 @@ func TestStatusError(t *testing.T) {
 	cases := []struct {
 		desc          string
 		reqURL        string
+		contentType   string
 		expBody       string
 		expStatusCode int
 	}{{
 		desc:          "With registered error no body",
 		reqURL:        testServerURL + `/error/no-body?k=v`,
+		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error binary",
 		reqURL:        testServerURL + `/error/binary?k=v`,
+		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerURL + `/error/plain?k=v`,
+		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerURL + `/error/json?k=v`,
+		contentType:   ContentTypeJSON,
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerURL + `/error/no-code?k=v`,
+		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusInternalServerError,
 		expBody:       `{"message":"internal server error","name":"ERR_INTERNAL","code":500}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerURL + `/error/custom?k=v`,
+		contentType:   ContentTypeForm,
 		expStatusCode: http.StatusInternalServerError,
 		expBody:       `{"message":"internal server error","name":"ERR_INTERNAL","code":500}`,
 	}}
@@ -839,6 +847,7 @@ func TestStatusError(t *testing.T) {
 		if e != nil {
 			t.Fatal(e)
 		}
+		req.Header.Set(HeaderContentType, c.contentType)
 
 		res, e := client.Do(req)
 		if e != nil {

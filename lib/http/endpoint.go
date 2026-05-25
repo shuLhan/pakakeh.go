@@ -8,7 +8,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
+	liberrors "kilabit.info/pakakeh.go/lib/errors"
 	"kilabit.info/pakakeh.go/lib/mlog"
 )
 
@@ -34,17 +36,20 @@ type Endpoint struct {
 	// Route to be served, default to "/".
 	Path string
 
-	// The type of request, default to RequestTypeNone.
-	// RequestTypeNone and RequestTypeQuery accept any content-type.
-	// Client request with content-type that does not match with defines
-	// RequestType will be rejected.
+	// The type of request.
+	// By setting this field, server will reject any request that does not
+	// match based on Content-Type with 400 Bad Request, except when set
+	// to [RequestTypeNone] and [RequestTypeQuery] it will accept any
+	// content-type.
 	//
-	// If set to [RequestTypeForm] or [RequestTypeQuery]
-	// server call [http.Request.ParseForm] to parse the request body into
-	// [http.Request.Form].
+	// If set to [RequestTypeForm], [RequestTypeQuery], or
+	// [RequestTypeJSON] server call [http.Request.ParseForm] to parse the
+	// query parameters or body for [http.Request.Form]
 	//
 	// If set to [RequestTypeMultipartForm] server call
 	// [http.Request.ParseMultipartForm].
+	//
+	// This field is optional, default to RequestTypeNone.
 	RequestType RequestType
 
 	// Type of response, default to ResponseTypeNone.
@@ -58,20 +63,34 @@ func (ep *Endpoint) call(
 	evaluators []Evaluator,
 	vals map[string]string,
 ) {
-	var (
-		logp = "Endpoint.call"
-		epr  = &EndpointRequest{
-			Endpoint:    ep,
-			HTTPWriter:  res,
-			HTTPRequest: req,
-		}
-		responseBody []byte
-		e            error
-	)
+	logp := `Endpoint.call`
 
-	epr.RequestBody, e = io.ReadAll(req.Body)
-	if e != nil {
-		mlog.Errf("%s: ReadAll: %s", logp, e)
+	epr := &EndpointRequest{
+		Endpoint:    ep,
+		HTTPWriter:  res,
+		HTTPRequest: req,
+	}
+
+	switch ep.RequestType {
+	case RequestTypeNone, RequestTypeQuery:
+		// Allow any content-type.
+	default:
+		contentType := req.Header.Get(HeaderContentType)
+		if !strings.HasPrefix(contentType, ep.RequestType.String()) {
+			epr.Error = &liberrors.E{
+				Code:    http.StatusBadRequest,
+				Message: `invalid content type`,
+			}
+			ep.ErrorHandler(epr)
+			return
+		}
+	}
+
+	var err error
+
+	epr.RequestBody, err = io.ReadAll(req.Body)
+	if err != nil {
+		mlog.Errf("%s: ReadAll: %s", logp, err)
 		res.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -84,13 +103,13 @@ func (ep *Endpoint) call(
 		// NOOP.
 
 	case RequestTypeForm, RequestTypeQuery, RequestTypeJSON:
-		e = req.ParseForm()
+		err = req.ParseForm()
 
 	case RequestTypeMultipartForm:
-		e = req.ParseMultipartForm(0)
+		err = req.ParseMultipartForm(0)
 	}
-	if e != nil {
-		mlog.Errf("%s: %s %s: request parse: %s", logp, req.Method, req.URL.Path, e)
+	if err != nil {
+		mlog.Errf("%s: %s %s: request parse: %s", logp, req.Method, req.URL.Path, err)
 		res.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -120,6 +139,8 @@ func (ep *Endpoint) call(
 		}
 	}
 
+	var responseBody []byte
+
 	responseBody, epr.Error = ep.Call(epr)
 	if epr.Error != nil {
 		ep.ErrorHandler(epr)
@@ -145,7 +166,7 @@ func (ep *Endpoint) call(
 	for nwrite < len(responseBody) {
 		n, err := res.Write(responseBody[nwrite:])
 		if err != nil {
-			mlog.Errf("%s: %s %s: response write: %s", logp, req.Method, req.URL.Path, e)
+			mlog.Errf("%s: %s %s: response write: %s", logp, req.Method, req.URL.Path, err)
 			break
 		}
 		nwrite += n
