@@ -14,11 +14,10 @@ import (
 	"time"
 )
 
-// ErrScheduleUnknown define an error when unknown schedule kind parsed from
-// value.
+// ErrScheduleUnknown an error for unknown schedule value.
 var ErrScheduleUnknown = errors.New(`unknown schedule`)
 
-// List of kind of schedule.
+// List of kind for [Schedule].
 const (
 	ScheduleKindMinutely = `minutely`
 	ScheduleKindHourly   = `hourly`
@@ -44,8 +43,6 @@ type Scheduler struct {
 	tod     []Clock // List of time in daily schedule.
 	dow     []int   // List of day in weekly schedule.
 	dom     []int   // List of day in monthly schedule.
-
-	nextDuration time.Duration
 
 	sync.Mutex
 }
@@ -242,7 +239,6 @@ func (sch *Scheduler) calcNext(now time.Time) {
 
 	sch.Lock()
 	sch.next = next
-	sch.nextDuration = sch.next.Sub(now)
 	sch.Unlock()
 }
 
@@ -564,18 +560,22 @@ func (sch *Scheduler) nextDayOfMonth(today int) (nextDay int, found bool) {
 
 // run the ticker for scheduler.
 func (sch *Scheduler) run() {
-	var ticker = time.NewTicker(sch.nextDuration)
+	wrk := newWorkerOnce()
+	q := make(chan time.Time, 1)
+	id := wrk.reg(q)
 
 	for {
 		select {
-		case <-ticker.C:
-			// Calculate the next event and notify user.
-			// This will allow user to call the Next method after
-			// receiving the event.
-			var now = sch.next
+		case now := <-q:
+			if now.Before(sch.next) {
+				continue
+			}
 
-			sch.calcNext(NowFunc().UTC())
-			ticker.Reset(sch.nextDuration)
+			// Calculate the next event before notifying user to
+			// allow them to known when the scheduler will
+			// running again using [Scheduler.Next].
+
+			sch.calcNext(now)
 
 			select {
 			case sch.c <- now:
@@ -583,9 +583,9 @@ func (sch *Scheduler) run() {
 			}
 
 		case <-sch.cstop:
-			ticker.Stop()
 			// Send ACK back to the stopper.
 			sch.cstop <- struct{}{}
+			wrk.unreg(id)
 			return
 		}
 	}
