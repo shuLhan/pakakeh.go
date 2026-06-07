@@ -6,6 +6,7 @@
 :sectanchors:
 :stylesheet: default, changelog.css
 :toc:
+:toclevels: 1
 
 This Go module usually released every month, at the first week of the month.
 
@@ -36,6 +37,82 @@ Legend,
 * 🌱: New feature
 * 🌼: Enhancement
 * 💧: Chores
+
+
+[#v0_65_0]
+== pakakeh.go v0.65.0 (2026-06-07)
+
+🪵 lib/http: makes the Endpoint.RequestType strict.
+
+Previously, the endpoint ccept any content-type regarding the value
+in [Endpoint.RequestType].
+
+This changes make the endpoint become strict, it will reject request if
+the Content-Type does not match with registered type.
+
+This is breaking changes.
+
+🌼 lib/systemd: mark daemon build-able only on linux OS.
+
+The other OS will get stub that return nil listener without error.
+
+🌼 lib/os: do not remove the archive/compressed file on success.
+
+Removing a file should be handled by user not a program.
+
+🌼 lib/html: fix NormalizeForID that replace original value.
+
+Turns out modifying slice of byte of string modify the original content of
+string itself.
+I thought string is immutable.
+
+🌼 lib/time: expose the variable NowFunc.
+
+The NowFunc variable is a function that return the current local time.
+It is exposed so that it can be override to mock the current time during
+testing.
+
+🌼 lib/uuidv7: allow un-marshaling empty data.
+
+Empty data or empty string "" similar to setting the value to nil.
+
+🌼 lib/http: set content-type in DefaultErrorHandler based on ResponseType.
+
+Previously, any error handled by DefaultErrorHandler always response
+with content-type JSON with predefined message format.
+
+This changes it to set response content-type based on registered
+[Endpoint.ResponseType].
+
+For [ResponseTypeBinary], [ResponseTypeHTML], [ResponseTypePlain], or
+[ResponseTypeXML] it will write the error message in the body as plain
+text.
+For [ResponseTypeJSON] it use the previous format.
+
+🌼 lib/time: implement internal worker for managing ticker in schedulers.
+
+The worker define internal worker for [time.Scheduler].
+Its run a ticker, rounded by minute, that publish the current [time.Time]
+to all subscribers.
+
+The original idea is to fix the Scheduler not running as scheduled when
+the host system is suspended or sleep.
+
+🌼 lib/time: replace Scheduler ticker with worker
+
+There is a case where a program that use Scheduler with schedule set
+to daily at 00:00 is never run as scheduled.
+The cause was the host that run the program is being suspended or sleep
+on OS level.
+The program is still running after wake up but the schedule is delayed
+based on how long the host OS suspened.
+If its suspended for 3 hours, then the scheduler will run at 03:00.
+
+The fix is by running an internal worker that run a ticker.
+Scheduler that register to this worker, will receive an instance of
+current time in UTC every minute, which they will use to compare with
+their next schedule.
+
 
 
 [#v0_64_0]
