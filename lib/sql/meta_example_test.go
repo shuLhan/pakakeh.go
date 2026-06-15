@@ -6,7 +6,6 @@ package sql_test
 import (
 	"fmt"
 	"slices"
-	"strings"
 
 	"kilabit.info/pakakeh.go/lib/sql"
 )
@@ -515,7 +514,7 @@ func ExampleMeta_selectOnPostgresql() {
 	// 2
 }
 
-// Sometime the query need to be stiched piece by piece.
+// Example of creating parent and sub-query.
 func ExampleMeta_subquery() {
 	type Table struct {
 		Name  string
@@ -528,75 +527,23 @@ func ExampleMeta_subquery() {
 		id    = 1
 		subid = 500
 		t     Table
-		qb    strings.Builder
 	)
 
 	meta.Bind(`id`, &t.ID)
 	meta.Bind(`sub_id`, &t.SubID)
 	meta.Bind(`name`, &t.Name)
+	meta.BindWhere(``, `id`, `=`, id)
 
-	fmt.Fprintf(&qb, `SELECT %s FROM t WHERE 1=1`, meta.Names())
+	subq := meta.Sub()
+	subq.Bind(`id`, nil)
+	subq.BindWhere(``, `u.id`, `=`, subid)
 
-	if id != 0 {
-		op := meta.BindWhere(`AND`, `id`, `=`, id)
-		qb.WriteString(op.String())
-	}
-	if subid != 0 {
-		op := meta.BindWhere(``, `u.id`, `=`, subid)
-		fmt.Fprintf(&qb, ` AND sub_id = (SELECT id FROM u WHERE %s);`,
-			op.String())
-	}
-
-	// db.Exec(qb.String(),meta.WhereValues()...).Scan(meta.ListValue...)
-
-	fmt.Println(qb.String())
-	fmt.Println(meta.WhereValues())
-
-	// Output:
-	// SELECT id,sub_id,name FROM t WHERE 1=1 AND id = $1 AND sub_id = (SELECT id FROM u WHERE  u.id = $2);
-	// [1 500]
-}
-
-func ExampleMeta_subqueryWithIndex() {
-	type Table struct {
-		Name  string
-		ID    int
-		SubID int
-	}
-
-	var (
-		meta  = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
-		id    = 1
-		subid = 500
-		t     Table
-	)
-
-	meta.Bind(`id`, &t.ID)
-	meta.Bind(`sub_id`, &t.SubID)
-	meta.Bind(`name`, &t.Name)
-
-	var qb strings.Builder
-
-	fmt.Fprintf(&qb, `SELECT %s FROM t WHERE 1=1`, meta.Names())
-	if id != 0 {
-		qb.WriteString(` AND id = $%d`)
-		meta.BindWhere(``, `id`, `=`, id)
-	}
-	if subid != 0 {
-		qb.WriteString(` AND sub_id = (SELECT id FROM u WHERE u.id = $%d);`)
-		meta.BindWhere(``, `u.id`, `=`, subid)
-	}
-
-	var q = fmt.Sprintf(qb.String(), meta.Index...)
-
-	// db.Exec(q, meta.WhereValues()...).Scan(meta.ListValue...)
-
+	q := fmt.Sprintf(`%s AND sub_id = (%s)`, meta.Select(`t`), subq.Select(`u`))
+	vals := slices.Concat(meta.WhereValues(), subq.WhereValues())
 	fmt.Println(q)
-	fmt.Println(meta.Index)
-	fmt.Println(meta.WhereValues())
+	fmt.Println(vals)
 
 	// Output:
-	// SELECT id,sub_id,name FROM t WHERE 1=1 AND id = $1 AND sub_id = (SELECT id FROM u WHERE u.id = $2);
-	// [1 2]
+	// SELECT id,sub_id,name FROM t WHERE  id = $1 AND sub_id = (SELECT id FROM u WHERE  u.id = $2)
 	// [1 500]
 }

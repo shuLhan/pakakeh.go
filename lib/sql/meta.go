@@ -34,9 +34,6 @@ type Meta struct {
 	// listOpWhere contains list of WHERE conditions.
 	listOpWhere []OpWhere
 
-	// Index collect all holder integer value, as in "1,2,3,...".
-	Index []any
-
 	nholder int
 }
 
@@ -72,7 +69,6 @@ func (meta *Meta) Bind(colName string, val any) {
 
 	if meta.kind == DMLKindInsert || meta.kind == DMLKindUpdate {
 		meta.nholder++
-		meta.Index = append(meta.Index, meta.nholder)
 	}
 }
 
@@ -128,7 +124,6 @@ func (meta *Meta) bindOnPostgres(prm *param, val any) string {
 		return prm.holder
 	}
 	meta.nholder++
-	meta.Index = append(meta.Index, meta.nholder)
 	prm.holder = fmt.Sprintf(`$%d`, meta.nholder)
 	meta.ListValue = append(meta.ListValue, val)
 	return prm.holder
@@ -139,7 +134,6 @@ func (meta *Meta) bindOnOthers(prm *param, val any) string {
 		prm.holder = DefaultPlaceHolder
 	}
 	meta.nholder++
-	meta.Index = append(meta.Index, meta.nholder)
 	meta.ListValue = append(meta.ListValue, val)
 	return prm.holder
 }
@@ -169,7 +163,6 @@ func (meta *Meta) BindWhere(logic, col, comp string, val any) (whereOp *OpWhere)
 
 	if val != nil {
 		meta.nholder++
-		meta.Index = append(meta.Index, meta.nholder)
 		if meta.driver == DriverNamePostgres {
 			whereOp.holder = fmt.Sprintf(`$%d`, meta.nholder)
 		} else {

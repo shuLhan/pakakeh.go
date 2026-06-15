@@ -20,7 +20,6 @@ func TestMetaBind(t *testing.T) {
 		driver       string
 		expListName  string
 		expListValue string
-		expIndex     string
 		kind         DMLKind
 		bind         []bindCase
 		expNholder   int
@@ -39,7 +38,6 @@ func TestMetaBind(t *testing.T) {
 		}},
 		expListName:  `[f1]`,
 		expListValue: `[v1.1]`,
-		expIndex:     `[1]`,
 		expNholder:   1,
 	}}
 
@@ -59,9 +57,6 @@ func TestMetaBind(t *testing.T) {
 
 		got = fmt.Sprintf(`%v`, meta.ListValue)
 		test.Assert(t, `ListValue`, c.expListValue, got)
-
-		got = fmt.Sprintf(`%v`, meta.Index)
-		test.Assert(t, `Index`, c.expIndex, got)
 
 		test.Assert(t, `nholder`, c.expNholder, meta.nholder)
 	}
