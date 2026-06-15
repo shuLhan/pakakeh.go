@@ -59,7 +59,7 @@ func ExampleMeta_BindWhere() {
 	// [1000 JohnDoe]
 }
 
-func ExampleMeta_bulkInsert_postgres() {
+func ExampleMeta_BulkInsert_postgres() {
 	type Tag struct {
 		Name string
 		ID   int
@@ -88,8 +88,7 @@ func ExampleMeta_bulkInsert_postgres() {
 		meta.BulkBindValues(doc.ID, tag.ID)
 	}
 
-	var q = fmt.Sprintf(`INSERT INTO document_tag (%s) VALUES %s;`,
-		meta.Names(), meta.BulkHolders())
+	q := meta.BulkInsert(`document_tag`)
 
 	// db.Exec(q, meta.InsertValues()...)
 
@@ -101,7 +100,7 @@ func ExampleMeta_bulkInsert_postgres() {
 	// [1 100 101]
 }
 
-func ExampleMeta_bulkInsert_nonPostgres() {
+func ExampleMeta_BulkInsert_nonPostgres() {
 	type Tag struct {
 		Name string
 		ID   int

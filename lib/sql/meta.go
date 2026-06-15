@@ -71,7 +71,7 @@ func (meta *Meta) bind(colName string, val any, isInsertUpdate bool) {
 // The argument unique=false allow setting the value only once in multiple
 // insert-values.
 //
-// See the examples in BulkInsert_postgres and BulkInsert_nonPostgres.
+// See the examples in [Meta.BulkInsert].
 func (meta *Meta) BulkBindName(name string, unique bool) (err error) {
 	logp := `BulkBindName`
 
@@ -93,7 +93,7 @@ func (meta *Meta) BulkBindName(name string, unique bool) (err error) {
 // The number of arguments must match with the number of calls to
 // [Meta.BindName].
 //
-// See the examples in BulkInsert_postgres and BulkInsert_nonPostgres.
+// See the examples in [Meta.BulkInsert].
 func (meta *Meta) BulkBindValues(values ...any) (err error) {
 	logp := `BulkBindValues`
 	if len(values) != len(meta.listParam) {
@@ -164,7 +164,7 @@ func (meta *Meta) BindWhere(logic, col, comp string, val any) (whereOp *OpWhere)
 	return whereOp
 }
 
-// BulkHolders returns the string query for bulk INSERT-VALUES.
+// BulkHolders returns the string holders for bulk VALUES in INSERT query.
 // For example, with Postgresql driver, it will return "($1,$2),($3,$4)".
 func (meta *Meta) BulkHolders() string {
 	var sb strings.Builder
@@ -177,6 +177,14 @@ func (meta *Meta) BulkHolders() string {
 		sb.WriteString(`)`)
 	}
 	return sb.String()
+}
+
+// BulkInsert returns the string query for bulk INSERT.
+// For example, with Postgresql driver, it will return
+// "INSERT INTO t (x,y) VALUES ($1,$2),($3,$4)".
+func (meta *Meta) BulkInsert(tableName string) string {
+	return fmt.Sprintf(`INSERT INTO %s (%s) VALUES %s;`, tableName,
+		meta.Names(), meta.BulkHolders())
 }
 
 // Delete returns the DML for DELETE query.
