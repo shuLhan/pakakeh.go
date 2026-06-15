@@ -24,15 +24,11 @@ func ExampleMeta_Bind() {
 	meta.Bind(`id`, &t.ID)
 	meta.Bind(`name`, &t.Name)
 
-	var q = fmt.Sprintf(`SELECT %s FROM t;`, meta.Names())
-
-	// db.Exec(q).Scan(meta.ListValue...)
-
-	fmt.Println(q)
+	fmt.Println(meta.Select(`t`))
 	fmt.Printf("%T %T", meta.ListValue...)
 
 	// Output:
-	// SELECT id,name FROM t;
+	// SELECT id,name FROM t
 	// *int *string
 }
 
@@ -231,15 +227,10 @@ func ExampleMeta_Select() {
 	qmeta.BindSelect(`name`, &name)
 	q := qmeta.Select(`my_table`)
 	fmt.Println(q)
-	q = `[`
-	for _, v := range qmeta.ScanHolders() {
-		q += fmt.Sprintf(`%T `, v)
-	}
-	q += `]`
-	fmt.Println(q)
+	fmt.Printf("%T %T\n", qmeta.ScanHolders()...)
 	// Output:
 	// SELECT id,name FROM my_table
-	// [*int64 *string ]
+	// *int64 *string
 }
 
 func ExampleMeta_Select_withWhere() {
@@ -252,16 +243,11 @@ func ExampleMeta_Select_withWhere() {
 	q := qmeta.Select(`my_table`)
 	fmt.Println(q)
 	fmt.Println(qmeta.WhereValues())
-	q = `[`
-	for _, v := range qmeta.ScanHolders() {
-		q += fmt.Sprintf(`%T `, v)
-	}
-	q += `]`
-	fmt.Println(q)
+	fmt.Printf("%T %T\n", qmeta.ScanHolders()...)
 	// Output:
 	// SELECT id,name FROM my_table WHERE  id > $1
 	// [10]
-	// [*int64 *string ]
+	// *int64 *string
 }
 
 func ExampleMeta_Sub() {
@@ -296,14 +282,12 @@ func ExampleMeta_Sub() {
 	// db.QueryRow(q, qparams...).Scan(meta.ListValue...)
 
 	fmt.Println(q)
-	fmt.Println(`SELECT #n=`, len(meta.ListValue))
 	fmt.Println(`WHERE=`, meta.WhereValues())
 	fmt.Println(`WHERE IN=`, metain.WhereValues())
 	fmt.Println(`qparams=`, qparams)
 
 	// Output:
 	// SELECT id,name FROM t WHERE id=$1 OR name IN ($2,$3);
-	// SELECT #n= 2
 	// WHERE= [1]
 	// WHERE IN= [hello world]
 	// qparams= [1 hello world]
