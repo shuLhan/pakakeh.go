@@ -27,6 +27,8 @@ type Meta struct {
 	// select.
 	ListValue []any
 
+	listJoin []opJoin
+
 	// listOpWhere contains list of WHERE conditions.
 	listOpWhere []OpWhere
 
@@ -48,6 +50,30 @@ func NewMeta(driverName string) (meta *Meta) {
 // Bind binds the column name and value for DML INSERT or UPDATE.
 func (meta *Meta) Bind(colName string, val any) {
 	meta.bind(colName, val, true)
+}
+
+// BindJoin adds the JOIN statement for SELECT query.
+func (meta *Meta) BindJoin(onTable, alias, onColumn, refColumn string) {
+	op := opJoin{
+		mode:      `JOIN`,
+		onTable:   onTable,
+		alias:     alias,
+		onColumn:  onColumn,
+		refColumn: refColumn,
+	}
+	meta.listJoin = append(meta.listJoin, op)
+}
+
+// BindLeftJoin adds the LEFT JOIN statement for SELECT query.
+func (meta *Meta) BindLeftJoin(onTable, alias, onColumn, refColumn string) {
+	op := opJoin{
+		mode:      `LEFT JOIN`,
+		onTable:   onTable,
+		alias:     alias,
+		onColumn:  onColumn,
+		refColumn: refColumn,
+	}
+	meta.listJoin = append(meta.listJoin, op)
 }
 
 // BindLimit sets the limit of rows in select query.
@@ -241,30 +267,6 @@ func (meta *Meta) InsertValues() []any {
 	return meta.ListValue
 }
 
-// Join adds the JOIN statement for SELECT query.
-func (meta *Meta) Join(onTable, alias, onColumn, refColumn string) {
-	op := opJoin{
-		mode:      `JOIN`,
-		onTable:   onTable,
-		alias:     alias,
-		onColumn:  onColumn,
-		refColumn: refColumn,
-	}
-	meta.listJoin = append(meta.listJoin, op)
-}
-
-// LeftJoin adds the LEFT JOIN statement for SELECT query.
-func (meta *Meta) LeftJoin(onTable, alias, onColumn, refColumn string) {
-	op := opJoin{
-		mode:      `LEFT JOIN`,
-		onTable:   onTable,
-		alias:     alias,
-		onColumn:  onColumn,
-		refColumn: refColumn,
-	}
-	meta.listJoin = append(meta.listJoin, op)
-}
-
 // Names returns string of column names, for example "col1, col2, ...", for
 // DML INSERT or SELECT.
 func (meta *Meta) Names() string {
@@ -280,6 +282,11 @@ func (meta *Meta) ScanHolders() []any {
 // Select returns the DML SELECT for tableName.
 func (meta *Meta) Select(tableName string) (q string) {
 	q = fmt.Sprintf(`SELECT %s FROM %s`, meta.Names(), tableName)
+	if len(meta.listJoin) != 0 {
+		for _, op := range meta.listJoin {
+			q += op.String()
+		}
+	}
 	if len(meta.listOpWhere) != 0 {
 		q += fmt.Sprintf(` WHERE %s`, meta.WhereFields())
 	}
