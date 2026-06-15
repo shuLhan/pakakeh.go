@@ -81,11 +81,11 @@ func ExampleMeta_bulkInsert_postgres() {
 		}},
 	}
 
-	meta.BindName(`document_id`, false)
-	meta.BindName(`tag_id`, true)
+	meta.BulkBindName(`document_id`, false)
+	meta.BulkBindName(`tag_id`, true)
 
 	for _, tag := range doc.Tags {
-		meta.BindValues(doc.ID, tag.ID)
+		meta.BulkBindValues(doc.ID, tag.ID)
 	}
 
 	var q = fmt.Sprintf(`INSERT INTO document_tag (%s) VALUES %s;`,
@@ -123,11 +123,11 @@ func ExampleMeta_bulkInsert_nonPostgres() {
 		}},
 	}
 
-	meta.BindName(`document_id`, false)
-	meta.BindName(`tag_id`, true)
+	meta.BulkBindName(`document_id`, false)
+	meta.BulkBindName(`tag_id`, true)
 
 	for _, tag := range doc.Tags {
-		meta.BindValues(doc.ID, tag.ID)
+		meta.BulkBindValues(doc.ID, tag.ID)
 	}
 
 	var q = fmt.Sprintf(`INSERT INTO document_tag (%s) VALUES %s;`,

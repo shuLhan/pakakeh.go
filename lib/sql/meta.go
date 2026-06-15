@@ -72,13 +72,13 @@ func (meta *Meta) Bind(colName string, val any) {
 	}
 }
 
-// BindName binds the column name for bulk insert.
+// BulkBindName binds the column name for bulk insert.
 // The argument unique=false allow setting the value only once in multiple
 // insert-values.
 //
 // See the examples in BulkInsert_postgres and BulkInsert_nonPostgres.
-func (meta *Meta) BindName(name string, unique bool) (err error) {
-	logp := `BindName`
+func (meta *Meta) BulkBindName(name string, unique bool) (err error) {
+	logp := `BulkBindName`
 
 	for _, cur := range meta.listParam {
 		if cur.name == name {
@@ -94,13 +94,13 @@ func (meta *Meta) BindName(name string, unique bool) (err error) {
 	return nil
 }
 
-// BindValues bind the values for bulk insert.
+// BulkBindValues bind the values for bulk insert.
 // The number of arguments must match with the number of calls to
 // [Meta.BindName].
 //
 // See the examples in BulkInsert_postgres and BulkInsert_nonPostgres.
-func (meta *Meta) BindValues(values ...any) (err error) {
-	logp := `BindValues`
+func (meta *Meta) BulkBindValues(values ...any) (err error) {
+	logp := `BulkBindValues`
 	if len(values) != len(meta.listParam) {
 		return fmt.Errorf(`%s: invalid number of arguments, want %d`,
 			logp, len(meta.listParam))
@@ -109,9 +109,9 @@ func (meta *Meta) BindValues(values ...any) (err error) {
 	var holder string
 	for x, param := range meta.listParam {
 		if meta.driver == DriverNamePostgres {
-			holder = meta.bindOnPostgres(param, values[x])
+			holder = meta.bulkBindOnPostgres(param, values[x])
 		} else {
-			holder = meta.bindOnOthers(param, values[x])
+			holder = meta.bulkBindOnOthers(param, values[x])
 		}
 		holders = append(holders, holder)
 	}
@@ -119,7 +119,7 @@ func (meta *Meta) BindValues(values ...any) (err error) {
 	return nil
 }
 
-func (meta *Meta) bindOnPostgres(prm *param, val any) string {
+func (meta *Meta) bulkBindOnPostgres(prm *param, val any) string {
 	if !prm.unique && prm.holder != "" {
 		return prm.holder
 	}
@@ -129,7 +129,7 @@ func (meta *Meta) bindOnPostgres(prm *param, val any) string {
 	return prm.holder
 }
 
-func (meta *Meta) bindOnOthers(prm *param, val any) string {
+func (meta *Meta) bulkBindOnOthers(prm *param, val any) string {
 	if prm.holder == "" {
 		prm.holder = DefaultPlaceHolder
 	}
