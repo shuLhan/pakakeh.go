@@ -32,6 +32,19 @@ func ExampleMeta_Bind() {
 	// *int *string
 }
 
+func ExampleMeta_BindOrderBy() {
+	var id int64
+	var name string
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
+	qmeta.BindSelect(`id`, &id)
+	qmeta.BindSelect(`name`, &name)
+	qmeta.BindOrderBy(`id`, `DESC`)
+	qmeta.BindOrderBy(`name`, `DESC`)
+	fmt.Println(qmeta.Select(`my_table`))
+	// Output:
+	// SELECT id,name FROM my_table ORDER BY id DESC, name DESC
+}
+
 func ExampleMeta_BindWhere() {
 	var (
 		meta = sql.NewMeta(sql.DriverNamePostgres)

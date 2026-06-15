@@ -30,6 +30,8 @@ type Meta struct {
 	// listOpWhere contains list of WHERE conditions.
 	listOpWhere []OpWhere
 
+	listOrderBy []opOrderBy
+
 	nholder int
 }
 
@@ -44,6 +46,16 @@ func NewMeta(driverName string) (meta *Meta) {
 // Bind binds the column name and value for DML INSERT or UPDATE.
 func (meta *Meta) Bind(colName string, val any) {
 	meta.bind(colName, val, true)
+}
+
+// BindOrderBy adds the column name and their order for SELECT ... ORDER BY
+// query.
+func (meta *Meta) BindOrderBy(name, order string) {
+	op := opOrderBy{
+		name:  name,
+		order: order,
+	}
+	meta.listOrderBy = append(meta.listOrderBy, op)
 }
 
 // BindSelect binds the column name and scan holder value for DML SELECT.
@@ -239,6 +251,15 @@ func (meta *Meta) Select(tableName string) (q string) {
 	q = fmt.Sprintf(`SELECT %s FROM %s`, meta.Names(), tableName)
 	if len(meta.listOpWhere) != 0 {
 		q += fmt.Sprintf(` WHERE %s`, meta.WhereFields())
+	}
+	if len(meta.listOrderBy) != 0 {
+		q += ` ORDER BY `
+		for x, op := range meta.listOrderBy {
+			if x > 0 {
+				q += `, `
+			}
+			q += op.String()
+		}
 	}
 	return q
 }
