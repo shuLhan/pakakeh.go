@@ -33,6 +33,8 @@ type Meta struct {
 	listOrderBy []opOrderBy
 
 	nholder int
+
+	limit int
 }
 
 // NewMeta creates new Meta using specific driver name and DML operations.
@@ -46,6 +48,11 @@ func NewMeta(driverName string) (meta *Meta) {
 // Bind binds the column name and value for DML INSERT or UPDATE.
 func (meta *Meta) Bind(colName string, val any) {
 	meta.bind(colName, val, true)
+}
+
+// BindLimit sets the limit of rows in select query.
+func (meta *Meta) BindLimit(n int) {
+	meta.limit = n
 }
 
 // BindOrderBy adds the column name and their order for SELECT ... ORDER BY
@@ -234,6 +241,30 @@ func (meta *Meta) InsertValues() []any {
 	return meta.ListValue
 }
 
+// Join adds the JOIN statement for SELECT query.
+func (meta *Meta) Join(onTable, alias, onColumn, refColumn string) {
+	op := opJoin{
+		mode:      `JOIN`,
+		onTable:   onTable,
+		alias:     alias,
+		onColumn:  onColumn,
+		refColumn: refColumn,
+	}
+	meta.listJoin = append(meta.listJoin, op)
+}
+
+// LeftJoin adds the LEFT JOIN statement for SELECT query.
+func (meta *Meta) LeftJoin(onTable, alias, onColumn, refColumn string) {
+	op := opJoin{
+		mode:      `LEFT JOIN`,
+		onTable:   onTable,
+		alias:     alias,
+		onColumn:  onColumn,
+		refColumn: refColumn,
+	}
+	meta.listJoin = append(meta.listJoin, op)
+}
+
 // Names returns string of column names, for example "col1, col2, ...", for
 // DML INSERT or SELECT.
 func (meta *Meta) Names() string {
@@ -260,6 +291,9 @@ func (meta *Meta) Select(tableName string) (q string) {
 			}
 			q += op.String()
 		}
+	}
+	if meta.limit != 0 {
+		q += ` LIMIT ` + strconv.Itoa(meta.limit)
 	}
 	return q
 }

@@ -32,6 +32,23 @@ func ExampleMeta_Bind() {
 	// *int *string
 }
 
+func ExampleMeta_BindLimit() {
+	type row struct {
+		name string
+		id   int
+	}
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
+	r := row{}
+	qmeta.BindSelect(`id`, &r.id)
+	qmeta.BindSelect(`name`, &r.name)
+	qmeta.BindLimit(10)
+
+	q := qmeta.Select(`my_table`)
+	fmt.Println(q)
+	// Output:
+	// SELECT id,name FROM my_table LIMIT 10
+}
+
 func ExampleMeta_BindOrderBy() {
 	var id int64
 	var name string
@@ -211,6 +228,40 @@ func ExampleMeta_Insert() {
 	// Output:
 	// INSERT INTO my_table (name,age) VALUES ($1,$2);
 	// [roana 43]
+}
+
+func ExampleMeta_Join() {
+	type row struct {
+		id   int
+		name string
+	}
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
+	r := row{}
+	qmeta.BindSelect(`id`, &r.id)
+	qmeta.BindSelect(`name`, &r.name)
+	qmeta.Join(`other`, `o`, `o.id`, `my_table.id`)
+
+	q := qmeta.Select(`my_table`)
+	fmt.Println(q)
+	// Output:
+	// SELECT id,name FROM my_table JOIN other AS o ON o.id = my_table.id
+}
+
+func ExampleMeta_LeftJoin() {
+	type row struct {
+		id   int
+		name string
+	}
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
+	r := row{}
+	qmeta.BindSelect(`id`, &r.id)
+	qmeta.BindSelect(`name`, &r.name)
+	qmeta.LeftJoin(`other`, `o`, `o.id`, `my_table.id`)
+
+	q := qmeta.Select(`my_table`)
+	fmt.Println(q)
+	// Output:
+	// SELECT id,name FROM my_table LEFT JOIN other AS o ON o.id = my_table.id
 }
 
 func ExampleMeta_Names() {
