@@ -178,12 +178,14 @@ func (meta *Meta) BindWhere(logic, col, comp string, val any) (whereOp *OpWhere)
 		val:    val,
 	}
 
-	meta.nholder++
-	meta.Index = append(meta.Index, meta.nholder)
-	if meta.driver == DriverNamePostgres {
-		whereOp.holder = fmt.Sprintf(`$%d`, meta.nholder)
-	} else {
-		whereOp.holder = DefaultPlaceHolder
+	if val != nil {
+		meta.nholder++
+		meta.Index = append(meta.Index, meta.nholder)
+		if meta.driver == DriverNamePostgres {
+			whereOp.holder = fmt.Sprintf(`$%d`, meta.nholder)
+		} else {
+			whereOp.holder = DefaultPlaceHolder
+		}
 	}
 
 	meta.listOpWhere = append(meta.listOpWhere, *whereOp)
@@ -206,10 +208,22 @@ func (meta *Meta) BulkHolders() string {
 	return sb.String()
 }
 
+// Delete returns the DML for DELETE query.
+func (meta *Meta) Delete(tableName string) string {
+	return fmt.Sprintf(`DELETE FROM %s WHERE %s`, tableName,
+		meta.WhereFields())
+}
+
 // Holders returns string of holders joined with comma ",";
 // for example "$1, $2, ...", for INSERT-VALUES.
 func (meta *Meta) Holders() string {
 	return strings.Join(meta.ListHolder, `,`)
+}
+
+// Insert returns the DML for INSERT query.
+func (meta *Meta) Insert(tableName string) string {
+	return fmt.Sprintf(`INSERT INTO %s (%s) VALUES (%s);`, tableName,
+		meta.Names(), meta.Holders())
 }
 
 // InsertValues returns the list of value for executing INSERT statement.
@@ -228,6 +242,21 @@ func (meta *Meta) Names() string {
 	return strings.Join(meta.ListName, `,`)
 }
 
+// ScanHolders returns list of variables for [sql.Row.Scan] or
+// [sql.Rows.Scan].
+func (meta *Meta) ScanHolders() []any {
+	return meta.ListValue
+}
+
+// Select returns the DML SELECT for tableName.
+func (meta *Meta) Select(tableName string) (q string) {
+	q = fmt.Sprintf(`SELECT %s FROM %s`, meta.Names(), tableName)
+	if len(meta.listOpWhere) != 0 {
+		q += fmt.Sprintf(` WHERE %s`, meta.WhereFields())
+	}
+	return q
+}
+
 // Sub returns the child of Meta for building subquery.
 func (meta *Meta) Sub() (sub *Meta) {
 	sub = &Meta{
@@ -236,6 +265,15 @@ func (meta *Meta) Sub() (sub *Meta) {
 		nholder: meta.nholder,
 	}
 	return sub
+}
+
+// Update returns the DML UPDATE query for tableName.
+func (meta *Meta) Update(tableName string) (q string) {
+	q = fmt.Sprintf(`UPDATE %s SET %s`, tableName, meta.UpdateFields())
+	if len(meta.listOpWhere) != 0 {
+		q += fmt.Sprintf(` WHERE %s`, meta.WhereFields())
+	}
+	return q
 }
 
 // UpdateFields returns string of "col1=<holder>, col2=<holder>, ..." for
@@ -313,7 +351,9 @@ func (meta *Meta) WhereHolders() string {
 func (meta *Meta) WhereValues() (list []any) {
 	list = make([]any, 0, len(meta.listOpWhere))
 	for _, op := range meta.listOpWhere {
-		list = append(list, op.val)
+		if op.val != nil {
+			list = append(list, op.val)
+		}
 	}
 	return list
 }

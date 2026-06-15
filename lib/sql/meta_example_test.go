@@ -144,6 +144,18 @@ func ExampleMeta_bulkInsert_nonPostgres() {
 	// [1 100 1 101]
 }
 
+func ExampleMeta_Delete() {
+	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindDelete)
+	qmeta.BindWhere(``, `account_id`, `=`, 1000)
+	qmeta.BindWhere(`AND`, `id`, `=`, 1)
+	q := qmeta.Delete(`my_table`)
+	fmt.Println(q)
+	fmt.Println(qmeta.WhereValues())
+	// Output:
+	// DELETE FROM my_table WHERE  account_id = $1 AND id = $2
+	// [1000 1]
+}
+
 func ExampleMeta_Holders_mysql() {
 	type Table struct {
 		Name string
@@ -182,6 +194,18 @@ func ExampleMeta_Holders_postgres() {
 	// INSERT INTO t VALUES ($1,$2);
 }
 
+func ExampleMeta_Insert() {
+	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindInsert)
+	qmeta.Bind(`name`, `roana`)
+	qmeta.Bind(`age`, 43)
+	q := qmeta.Insert(`my_table`)
+	fmt.Println(q)
+	fmt.Println(qmeta.InsertValues())
+	// Output:
+	// INSERT INTO my_table (name,age) VALUES ($1,$2);
+	// [roana 43]
+}
+
 func ExampleMeta_Names() {
 	type Table struct {
 		Name string
@@ -199,6 +223,47 @@ func ExampleMeta_Names() {
 	fmt.Printf("SELECT %s FROM t;\n", meta.Names())
 	// Output:
 	// SELECT id,name FROM t;
+}
+
+func ExampleMeta_Select() {
+	var id int64
+	var name string
+	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
+	qmeta.Bind(`id`, &id)
+	qmeta.Bind(`name`, &name)
+	q := qmeta.Select(`my_table`)
+	fmt.Println(q)
+	q = `[`
+	for _, v := range qmeta.ScanHolders() {
+		q += fmt.Sprintf(`%T `, v)
+	}
+	q += `]`
+	fmt.Println(q)
+	// Output:
+	// SELECT id,name FROM my_table
+	// [*int64 *string ]
+}
+
+func ExampleMeta_Select_withWhere() {
+	var id int64
+	var name string
+	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
+	qmeta.Bind(`id`, &id)
+	qmeta.Bind(`name`, &name)
+	qmeta.BindWhere(``, `id`, `>`, 10)
+	q := qmeta.Select(`my_table`)
+	fmt.Println(q)
+	fmt.Println(qmeta.WhereValues())
+	q = `[`
+	for _, v := range qmeta.ScanHolders() {
+		q += fmt.Sprintf(`%T `, v)
+	}
+	q += `]`
+	fmt.Println(q)
+	// Output:
+	// SELECT id,name FROM my_table WHERE  id > $1
+	// [10]
+	// [*int64 *string ]
 }
 
 func ExampleMeta_Sub() {
@@ -244,6 +309,31 @@ func ExampleMeta_Sub() {
 	// WHERE= [1]
 	// WHERE IN= [hello world]
 	// qparams= [1 hello world]
+}
+
+func ExampleMeta_Update() {
+	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindUpdate)
+	qmeta.Bind(`name`, `roana`)
+	qmeta.Bind(`age`, 43)
+	q := qmeta.Update(`my_table`)
+	fmt.Println(q)
+	fmt.Println(qmeta.UpdateValues())
+	// Output:
+	// UPDATE my_table SET name=$1,age=$2
+	// [roana 43]
+}
+
+func ExampleMeta_Update_withWhere() {
+	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindUpdate)
+	qmeta.Bind(`name`, `roana`)
+	qmeta.Bind(`age`, 44)
+	qmeta.BindWhere(``, `id`, `=`, `1`)
+	q := qmeta.Update(`my_table`)
+	fmt.Println(q)
+	fmt.Println(qmeta.UpdateValues())
+	// Output:
+	// UPDATE my_table SET name=$1,age=$2 WHERE  id = $3
+	// [roana 44 1]
 }
 
 func ExampleMeta_UpdateFields() {
