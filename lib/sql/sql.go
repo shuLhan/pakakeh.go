@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020 Shulhan <ms@kilabit.info>
 
-// Package sql is an extension to standard library "database/sql.DB" that
-// provide common functionality across DBMS.
+// Package sql is an extension to standard library [database/sql] that
+// provides common functionalities across DBMS.
 package sql
 
 // List of known driver name for database connection.

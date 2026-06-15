@@ -5,6 +5,7 @@ package sql
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -21,10 +22,6 @@ type Meta struct {
 	ListName []string
 
 	listParam []*param
-
-	// ListHolder contains list of column holder, as in "?" or "$x",
-	// depends on the driver.
-	ListHolder []string
 
 	// Stores the holders for bulk insert, for example
 	// "[[$1 $2] [$1 $3]]".
@@ -44,7 +41,6 @@ type Meta struct {
 }
 
 // NewMeta creates new Meta using specific driver name and DML operations.
-// The driver affect the [Meta.ListHolder] value.
 func NewMeta(driverName string, dmlKind DMLKind) (meta *Meta) {
 	meta = &Meta{
 		driver: driverName,
@@ -77,11 +73,6 @@ func (meta *Meta) Bind(colName string, val any) {
 	if meta.kind == DMLKindInsert || meta.kind == DMLKindUpdate {
 		meta.nholder++
 		meta.Index = append(meta.Index, meta.nholder)
-		if meta.driver == DriverNamePostgres {
-			meta.ListHolder = append(meta.ListHolder, fmt.Sprintf(`$%d`, meta.nholder))
-		} else {
-			meta.ListHolder = append(meta.ListHolder, DefaultPlaceHolder)
-		}
 	}
 }
 
@@ -139,7 +130,6 @@ func (meta *Meta) bindOnPostgres(prm *param, val any) string {
 	meta.nholder++
 	meta.Index = append(meta.Index, meta.nholder)
 	prm.holder = fmt.Sprintf(`$%d`, meta.nholder)
-	meta.ListHolder = append(meta.ListHolder, prm.holder)
 	meta.ListValue = append(meta.ListValue, val)
 	return prm.holder
 }
@@ -150,7 +140,6 @@ func (meta *Meta) bindOnOthers(prm *param, val any) string {
 	}
 	meta.nholder++
 	meta.Index = append(meta.Index, meta.nholder)
-	meta.ListHolder = append(meta.ListHolder, prm.holder)
 	meta.ListValue = append(meta.ListValue, val)
 	return prm.holder
 }
@@ -217,7 +206,19 @@ func (meta *Meta) Delete(tableName string) string {
 // Holders returns string of holders joined with comma ",";
 // for example "$1, $2, ...", for INSERT-VALUES.
 func (meta *Meta) Holders() string {
-	return strings.Join(meta.ListHolder, `,`)
+	var sb strings.Builder
+	for x := range meta.ListName {
+		if x > 0 {
+			sb.WriteString(`,`)
+		}
+		if meta.driver == DriverNamePostgres {
+			sb.WriteString(`$`)
+			sb.WriteString(strconv.Itoa(x + 1))
+		} else {
+			sb.WriteString(DefaultPlaceHolder)
+		}
+	}
+	return sb.String()
 }
 
 // Insert returns the DML for INSERT query.
@@ -285,18 +286,20 @@ func (meta *Meta) UpdateFields() string {
 		return ``
 	}
 
-	var (
-		sb strings.Builder
-		x  int
-	)
+	var sb strings.Builder
 
-	// Use the ListName as pivot, since ListHolder can expanded by
-	// BindWhere if DML kind is UPDATE.
-	for ; x < len(meta.ListName); x++ {
+	for x := 0; x < len(meta.ListName); x++ {
 		if x > 0 {
 			sb.WriteByte(',')
 		}
-		fmt.Fprintf(&sb, `%s=%s`, meta.ListName[x], meta.ListHolder[x])
+		sb.WriteString(meta.ListName[x])
+		sb.WriteString(`=`)
+		if meta.driver == DriverNamePostgres {
+			sb.WriteString(`$`)
+			sb.WriteString(strconv.Itoa(x + 1))
+		} else {
+			sb.WriteString(DefaultPlaceHolder)
+		}
 	}
 	return sb.String()
 }
