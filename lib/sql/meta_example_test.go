@@ -17,7 +17,7 @@ func ExampleMeta_Bind() {
 	}
 
 	var (
-		meta = sql.NewMeta(sql.DriverNameMysql, sql.DMLKindSelect)
+		meta = sql.NewMeta(sql.DriverNameMysql)
 		t    = Table{}
 	)
 
@@ -38,7 +38,7 @@ func ExampleMeta_Bind() {
 
 func ExampleMeta_BindWhere() {
 	var (
-		meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
+		meta = sql.NewMeta(sql.DriverNamePostgres)
 		vals = []any{
 			int(1000),
 			string(`JohnDoe`),
@@ -69,7 +69,7 @@ func ExampleMeta_bulkInsert_postgres() {
 		ID   int
 	}
 
-	meta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindInsert)
+	meta := sql.NewMeta(sql.DriverNamePostgres)
 	doc := Document{
 		ID: 1,
 		Tags: []Tag{{
@@ -111,7 +111,7 @@ func ExampleMeta_bulkInsert_nonPostgres() {
 		ID   int
 	}
 
-	meta := sql.NewMeta(sql.DriverNameMysql, sql.DMLKindInsert)
+	meta := sql.NewMeta(sql.DriverNameMysql)
 	doc := Document{
 		ID: 1,
 		Tags: []Tag{{
@@ -144,7 +144,7 @@ func ExampleMeta_bulkInsert_nonPostgres() {
 }
 
 func ExampleMeta_Delete() {
-	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindDelete)
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
 	qmeta.BindWhere(``, `account_id`, `=`, 1000)
 	qmeta.BindWhere(`AND`, `id`, `=`, 1)
 	q := qmeta.Delete(`my_table`)
@@ -162,7 +162,7 @@ func ExampleMeta_Holders_mysql() {
 	}
 
 	var (
-		meta = sql.NewMeta(sql.DriverNameMysql, sql.DMLKindInsert)
+		meta = sql.NewMeta(sql.DriverNameMysql)
 		t    = Table{Name: `newname`, ID: 2}
 	)
 
@@ -181,7 +181,7 @@ func ExampleMeta_Holders_postgres() {
 	}
 
 	var (
-		meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindInsert)
+		meta = sql.NewMeta(sql.DriverNamePostgres)
 		t    = Table{Name: `newname`, ID: 2}
 	)
 
@@ -194,7 +194,7 @@ func ExampleMeta_Holders_postgres() {
 }
 
 func ExampleMeta_Insert() {
-	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindInsert)
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
 	qmeta.Bind(`name`, `roana`)
 	qmeta.Bind(`age`, 43)
 	q := qmeta.Insert(`my_table`)
@@ -212,7 +212,7 @@ func ExampleMeta_Names() {
 	}
 
 	var (
-		meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
+		meta = sql.NewMeta(sql.DriverNamePostgres)
 		t    = Table{}
 	)
 
@@ -227,9 +227,9 @@ func ExampleMeta_Names() {
 func ExampleMeta_Select() {
 	var id int64
 	var name string
-	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
-	qmeta.Bind(`id`, &id)
-	qmeta.Bind(`name`, &name)
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
+	qmeta.BindSelect(`id`, &id)
+	qmeta.BindSelect(`name`, &name)
 	q := qmeta.Select(`my_table`)
 	fmt.Println(q)
 	q = `[`
@@ -246,9 +246,9 @@ func ExampleMeta_Select() {
 func ExampleMeta_Select_withWhere() {
 	var id int64
 	var name string
-	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
-	qmeta.Bind(`id`, &id)
-	qmeta.Bind(`name`, &name)
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
+	qmeta.BindSelect(`id`, &id)
+	qmeta.BindSelect(`name`, &name)
 	qmeta.BindWhere(``, `id`, `>`, 10)
 	q := qmeta.Select(`my_table`)
 	fmt.Println(q)
@@ -272,13 +272,13 @@ func ExampleMeta_Sub() {
 	}
 
 	var (
-		meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
+		meta = sql.NewMeta(sql.DriverNamePostgres)
 		t    = Table{}
 		qid  = 1
 	)
 
-	meta.Bind(`id`, &t.ID)
-	meta.Bind(`name`, &t.Name)
+	meta.BindSelect(`id`, &t.ID)
+	meta.BindSelect(`name`, &t.Name)
 	meta.BindWhere(``, `id`, `=`, qid)
 
 	var (
@@ -311,7 +311,7 @@ func ExampleMeta_Sub() {
 }
 
 func ExampleMeta_Update() {
-	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindUpdate)
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
 	qmeta.Bind(`name`, `roana`)
 	qmeta.Bind(`age`, 43)
 	q := qmeta.Update(`my_table`)
@@ -323,7 +323,7 @@ func ExampleMeta_Update() {
 }
 
 func ExampleMeta_Update_withWhere() {
-	qmeta := sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindUpdate)
+	qmeta := sql.NewMeta(sql.DriverNamePostgres)
 	qmeta.Bind(`name`, `roana`)
 	qmeta.Bind(`age`, 44)
 	qmeta.BindWhere(``, `id`, `=`, `1`)
@@ -342,7 +342,7 @@ func ExampleMeta_UpdateFields() {
 	}
 
 	var (
-		meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindUpdate)
+		meta = sql.NewMeta(sql.DriverNamePostgres)
 		t    = Table{
 			ID:   2,
 			Name: `world`,
@@ -376,7 +376,7 @@ func ExampleMeta_UpdateValues() {
 	}
 
 	var (
-		meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindUpdate)
+		meta = sql.NewMeta(sql.DriverNamePostgres)
 		t    = Table{
 			ID:   2,
 			Name: `world`,
@@ -404,7 +404,7 @@ func ExampleMeta_UpdateValues() {
 }
 
 func ExampleMeta_WhereFields() {
-	var meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
+	var meta = sql.NewMeta(sql.DriverNamePostgres)
 
 	meta.BindWhere(``, `id`, `=`, 1000)
 	meta.BindWhere(`AND`, `name`, `=`, `share`)
@@ -418,7 +418,7 @@ func ExampleMeta_WhereFields() {
 }
 
 func ExampleMeta_WhereHolders() {
-	var meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
+	var meta = sql.NewMeta(sql.DriverNamePostgres)
 
 	meta.BindWhere(``, ``, ``, 1000)
 	meta.BindWhere(``, ``, ``, `share`)
@@ -433,7 +433,7 @@ func ExampleMeta_WhereHolders() {
 
 func ExampleMeta_deleteOnPostgresql() {
 	var (
-		meta  = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindUpdate)
+		meta  = sql.NewMeta(sql.DriverNamePostgres)
 		qid   = 1
 		qname = `hello`
 	)
@@ -460,7 +460,7 @@ func ExampleMeta_insertOnPostgresql() {
 	}
 
 	var (
-		meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindInsert)
+		meta = sql.NewMeta(sql.DriverNamePostgres)
 		t    = Table{
 			ID:   1,
 			Name: `hello`,
@@ -489,14 +489,14 @@ func ExampleMeta_selectOnPostgresql() {
 	}
 
 	var (
-		meta  = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
+		meta  = sql.NewMeta(sql.DriverNamePostgres)
 		t     = Table{}
 		qid   = 1
 		qname = `hello`
 	)
 
-	meta.Bind(`id`, &t.ID)
-	meta.Bind(`name`, &t.Name)
+	meta.BindSelect(`id`, &t.ID)
+	meta.BindSelect(`name`, &t.Name)
 	meta.BindWhere(``, `id`, `=`, qid)
 	meta.BindWhere(`OR`, `name`, `=`, qname)
 
@@ -523,19 +523,19 @@ func ExampleMeta_subquery() {
 	}
 
 	var (
-		meta  = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
+		meta  = sql.NewMeta(sql.DriverNamePostgres)
 		id    = 1
 		subid = 500
 		t     Table
 	)
 
-	meta.Bind(`id`, &t.ID)
-	meta.Bind(`sub_id`, &t.SubID)
-	meta.Bind(`name`, &t.Name)
+	meta.BindSelect(`id`, &t.ID)
+	meta.BindSelect(`sub_id`, &t.SubID)
+	meta.BindSelect(`name`, &t.Name)
 	meta.BindWhere(``, `id`, `=`, id)
 
 	subq := meta.Sub()
-	subq.Bind(`id`, nil)
+	subq.BindSelect(`id`, nil)
 	subq.BindWhere(``, `u.id`, `=`, subid)
 
 	q := fmt.Sprintf(`%s AND sub_id = (%s)`, meta.Select(`t`), subq.Select(`u`))

@@ -93,9 +93,9 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 	return cl.TableNames, nil
 }
 
-// Meta returns new instance of [Meta] for DML kind.
-func (cl *Client) Meta(kind DMLKind) *Meta {
-	return NewMeta(cl.DriverName, kind)
+// Meta returns new instance of [Meta].
+func (cl *Client) Meta() *Meta {
+	return NewMeta(cl.DriverName)
 }
 
 // Migrate migratest the database using list of SQL files inside a directory.

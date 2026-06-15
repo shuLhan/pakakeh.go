@@ -20,7 +20,6 @@ func TestMetaBind(t *testing.T) {
 		driver       string
 		expListName  string
 		expListValue string
-		kind         DMLKind
 		bind         []bindCase
 		expNholder   int
 	}
@@ -28,7 +27,6 @@ func TestMetaBind(t *testing.T) {
 	var listCase = []testCase{{
 		desc:   `With the same name`,
 		driver: DriverNamePostgres,
-		kind:   DMLKindInsert,
 		bind: []bindCase{{
 			name: `f1`,
 			val:  `v1`,
@@ -44,7 +42,7 @@ func TestMetaBind(t *testing.T) {
 	var c testCase
 
 	for _, c = range listCase {
-		var meta = NewMeta(c.driver, c.kind)
+		var meta = NewMeta(c.driver)
 
 		var bind bindCase
 

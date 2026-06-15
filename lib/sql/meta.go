@@ -12,10 +12,6 @@ import (
 // Meta contains the DML meta data, including driver name, list of column
 // names, list of column holders, and list of values.
 type Meta struct {
-	// kind of DML, like SELECT or UPDATE.
-	// The kind affect the [Bind] and [BindWhere].
-	kind DMLKind
-
 	driver string
 
 	// ListName contains list of column name.
@@ -38,26 +34,25 @@ type Meta struct {
 }
 
 // NewMeta creates new Meta using specific driver name and DML operations.
-func NewMeta(driverName string, dmlKind DMLKind) (meta *Meta) {
+func NewMeta(driverName string) (meta *Meta) {
 	meta = &Meta{
 		driver: driverName,
-		kind:   dmlKind,
 	}
 	return meta
 }
 
-// Bind binds column name and variable for DML INSERT, SELECT, or UPDATE.
-// It is a no-op for DML DELETE.
+// Bind binds the column name and value for DML INSERT or UPDATE.
 func (meta *Meta) Bind(colName string, val any) {
-	if meta.kind == DMLKindDelete {
-		return
-	}
+	meta.bind(colName, val, true)
+}
 
-	var (
-		name string
-		x    int
-	)
-	for x, name = range meta.ListName {
+// BindSelect binds the column name and scan holder value for DML SELECT.
+func (meta *Meta) BindSelect(colName string, val any) {
+	meta.bind(colName, val, false)
+}
+
+func (meta *Meta) bind(colName string, val any, isInsertUpdate bool) {
+	for x, name := range meta.ListName {
 		if name == colName {
 			meta.ListValue[x] = val
 			return
@@ -67,7 +62,7 @@ func (meta *Meta) Bind(colName string, val any) {
 	meta.ListName = append(meta.ListName, colName)
 	meta.ListValue = append(meta.ListValue, val)
 
-	if meta.kind == DMLKindInsert || meta.kind == DMLKindUpdate {
+	if isInsertUpdate {
 		meta.nholder++
 	}
 }
@@ -147,13 +142,7 @@ func (meta *Meta) bulkBindOnOthers(prm *param, val any) string {
 //
 // The comp parameter defines the comparison for col and val, like "=" for
 // equality or "!=" for non-equality.
-//
-// It is a no-operation for DML INSERT.
 func (meta *Meta) BindWhere(logic, col, comp string, val any) (whereOp *OpWhere) {
-	if meta.kind == DMLKindInsert {
-		return nil
-	}
-
 	whereOp = &OpWhere{
 		logic:  logic,
 		column: col,
@@ -227,12 +216,7 @@ func (meta *Meta) InsertValues() []any {
 
 // Names returns string of column names, for example "col1, col2, ...", for
 // DML INSERT or SELECT.
-//
-// It will return an empty string if kind is UPDATE or DELETE.
 func (meta *Meta) Names() string {
-	if meta.kind == DMLKindUpdate || meta.kind == DMLKindDelete {
-		return ``
-	}
 	return strings.Join(meta.ListName, `,`)
 }
 
@@ -255,7 +239,6 @@ func (meta *Meta) Select(tableName string) (q string) {
 func (meta *Meta) Sub() (sub *Meta) {
 	sub = &Meta{
 		driver:  meta.driver,
-		kind:    meta.kind,
 		nholder: meta.nholder,
 	}
 	return sub
@@ -272,13 +255,7 @@ func (meta *Meta) Update(tableName string) (q string) {
 
 // UpdateFields returns string of "col1=<holder>, col2=<holder>, ..." for
 // DML UPDATE.
-//
-// It will return an empty string if kind is not DML UPDATE.
 func (meta *Meta) UpdateFields() string {
-	if meta.kind != DMLKindUpdate {
-		return ``
-	}
-
 	var sb strings.Builder
 
 	for x := 0; x < len(meta.ListName); x++ {
@@ -299,24 +276,14 @@ func (meta *Meta) UpdateFields() string {
 
 // UpdateValues returns the merged of ListValue and list WhereValues for DML
 // UPDATE.
-//
-// It will return nil if kind is not DML UPDATE.
 func (meta *Meta) UpdateValues() (listVal []any) {
-	if meta.kind != DMLKindUpdate {
-		return nil
-	}
 	listVal = append(listVal, meta.ListValue...)
 	listVal = append(listVal, meta.WhereValues()...)
 	return listVal
 }
 
 // WhereFields returns the DML for WHERE query, as in "col=$? AND y!=$?...".
-// It will return an empty string if kind is DML INSERT.
 func (meta *Meta) WhereFields() string {
-	if meta.kind == DMLKindInsert {
-		return ``
-	}
-
 	var sb strings.Builder
 	for _, op := range meta.listOpWhere {
 		sb.WriteString(op.String())
@@ -327,12 +294,7 @@ func (meta *Meta) WhereFields() string {
 // WhereHolders returns string of holders joining by comma, for example
 // "$1,$2, ...", based on number of item added with [Meta.BindWhere].
 // Similar to method Holders but for where condition.
-//
-// It will return an empty string if kind is DML INSERT.
 func (meta *Meta) WhereHolders() string {
-	if meta.kind == DMLKindInsert {
-		return ``
-	}
 	var sb strings.Builder
 	for x, op := range meta.listOpWhere {
 		if x > 0 {
