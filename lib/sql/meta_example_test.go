@@ -16,20 +16,26 @@ func ExampleMeta_Bind() {
 		ID   int
 	}
 
-	var (
-		meta = sql.NewMeta(sql.DriverNameMysql)
-		t    = Table{}
-	)
+	meta := sql.NewMeta(sql.DriverNameMysql)
+	t := Table{
+		Name: `roana`,
+		ID:   100,
+	}
 
-	meta.Bind(`id`, &t.ID)
-	meta.Bind(`name`, &t.Name)
+	meta.Bind(`id`, t.ID)
+	meta.Bind(`name`, t.Name)
 
-	fmt.Println(meta.Select(`t`))
-	fmt.Printf("%T %T", meta.ListValue...)
+	fmt.Println(meta.Insert(`t`))
+	fmt.Println(meta.InsertValues())
+
+	fmt.Println(meta.Update(`t`))
+	fmt.Println(meta.UpdateValues())
 
 	// Output:
-	// SELECT id,name FROM t
-	// *int *string
+	// INSERT INTO t (id,name) VALUES (?,?);
+	// [100 roana]
+	// UPDATE t SET id=?,name=?
+	// [100 roana]
 }
 
 func ExampleMeta_BindJoin() {
@@ -105,17 +111,13 @@ func ExampleMeta_BindWhere() {
 		}
 	)
 
-	opWhere := meta.BindWhere(``, `id`, `=`, vals[0])
-	fmt.Printf("%s\n", opWhere.String())
-
-	opWhere = meta.BindWhere(`AND`, `name`, `=`, vals[1])
-	fmt.Printf("%s\n", opWhere.String())
-
+	meta.BindWhere(``, `id`, `=`, vals[0])
+	meta.BindWhere(`AND`, `name`, `=`, vals[1])
+	fmt.Println(meta.Delete(`my_table`))
 	fmt.Println(meta.WhereValues())
 
 	// Output:
-	// id = $1
-	//  AND name = $2
+	// DELETE FROM my_table WHERE  id = $1 AND name = $2
 	// [1000 JohnDoe]
 }
 
