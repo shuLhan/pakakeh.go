@@ -4,7 +4,10 @@
 package time
 
 import (
+	"crypto/rand"
 	"log"
+	"math"
+	"math/big"
 	"sync"
 	"time"
 )
@@ -75,7 +78,8 @@ func (wrk *worker) reg(q chan<- time.Time) (id int64) {
 
 	ntry := 0
 	for {
-		id = NowFunc().UTC().UnixNano()
+		n, _ := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
+		id = n.Int64()
 		_, ok := wrk.subs[id]
 		if !ok {
 			break
