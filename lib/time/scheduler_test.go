@@ -17,6 +17,7 @@ func TestNewScheduler(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		go sch.Start()
 		t.Cleanup(func() {
 			sch.Stop()
 		})

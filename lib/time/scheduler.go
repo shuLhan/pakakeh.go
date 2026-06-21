@@ -132,9 +132,6 @@ func NewScheduler(schedule string) (sch *Scheduler, err error) {
 
 	sch.C = c
 	sch.c = c
-	sch.cstop = make(chan struct{}, 1)
-
-	go sch.run()
 
 	return sch, nil
 }
@@ -558,11 +555,12 @@ func (sch *Scheduler) nextDayOfMonth(today int) (nextDay int, found bool) {
 	return sch.dom[0], false
 }
 
-// run the ticker for scheduler.
-func (sch *Scheduler) run() {
+// Start starts the scheduler.
+func (sch *Scheduler) Start() {
 	wrk := newWorkerOnce()
 	q := make(chan time.Time, 1)
 	id := wrk.reg(q)
+	sch.cstop = make(chan struct{}, 1)
 
 	for {
 		select {
@@ -593,6 +591,9 @@ func (sch *Scheduler) run() {
 
 // Stop the scheduler.
 func (sch *Scheduler) Stop() {
+	if sch.cstop == nil {
+		return
+	}
 	select {
 	case sch.cstop <- struct{}{}:
 		// Wait for ACK.
