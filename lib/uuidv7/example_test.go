@@ -160,3 +160,10 @@ func ExampleUUID_Scan() {
 	// Output:
 	// 017F22E2-79B0-7CC3-98C4-DC0C0C07398F
 }
+
+func ExampleUUID_Time() {
+	id := uuidv7.Parse(`017F22E2-79B0-7CC3-98C4-DC0C0C07398F`)
+	fmt.Println(id.Time().UTC())
+	// Output:
+	// 2022-02-22 19:22:22 +0000 UTC
+}

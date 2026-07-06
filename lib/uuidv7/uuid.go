@@ -29,7 +29,7 @@ var NowFunc = func() time.Time {
 var RandFunc = func() (v uint64) {
 	b := make([]byte, 8)
 	rand.Read(b)
-	v, _ = binary.Uvarint(b)
+	v = binary.NativeEndian.Uint64(b)
 	return v
 }
 
