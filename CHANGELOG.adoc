@@ -39,6 +39,86 @@ Legend,
 * 💧: Chores
 
 
+[#v0_66_0]
+== pakakeh.go v0.66.0 (2026-07-06)
+
+This release has major refactoring on [lib/sql] and one breaking changes in
+the [lib/time.Scheduler].
+
+**🪵 lib/sql: remove field ListHolder in Meta**
+
+Instead of storing the list of holder, generates them when needed,
+especially in Holders() and UpdateFields() methods.
+
+**🪵 lib/sql: remove the Index field from Meta**
+
+Previously, the Index field is used to track the numeric holder for
+PostgreSQL driver.
+Along the time, we did not have any valid use cases to track it, so we
+can safely remove it here.
+
+**🪵 lib/sql: add prefix Bulk to method BindName and BindValues in Meta**
+
+The prefix indicates that those methods are for bulk insert operations.
+
+**🪵 lib/sql: remove the kind field and parameter from Meta**
+
+The original purpose of kind field is to increment the nholder so the
+Meta query can generate holder like $1, $2, ... for driver Postgresql.
+
+This changes add BindSelect to differentiate with Bind method for insert
+or update so we can remove the kind parameter and field from Meta.
+
+**🪵 lib/time: add method Start to Scheduler**
+
+Previously, the Scheduler automatically started when created
+using NewScheduler.
+On some cases, we did not want it that way, the Scheduler
+should be started explicitly.
+
+
+**🌱 lib/sql: add methods to generate SQL query**
+
+The Delete, Insert, Select, and Update returns the SQL query for delete,
+insert, select, and update statement, respectively.
+
+**🌱 lib/sql: add method BulkInsert**
+
+The BulkInsert method returns the string query for bulk insert.
+
+**🌱 lib/sql: add method BindOrderBy to Meta**
+
+The BindOrderBy method adds the column name and their order for
+generating SELECT...ORDER BY query.
+
+**🌱 lib/sql: add method BindLimit to set the query limit on select statement**
+
+**🌱 lib/sql: add method BindJoin and BindLeftJoin in Meta**
+
+The BindJoin method adds the JOIN statement for SELECT query, while
+BindLeftJoin method adds the LEFT JOIN statement.
+
+**🌱 lib/sql: implements common SQL DML using Meta and Session**
+
+By combining Meta and Session, this package provides functions to execute
+SQL delete, insert, select, and update by passing them into function.
+
+The Meta argument generate the DML query based on pre-defined bindings,
+while the Session argument execute the query.
+
+**🌼 lib/time: use [rand.Int] package to generate ID instead of NowFunc**
+
+In a module that override NowFunc() for testing, the returned time will
+always the same, and it would panic after 5 attempts.
+
+Instead of using NowFunc generate id using [crypto/rand.Int].
+
+**🌼 lib/uuidv7: use binary.NativeEndian to convert random bytes to uint64**
+
+Using binary.Uvarint does not read the full bytes and cause many zeros
+on generated UUID.
+
+
 [#v0_65_0]
 == pakakeh.go v0.65.0 (2026-06-07)
 
